@@ -15,10 +15,10 @@
     "noImplicitReturns": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   },
 
-  "include": ["src/**/*",
-    "src/__tests__/**/*"
-  ]
+  "include": ["src/**/*", "src/__tests__/**/*"]
 }
