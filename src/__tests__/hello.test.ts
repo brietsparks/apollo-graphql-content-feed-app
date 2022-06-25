@@ -1,10 +1,5 @@
-import { hello } from 'bak/hello';
-import { testOrm } from 'bak/ormtest';
+import { hello } from '../hello';
 
 test('hello', () => {
   expect(hello('world')).toEqual('Hello world');
-});
-
-test('orm', async () => {
-  await testOrm();
 });
