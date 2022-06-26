@@ -1,10 +1,25 @@
-import http from 'http';
+import { createApp } from './app';
 
-import { hello } from './hello';
+const action = process.argv[2];
 
-http.createServer(function (req, res) {
-  res.write(hello('world!')); //write a response
-  res.end();
-}).listen(3000, function(){
-  console.log("server start at port 3000");
-});
+const app = createApp();
+
+const vars = {
+  port: 3000
+};
+
+if (!action || action === 'serve') {
+  app.server.start().then(s => {
+    s.listen(vars.port, () => {
+      console.log(`listening on port ${vars.port}`)
+    });
+  });
+}
+
+if (action === 'db:up') {
+  app.db.migrate.up().then(process.exit);
+}
+
+if (action === 'db:down') {
+  app.db.migrate.down().then(process.exit);
+}

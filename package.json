@@ -14,6 +14,7 @@
     "nodemon": "^2.0.18",
     "prettier": "~2.6",
     "rimraf": "~3.0",
+    "testcontainers": "^8.11.0",
     "ts-jest": "~28.0",
     "ts-node": "^10.8.1",
     "tsutils": "~3.21",
@@ -21,6 +22,8 @@
   },
   "scripts": {
     "dev": "nodemon src/main.ts",
+    "db:up": "ts-node src/main.ts db:up",
+    "db:down": "ts-node src/main.ts db:down",
     "start": "node build/src/main.js",
     "clean": "rimraf coverage build tmp",
     "prebuild": "npm run lint",
@@ -28,12 +31,24 @@
     "build:release": "npm run clean && tsc -p tsconfig.release.json",
     "lint": "eslint . --ext .ts --ext .mts",
     "test": "jest",
-    "prettier": "prettier --config .prettierrc --write ."
+    "prettier": "prettier --config .prettierrc --write .",
+    "gql": "graphql-codegen --config codegen.yml"
   },
   "author": "Briet Sparks",
   "license": "Apache-2.0",
   "dependencies": {
-    "tslib": "~2.4"
+    "@graphql-codegen/cli": "2.2.2",
+    "@graphql-codegen/introspection": "2.1.0",
+    "@graphql-codegen/typescript": "^2.3.1",
+    "@graphql-codegen/typescript-resolvers": "2.4.0",
+    "@types/knex": "^0.16.1",
+    "@types/uuid": "^8.3.4",
+    "apollo-server": "^3.9.0",
+    "graphql": "^16.5.0",
+    "knex": "^0.95.6",
+    "pg": "^8.7.3",
+    "tslib": "~2.4",
+    "uuid": "^8.3.2"
   },
   "volta": {
     "node": "16.13.0"
