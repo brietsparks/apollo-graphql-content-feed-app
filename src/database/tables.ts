@@ -5,3 +5,9 @@ export const usersTable = table('users', {
   name: 'name',
   creationTimestamp: 'creation_timestamp'
 });
+
+export const projectsTable = table('projects', {
+  id: 'id',
+  name: 'name',
+  creationTimestamp: 'creation_timestamp'
+});

@@ -1,3 +1,5 @@
+
+
 create table users
 (
     id                 uuid primary key,
@@ -9,6 +11,7 @@ create table projects
 (
     id                 uuid primary key,
     creation_timestamp timestamptz default (now() at time zone 'utc'),
+    -- owner_id            uuid not null references users(id), -- ...eventually
     name               varchar(100)
 );
 
