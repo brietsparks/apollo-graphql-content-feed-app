@@ -1,16 +1,70 @@
 type Query {
   user(id: String!): User
+  users(pagination: CursorPaginationInput, sort: [SortInput]): PaginatedUsers!
+  issues(pagination: CursorPaginationInput, sort: [SortInput]): PaginatedIssues!
 }
 
 type Mutation {
   createUser(params: CreateUserParams!): User!
+  createIssue(params: CreateUserParams): Issue!
 }
 
+#
+# Common
+#
+input SortInput {
+  field: String!
+  direction: SortDirection!
+}
+
+enum SortDirection {
+  asc
+  desc
+}
+
+input CursorPaginationInput {
+  cursor: String
+  limit: Int
+}
+
+type CursorPaginationResult {
+  cursorPrev: String
+  cursorStart: String!
+  cursorEnd: String!
+  cursorNext: String
+  hasPrev: Boolean!
+  hasNext: Boolean!
+}
+
+#
+# Entities
+#
 type User {
   id: String!
+  creationTimestamp: String!
   name: String!
 }
 
 input CreateUserParams {
   name: String!
+}
+
+type PaginatedUsers {
+  items: [User]!
+  pagination: CursorPaginationResult!
+}
+
+type Issue {
+  id: String!
+  creationTimestamp: String!
+  name: String!
+}
+
+input CreateIssueParams {
+  name: String!
+}
+
+type PaginatedIssues {
+  items: [Issue]!
+  pagination: CursorPaginationResult!
 }

@@ -7,6 +7,11 @@ export interface CreateUserParams {
   name: string;
 }
 
+export interface GetUsersParmas {
+
+}
+
+
 export class UsersRepository {
   constructor(
     private db: Knex
@@ -30,5 +35,9 @@ export class UsersRepository {
       .select(usersTable.columns)
       .where({ [usersTable.columns.id]: id })
       .first();
+  }
+
+  getUsers = async () => {
+
   }
 }
