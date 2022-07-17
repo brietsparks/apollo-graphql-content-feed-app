@@ -7,7 +7,7 @@ import { RequestContext } from './context';
 
 export function makeUsersResolver(repositories: Repositories) {
   const createUser: IFieldResolver<unknown, RequestContext, schema.MutationCreateUserArgs> = (_, { params }) => {
-    return repositories.usersRepository.createUser(params);
+    return repositories.usersRepository.createUser(params, { commit: true });
   }
 
   const getUser: IFieldResolver<unknown, RequestContext, schema.QueryUserArgs> = (_, { id }) => {

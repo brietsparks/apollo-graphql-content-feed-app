@@ -6,7 +6,7 @@ import {  } from '../database';
 import { TransactionsHelper, TransactionOptions } from './transactions';
 
 export interface CreateProjectParams {
-
+  name: string;
 }
 
 export class ProjectsRepository {
@@ -21,8 +21,6 @@ export class ProjectsRepository {
   createProject = async (params: CreateProjectParams, opts: TransactionOptions) => {
     return this.trx.query(opts, (async (trx) => {
       const id = uuid();
-
-      trx.into
     }));
   }
 }

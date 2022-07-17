@@ -13,24 +13,17 @@ describe('UsersRepository', () => {
     await app.stop();
   });
 
-  test('createUser', async () => {
+  test('createUser and getUser', async () => {
     const params = {
       name: faker.name.firstName()
     };
-    const user = await app.repositories.usersRepository.createUser(params);
+    const creation = await app.repositories.usersRepository.createUser(params,{ commit: true });
+    const retrieval = await app.repositories.usersRepository.getUser(creation.id);
 
-    expect(user).toEqual({
+    expect(retrieval).toEqual({
       id: expect.any(String),
       name: params.name,
       creationTimestamp: expect.any(Date)
     });
-  });
-
-  test('getUser', async () => {
-    const creation = await app.repositories.usersRepository.createUser({
-      name: faker.name.firstName()
-    });
-    const retrieval = await app.repositories.usersRepository.getUser(creation.id);
-    expect(retrieval).toEqual(creation);
   });
 });
