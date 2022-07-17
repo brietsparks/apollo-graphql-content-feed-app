@@ -17,4 +17,5 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/**/*.d.mts',
   ],
+  testTimeout: 10000
 };

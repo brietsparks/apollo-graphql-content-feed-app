@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "description": "Minimalistic boilerplate to quick-start Node.js development in TypeScript.",
   "devDependencies": {
+    "@faker-js/faker": "^7.3.0",
     "@types/jest": "~27.5",
     "@types/node": "~16",
     "@typescript-eslint/eslint-plugin": "~5.26",
@@ -14,7 +15,7 @@
     "nodemon": "^2.0.18",
     "prettier": "~2.6",
     "rimraf": "~3.0",
-    "testcontainers": "^8.11.0",
+    "testcontainers": "^8.11.1",
     "ts-jest": "~28.0",
     "ts-node": "^10.8.1",
     "tsutils": "~3.21",
