@@ -30,7 +30,7 @@ input CursorPaginationInput {
 }
 
 type CursorPage {
-  prev: String
+  start: String
   end: String
   next: String
 }
