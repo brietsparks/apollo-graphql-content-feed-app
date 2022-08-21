@@ -2,7 +2,15 @@ import { createApp } from './app';
 
 const action = process.argv[2];
 
-const app = createApp();
+const app = createApp({
+  db: {
+    user: 'appuser',
+    password: 'apppassword',
+    host: '127.0.0.1',
+    database: 'example_app',
+    port: 5432
+  }
+});
 
 const vars = {
   port: 3000

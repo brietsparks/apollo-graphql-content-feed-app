@@ -4,9 +4,27 @@ import { v4 as uuid } from 'uuid';
 import { usersTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
+
+export type User = {
+  id: string;
+  name: string;
+  creationTimestamp: string;
+}
+
+export const defaultUserPaginationParams: CursorPaginationParams = {
+  field: usersTable.columns.creationTimestamp,
+  sortDirection: 'desc',
+  limit: 10,
+  fieldmap: usersTable.columns,
+}
 
 export interface CreateUserParams {
   name: string;
+}
+
+export interface GetUsersParams {
+  cursorPagination: CursorPaginationParams;
 }
 
 export class UsersRepository {
@@ -40,4 +58,20 @@ export class UsersRepository {
       .where({ [usersTable.columns.id]: id })
       .first();
   };
+
+  getUsers = async (params: GetUsersParams): Promise<CursorPaginationResult<User>> => {
+    const pagination = makeCursorPagination<User>({
+      ...defaultUserPaginationParams,
+      ...params.cursorPagination,
+    });
+
+    const users = await this.db
+      .from(usersTable.name)
+      .select(usersTable.columns)
+      .where(...pagination.where)
+      .orderBy(...pagination.orderBy)
+      .limit(pagination.limit);
+
+    return pagination.getResult(users);
+  }
 }

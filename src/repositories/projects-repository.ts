@@ -21,6 +21,8 @@ export interface GetPaginatedProjectsParams {
 }
 
 export class ProjectsRepository {
+  static defaultPaginationField = projectsTable.columns.creationTimestamp
+
   private trx: TransactionsHelper;
 
   constructor(
@@ -45,11 +47,9 @@ export class ProjectsRepository {
   };
 
   getPaginatedProjects = async (params: GetPaginatedProjectsParams): Promise<CursorPaginationResult<Project>> => {
-    const paginationColumn = projectsTable.columns[params.cursorPagination.field] || projectsTable.columns.creationTimestamp;
     const pagination = makeCursorPagination<Project>({
       fieldmap: projectsTable.columns,
       ...params.cursorPagination,
-      field: paginationColumn,
     });
 
     const projects = await this.db
@@ -58,7 +58,7 @@ export class ProjectsRepository {
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
-    
+
     return pagination.getResult(projects);
   };
 }

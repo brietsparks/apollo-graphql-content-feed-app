@@ -1,7 +1,7 @@
 type Query {
-  user(id: String!): User
-  users(pagination: CursorPaginationInput, sort: [SortInput]): PaginatedUsers!
-  issues(pagination: CursorPaginationInput, sort: [SortInput]): PaginatedIssues!
+  getUser(id: String!): User
+  getUsers(pagination: CursorPaginationInput!): PaginatedUsers!
+  getIssues(pagination: CursorPaginationInput!): PaginatedIssues!
 }
 
 type Mutation {
@@ -23,17 +23,16 @@ enum SortDirection {
 }
 
 input CursorPaginationInput {
+  field: String
+  sortDirection: SortDirection
   cursor: String
   limit: Int
 }
 
-type CursorPaginationResult {
-  cursorPrev: String
-  cursorStart: String!
-  cursorEnd: String!
-  cursorNext: String
-  hasPrev: Boolean!
-  hasNext: Boolean!
+type CursorPage {
+  prev: String
+  end: String
+  next: String
 }
 
 #
@@ -51,7 +50,7 @@ input CreateUserParams {
 
 type PaginatedUsers {
   items: [User]!
-  pagination: CursorPaginationResult!
+  page: CursorPage!
 }
 
 type Issue {
@@ -66,5 +65,5 @@ input CreateIssueParams {
 
 type PaginatedIssues {
   items: [Issue]!
-  pagination: CursorPaginationResult!
+  page: CursorPage!
 }

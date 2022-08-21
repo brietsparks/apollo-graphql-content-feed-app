@@ -14,13 +14,44 @@ export type Scalars = {
   Float: number;
 };
 
+export type CreateIssueParams = {
+  name: Scalars['String'];
+};
+
 export type CreateUserParams = {
+  name: Scalars['String'];
+};
+
+export type CursorPaginationInput = {
+  cursor?: InputMaybe<Scalars['String']>;
+  field?: InputMaybe<Scalars['String']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  sortDirection?: InputMaybe<SortDirection>;
+};
+
+export type CursorPaginationResultCursors = {
+  __typename?: 'CursorPaginationResultCursors';
+  end?: Maybe<Scalars['String']>;
+  next?: Maybe<Scalars['String']>;
+  prev?: Maybe<Scalars['String']>;
+};
+
+export type Issue = {
+  __typename?: 'Issue';
+  creationTimestamp: Scalars['String'];
+  id: Scalars['String'];
   name: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createIssue: Issue;
   createUser: User;
+};
+
+
+export type MutationCreateIssueArgs = {
+  params?: InputMaybe<CreateUserParams>;
 };
 
 
@@ -28,18 +59,54 @@ export type MutationCreateUserArgs = {
   params: CreateUserParams;
 };
 
+export type PaginatedIssues = {
+  __typename?: 'PaginatedIssues';
+  items: Array<Maybe<Issue>>;
+  pagination: CursorPaginationResultCursors;
+};
+
+export type PaginatedUsers = {
+  __typename?: 'PaginatedUsers';
+  items: Array<Maybe<User>>;
+  page: CursorPaginationResultCursors;
+};
+
 export type Query = {
   __typename?: 'Query';
-  user?: Maybe<User>;
+  getIssues: PaginatedIssues;
+  getUser?: Maybe<User>;
+  getUsers: PaginatedUsers;
 };
 
 
-export type QueryUserArgs = {
+export type QueryGetIssuesArgs = {
+  pagination: CursorPaginationInput;
+};
+
+
+export type QueryGetUserArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryGetUsersArgs = {
+  pagination: CursorPaginationInput;
+};
+
+export enum SortDirection {
+  Asc = 'asc',
+  Desc = 'desc'
+}
+
+export type SortInput = {
+  direction: SortDirection;
+  field: Scalars['String'];
 };
 
 export type User = {
   __typename?: 'User';
+  creationTimestamp: Scalars['String'];
+  id: Scalars['String'];
   name: Scalars['String'];
 };
 
@@ -113,9 +180,18 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  CreateIssueParams: CreateIssueParams;
   CreateUserParams: CreateUserParams;
+  CursorPaginationInput: CursorPaginationInput;
+  CursorPaginationResultCursors: ResolverTypeWrapper<CursorPaginationResultCursors>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
+  Issue: ResolverTypeWrapper<Issue>;
   Mutation: ResolverTypeWrapper<{}>;
+  PaginatedIssues: ResolverTypeWrapper<PaginatedIssues>;
+  PaginatedUsers: ResolverTypeWrapper<PaginatedUsers>;
   Query: ResolverTypeWrapper<{}>;
+  SortDirection: SortDirection;
+  SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
 };
@@ -123,28 +199,71 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  CreateIssueParams: CreateIssueParams;
   CreateUserParams: CreateUserParams;
+  CursorPaginationInput: CursorPaginationInput;
+  CursorPaginationResultCursors: CursorPaginationResultCursors;
+  Int: Scalars['Int'];
+  Issue: Issue;
   Mutation: {};
+  PaginatedIssues: PaginatedIssues;
+  PaginatedUsers: PaginatedUsers;
   Query: {};
+  SortInput: SortInput;
   String: Scalars['String'];
   User: User;
 };
 
+export type CursorPaginationResultCursorsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginationResultCursors'] = ResolversParentTypes['CursorPaginationResultCursors']> = {
+  end?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  next?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  prev?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type IssueResolvers<ContextType = any, ParentType extends ResolversParentTypes['Issue'] = ResolversParentTypes['Issue']> = {
+  creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  createIssue?: Resolver<ResolversTypes['Issue'], ParentType, ContextType, RequireFields<MutationCreateIssueArgs, never>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'params'>>;
 };
 
+export type PaginatedIssuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedIssues'] = ResolversParentTypes['PaginatedIssues']> = {
+  items?: Resolver<Array<Maybe<ResolversTypes['Issue']>>, ParentType, ContextType>;
+  pagination?: Resolver<ResolversTypes['CursorPaginationResultCursors'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PaginatedUsersResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedUsers'] = ResolversParentTypes['PaginatedUsers']> = {
+  items?: Resolver<Array<Maybe<ResolversTypes['User']>>, ParentType, ContextType>;
+  page?: Resolver<ResolversTypes['CursorPaginationResultCursors'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, 'id'>>;
+  getIssues?: Resolver<ResolversTypes['PaginatedIssues'], ParentType, ContextType, RequireFields<QueryGetIssuesArgs, 'pagination'>>;
+  getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
+  getUsers?: Resolver<ResolversTypes['PaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersArgs, 'pagination'>>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
+  creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
+  CursorPaginationResultCursors?: CursorPaginationResultCursorsResolvers<ContextType>;
+  Issue?: IssueResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  PaginatedIssues?: PaginatedIssuesResolvers<ContextType>;
+  PaginatedUsers?: PaginatedUsersResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
