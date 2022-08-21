@@ -4,14 +4,20 @@ import { v4 as uuid } from 'uuid';
 import { projectsTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, makePagination } from './pagination';
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
+
+export type Project = {
+  id: string;
+  name: string;
+  creationTimestamp: Date;
+}
 
 export interface CreateProjectParams {
   name: string;
 }
 
 export interface GetPaginatedProjectsParams {
-  pagination: CursorPaginationParams;
+  cursorPagination: CursorPaginationParams;
 }
 
 export class ProjectsRepository {
@@ -38,9 +44,21 @@ export class ProjectsRepository {
     }));
   };
 
-  getPaginatedProjects = async (params: GetPaginatedProjectsParams) => {
-    const q = this.db
+  getPaginatedProjects = async (params: GetPaginatedProjectsParams): Promise<CursorPaginationResult<Project>> => {
+    const paginationColumn = projectsTable.columns[params.cursorPagination.field] || projectsTable.columns.creationTimestamp;
+    const pagination = makeCursorPagination<Project>({
+      fieldmap: projectsTable.columns,
+      ...params.cursorPagination,
+      field: paginationColumn,
+    });
+
+    const projects = await this.db
       .from(projectsTable.name)
-      .select(projectsTable.columns);
+      .select(projectsTable.columns)
+      .where(...pagination.where)
+      .orderBy(...pagination.orderBy)
+      .limit(pagination.limit);
+    
+    return pagination.getResult(projects);
   };
 }

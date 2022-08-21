@@ -1,128 +1,124 @@
-export interface CursorPaginationParams<T> {
-  cursor?: T;
+import { invert } from 'lodash';
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface Sort<T extends string[]> {
+  field: T;
+  direction: SortDirection;
+}
+
+export interface CursorPaginationResult<RecordType, CursorType = any> {
+  items: RecordType[];
+  page: CursorPage<CursorType>;
+}
+
+export interface CursorPaginationParams<CursorType = any> {
+  field: string;
+  sortDirection: SortDirection;
+  cursor?: CursorType;
   limit: number;
+  fieldmap?: Record<string, string>;
 }
 
-export interface CursorPaginationResult {
-  prev?: string;
-  start?: string;
-  end?: string;
-  next?: string;
+export type CursorPagination<RecordType, CursorType> =
+  Predicate<CursorType> & {
+  getResult: (items: RecordType[]) => CursorPaginationResult<RecordType>;
+  getPage: (items: RecordType[]) => CursorPage<CursorType>;
+  getItems: (items: RecordType[]) => RecordType[];
 }
 
-export interface CursorPaginatedItems<T> {
-  items: T[];
-  pagination: CursorPaginationResult;
+export interface CursorPage<CursorType> {
+  start?: CursorType;
+  end?: CursorType;
+  next?: CursorType;
+}
+
+export interface Predicate<CursorType> {
+  orderBy: OrderBy;
+  limit: number;
+  where: Where<CursorType>;
 }
 
 export type Comparator = '>=' | '<=';
 
-export function makePagination<T>(column: string, sortDirection: 'asc' | 'desc', params: CursorPaginationParams<T>) {
-  const comparator = sortDirection === 'asc' ? '>=' : '<=';
-  const orderBy: [string, Comparator] = [column, comparator]
-  const where: [any, string, any] = params.cursor ? [column, comparator, params.cursor] : [1, '=', 1];
+export type OrderBy = [string, SortDirection];
 
-  const predicate = {
+export type Where<CursorType> = [string, Comparator, CursorType];
+
+export function makeCursorPagination<RecordType, CursorType = any>(params: CursorPaginationParams<CursorType>): CursorPagination<RecordType, CursorType> {
+  const comparator: Comparator = params.sortDirection === 'asc' ? '>=' : '<=';
+  const orderBy: OrderBy = [params.field, params.sortDirection];
+  const where: Where<CursorType> = params.cursor ? [params.field, comparator, params.cursor] : ([1, '=', 1] as any);
+
+  const specifiedLimit = params.limit;
+  const queriedLimit = params.limit + 1; // +1 to get the next cursor
+
+  const predicate: Predicate<CursorType> = {
     orderBy,
-    limit: params.limit,
+    limit: queriedLimit,
     where
   };
 
-
-  function getPaginatedItems<T>(retrievedItems: unknown[]) {
+  function getPage(retrievedItems: unknown[]): CursorPage<CursorType> {
     if (retrievedItems.length === 0) {
-    return {
-      items: [],
-      pagination: {
-        hasNext: false,
-        cursorStart: params.cursor,
-        cursorNext: params.cursor
-      }
+      return {
+        start: params.cursor,
+        end: params.cursor,
+        next: undefined,
+      };
     }
+
+    const itemCursorField = params.fieldmap ? invert(params.fieldmap)[params.field] : params.field;
+
+    if (retrievedItems.length <= specifiedLimit) {
+      return {
+        start: params.cursor,
+        end: retrievedItems[retrievedItems.length - 1][itemCursorField],
+        next: undefined
+      };
+    }
+
+    if (retrievedItems.length === queriedLimit) {
+      return {
+        start: params.cursor,
+        end: retrievedItems[specifiedLimit - 1][itemCursorField],
+        next: retrievedItems[queriedLimit - 1][itemCursorField]
+      };
+    }
+
+    throw new Error('invalid cursor pagination state');
   }
 
-  if (retrievedItems.length <= this.params.limit) {
-    return {
-      items: retrievedItems as T[],
-      pagination: {
-        hasMore: false,
-        cursor: retrievedItems[retrievedItems.length - 1][this.params.field]
-      }
+
+  function getItems(retrievedItems: RecordType[]): RecordType[] {
+    if (retrievedItems.length === 0) {
+      return [];
     }
+
+    if (retrievedItems.length <= specifiedLimit) {
+      return retrievedItems;
+    }
+
+    if (retrievedItems.length === queriedLimit) {
+      const returnableItems = [...retrievedItems];
+      returnableItems.pop();
+      return returnableItems;
+    }
+
+    throw new Error('invalid cursor pagination state');
   }
 
-  const hasMore = retrievedItems.length > this.params.limit;
-
-  const returnableItems = [...retrievedItems];
-  returnableItems.pop();
-  const cursor = returnableItems[returnableItems.length - 1][this.params.field];
-
-  return {
-    items: returnableItems as T[],
-    pagination: {
-      hasMore,
-      cursor
+  function getResult(retrievedItems: RecordType[]): CursorPaginationResult<RecordType> {
+    return {
+      items: getItems(retrievedItems),
+      page: getPage(retrievedItems)
     }
-  };
-}
+  }
 
   return {
     ...predicate,
-    getPaginatedItems
+    getResult,
+    getPage,
+    getItems,
   };
 }
-
-
-
-// export class Pagination {
-//   constructor(
-//     public column: string,
-//     public sortDirection: 'asc' | 'desc',
-//     public params: CursorPaginationParams
-//   ) {}
-//
-//   getPredicate() {
-//     const comparator = this.sortDirection === 'asc' ? '>=' : '<=';
-//     return {
-//       orderBy: [this.column, comparator],
-//       limit: this.params.limit,
-//       where: [this.column, comparator, this.params.cursor]
-//     }
-//   }
-//
-//   getPaginatedItems<T>(retrievedItems: unknown[]) {
-//     if (retrievedItems.length === 0) {
-//       return {
-//         items: [],
-//         pagination: {
-//           hasMore: false,
-//           cursor: this.params.cursor
-//         }
-//       }
-//     }
-//
-//     if (retrievedItems.length <= this.params.limit) {
-//       return {
-//         items: retrievedItems as T[],
-//         pagination: {
-//           hasMore: false,
-//           cursor: retrievedItems[retrievedItems.length - 1][this.column]
-//         }
-//       }
-//     }
-//
-//     const hasMore = retrievedItems.length > this.params.limit;
-//
-//     const returnableItems = [...retrievedItems];
-//     returnableItems.pop();
-//     const cursor = returnableItems[returnableItems.length - 1][this.column];
-//
-//     return {
-//       items: returnableItems as T[],
-//       pagination: {
-//         hasMore,
-//         cursor
-//       }
-//     };
-//   }
-// }
