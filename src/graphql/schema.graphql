@@ -1,6 +1,8 @@
 type Query {
   getUser(id: String!): User
-  getUsers(pagination: CursorPaginationInput!): PaginatedUsers!
+  getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
+  getUsersByCursor(pagination: CursorPaginationInput!): CursorPaginatedUsers!
+  getUsersByOffset(pagination: OffsetPaginationInput!): OffsetPaginatedUsers!
   getIssues(pagination: CursorPaginationInput!): PaginatedIssues!
 }
 
@@ -35,6 +37,13 @@ type CursorPage {
   next: String
 }
 
+input OffsetPaginationInput {
+  sortField: String
+  sortDirection: SortDirection
+  offset: Int
+  limit: Int
+}
+
 #
 # Entities
 #
@@ -48,9 +57,13 @@ input CreateUserParams {
   name: String!
 }
 
-type PaginatedUsers {
-  items: [User]!
+type CursorPaginatedUsers {
+  items: [User!]!
   page: CursorPage!
+}
+
+type OffsetPaginatedUsers {
+  items: [User!]!
 }
 
 type Issue {
@@ -64,6 +77,6 @@ input CreateIssueParams {
 }
 
 type PaginatedIssues {
-  items: [Issue]!
+  items: [Issue!]!
   page: CursorPage!
 }
