@@ -86,7 +86,7 @@ export function makeCursorPagination<RecordType, CursorType = any>(params: Curso
       };
     }
 
-    throw new Error('invalid cursor pagination state');
+    throw new Error('invalid cursor pagination state in getPage. This is probably a bug with the library');
   }
 
 
@@ -105,7 +105,7 @@ export function makeCursorPagination<RecordType, CursorType = any>(params: Curso
       return returnableItems;
     }
 
-    throw new Error('invalid cursor pagination state');
+    throw new Error('invalid cursor pagination state in getItems. This is probably a bug with the library');
   }
 
   function getResult(retrievedItems: RecordType[]): CursorPaginationResult<RecordType> {
