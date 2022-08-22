@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 
 import { createPgTestcontainer, makeKnexClient } from '../database';
 
-import { makePagination } from '../repositories/pagination';
+import { makeCursorPagination } from '../repositories/pagination';
 
 describe('makePagination', () => {
   let testcontainer: StartedTestContainer;
@@ -37,11 +37,11 @@ describe('makePagination', () => {
   });
 
   it('returns paginated items', async () => {
-    const pagination = makePagination<number>(
-      'id',
-      'asc',
-      { limit: 2, cursor: 3 }
-    );
+    const pagination = makeCursorPagination<any>({
+      limit: 3,
+      sortDirection: 'desc',
+      field: 'id',
+    });
 
     const result = await db
       .from('items')
