@@ -138,7 +138,8 @@ export class UsersRepository {
       sortField: usersTable.columns[params.pagination.sortField] || defaultUserPageOffsetPaginationParams.sortField
     };
 
-    const pageOffset = pagination.page > 0 ? pagination.page - 1 : 0;
+    const currentPage = pagination.page > 0 ? pagination.page : 1;
+    const pageOffset = currentPage - 1;
     const offset = pageOffset * pagination.limit;
 
     const users = await this.db
@@ -148,9 +149,19 @@ export class UsersRepository {
       .limit(pagination.limit)
       .orderBy(pagination.sortField, pagination.sortDirection);
 
+    const usersCount = await this.db
+      .from(usersTable.name)
+      .count('*');
+
+    const lastPage = Math.ceil(usersCount[0].count / pagination.limit);
+
     return {
       items: users,
-      page: pagination
+      page: {
+        current: currentPage,
+        last: lastPage,
+        totalItems: usersCount[0].count
+      }
     };
   };
 }

@@ -23,8 +23,10 @@ export function makeUsersResolver(repositories: Repositories) {
     return repositories.usersRepository.getUsersByItemOffset({ pagination });
   };
 
-  const getUsersByPageOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByPageOffsetArgs> = (_, { pagination }) => {
-    return repositories.usersRepository.getUsersByPageOffset({ pagination });
+  const getUsersByPageOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByPageOffsetArgs> = async (_, { pagination }) => {
+    const result = await repositories.usersRepository.getUsersByPageOffset({ pagination });
+    console.log({ result });
+    return result;
   }
 
   const getUsers = getUsersByCursor;
