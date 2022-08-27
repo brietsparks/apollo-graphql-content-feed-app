@@ -1,4 +1,4 @@
-import { Repositories } from '../../repositories';
+import { Repositories } from '../repositories';
 
 import { makeUsersResolver } from './users-resolver';
 import { makeProjectsResolver } from './projects-resolver';

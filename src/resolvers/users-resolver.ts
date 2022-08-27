@@ -1,9 +1,9 @@
 import { IFieldResolver } from '@graphql-tools/utils';
 
-import { Repositories, User } from '../../repositories';
-import * as schema from '../../graphql';
+import { Repositories, User } from '../repositories';
+import * as schema from '../graphql';
 
-import { adaptCursorPagination } from '../adapters';
+import { adaptCursorPagination } from './adapters';
 import { RequestContext } from './context';
 
 export function makeUsersResolver(repositories: Repositories) {

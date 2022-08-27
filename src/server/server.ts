@@ -3,8 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { readFileSync } from 'fs';
 
 import { Repositories } from '../repositories';
-
-import { makeResolvers } from './resolvers';
+import { makeResolvers } from '../resolvers';
 
 const typeDefs = readFileSync(require.resolve('../graphql/schema.graphql')).toString('utf-8');
 
