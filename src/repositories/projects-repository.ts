@@ -21,8 +21,6 @@ export interface GetProjectsByCursorParams {
 }
 
 export class ProjectsRepository {
-  static defaultPaginationField = projectsTable.columns.creationTimestamp
-
   private trx: TransactionsHelper;
 
   constructor(

@@ -5,7 +5,7 @@ export interface Table<T extends Record<string, string>> {
   name: string;
   columns: T;
   prefixedColumns: Record<keyof T, string>;
-  writeColumns: (values: Partial<Record<keyof T, unknown>>) => Record<string, unknown>;
+  writeColumns: (values: Partial<Record<keyof T, unknown>>) => Record<T[keyof T], unknown>;
 }
 
 export function table<T extends Record<string, string>>(name: string, columns: T): Table<T> {
@@ -14,11 +14,12 @@ export function table<T extends Record<string, string>>(name: string, columns: T
     prefixedColumns[appColumnName] = `${name}.${dbColumnName}`;
   }
 
-  function writeColumns(values: Partial<Record<keyof T, unknown>>) {
+  // todo: function writeColumns<EntityType>
+  function writeColumns(values: Partial<Record<keyof T, unknown>>): Record<T[keyof T], unknown> {
     return Object.entries(values).reduce((acc, [field, value]) => {
       acc[columns[field]] = value;
       return acc;
-    }, {});
+    }, {} as Record<T[keyof T], unknown>);
   }
 
   return {

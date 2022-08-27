@@ -15,7 +15,10 @@ export type Scalars = {
 };
 
 export type CreateIssueParams = {
+  assigneeId?: InputMaybe<Scalars['String']>;
+  description?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
+  statusId?: InputMaybe<Scalars['String']>;
 };
 
 export type CreateProjectParams = {
@@ -54,9 +57,12 @@ export type CursorPaginationInput = {
 
 export type Issue = {
   __typename?: 'Issue';
+  assigneeId?: Maybe<Scalars['String']>;
   creationTimestamp: Scalars['String'];
+  description?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   name: Scalars['String'];
+  statusId?: Maybe<Scalars['String']>;
 };
 
 export type Mutation = {
@@ -68,7 +74,7 @@ export type Mutation = {
 
 
 export type MutationCreateIssueArgs = {
-  params: CreateUserParams;
+  params: CreateIssueParams;
 };
 
 
@@ -115,7 +121,9 @@ export type Project = {
 
 export type Query = {
   __typename?: 'Query';
+  getIssue?: Maybe<Issue>;
   getIssues: PaginatedIssues;
+  getIssuesByCursor: PaginatedIssues;
   getProject?: Maybe<Project>;
   getProjects: CursorPaginatedProjects;
   getProjectsByCursor: CursorPaginatedProjects;
@@ -127,7 +135,17 @@ export type Query = {
 };
 
 
+export type QueryGetIssueArgs = {
+  id?: InputMaybe<Scalars['String']>;
+};
+
+
 export type QueryGetIssuesArgs = {
+  pagination: CursorPaginationInput;
+};
+
+
+export type QueryGetIssuesByCursorArgs = {
   pagination: CursorPaginationInput;
 };
 
@@ -324,9 +342,12 @@ export type CursorPaginatedUsersResolvers<ContextType = any, ParentType extends 
 };
 
 export type IssueResolvers<ContextType = any, ParentType extends ResolversParentTypes['Issue'] = ResolversParentTypes['Issue']> = {
+  assigneeId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  statusId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -355,7 +376,9 @@ export type ProjectResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getIssue?: Resolver<Maybe<ResolversTypes['Issue']>, ParentType, ContextType, RequireFields<QueryGetIssueArgs, never>>;
   getIssues?: Resolver<ResolversTypes['PaginatedIssues'], ParentType, ContextType, RequireFields<QueryGetIssuesArgs, 'pagination'>>;
+  getIssuesByCursor?: Resolver<ResolversTypes['PaginatedIssues'], ParentType, ContextType, RequireFields<QueryGetIssuesByCursorArgs, 'pagination'>>;
   getProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryGetProjectArgs, 'id'>>;
   getProjects?: Resolver<ResolversTypes['CursorPaginatedProjects'], ParentType, ContextType, RequireFields<QueryGetProjectsArgs, 'pagination'>>;
   getProjectsByCursor?: Resolver<ResolversTypes['CursorPaginatedProjects'], ParentType, ContextType, RequireFields<QueryGetProjectsByCursorArgs, 'pagination'>>;

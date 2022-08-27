@@ -7,13 +7,15 @@ type Query {
   getProject(id: String!): Project
   getProjects(pagination: CursorPaginationInput!): CursorPaginatedProjects!
   getProjectsByCursor(pagination: CursorPaginationInput!): CursorPaginatedProjects!
+  getIssue(id: String): Issue
   getIssues(pagination: CursorPaginationInput!): PaginatedIssues!
+  getIssuesByCursor(pagination: CursorPaginationInput!): PaginatedIssues!
 }
 
 type Mutation {
   createUser(params: CreateUserParams!): User!
   createProject(params: CreateProjectParams!): Project!
-  createIssue(params: CreateUserParams!): Issue!
+  createIssue(params: CreateIssueParams!): Issue!
 }
 
 #
@@ -96,11 +98,17 @@ input CreateProjectParams {
 type Issue {
   id: String!
   creationTimestamp: String!
+  assigneeId: String
+  statusId: String
   name: String!
+  description: String
 }
 
 input CreateIssueParams {
   name: String!
+  assigneeId: String
+  statusId: String
+  description: String
 }
 
 type PaginatedIssues {

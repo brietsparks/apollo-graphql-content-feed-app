@@ -11,3 +11,12 @@ export const projectsTable = table('projects', {
   name: 'name',
   creationTimestamp: 'creation_timestamp'
 });
+
+export const issuesTable = table('issues', {
+  id: 'id',
+  creationTimestamp: 'creation_timestamp',
+  assigneeId: 'assignee_id',
+  statusId: 'status_id',
+  name: 'name',
+  description: 'description',
+});
