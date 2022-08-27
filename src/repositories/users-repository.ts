@@ -99,6 +99,7 @@ export class UsersRepository {
     const pagination = makeCursorPagination<User>({
       ...defaultUserCursorPaginationParams,
       ...params.pagination,
+      field: usersTable.columns[params.pagination.field] || defaultUserCursorPaginationParams.field
     });
 
     const users = await this.db

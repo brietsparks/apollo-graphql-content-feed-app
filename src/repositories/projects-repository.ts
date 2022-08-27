@@ -16,8 +16,8 @@ export interface CreateProjectParams {
   name: string;
 }
 
-export interface GetPaginatedProjectsParams {
-  cursorPagination: CursorPaginationParams;
+export interface GetProjectsByCursorParams {
+  pagination: CursorPaginationParams;
 }
 
 export class ProjectsRepository {
@@ -46,11 +46,8 @@ export class ProjectsRepository {
     }));
   };
 
-  getPaginatedProjects = async (params: GetPaginatedProjectsParams): Promise<CursorPaginationResult<Project>> => {
-    const pagination = makeCursorPagination<Project>({
-      fieldmap: projectsTable.columns,
-      ...params.cursorPagination,
-    });
+  getProjectsByCursor = async (params: GetProjectsByCursorParams): Promise<CursorPaginationResult<Project>> => {
+    const pagination = makeProjectsCursorPagination(params.pagination);
 
     const projects = await this.db
       .from(projectsTable.name)
@@ -61,4 +58,18 @@ export class ProjectsRepository {
 
     return pagination.getResult(projects);
   };
+}
+
+export function makeProjectsCursorPagination(params: Partial<CursorPaginationParams>) {
+  const defaultParams: CursorPaginationParams = {
+    field: projectsTable.columns.creationTimestamp,
+    sortDirection: 'desc',
+    limit: 10,
+    fieldmap: projectsTable.columns,
+  };
+
+  return makeCursorPagination<Project>({
+    ...defaultParams,
+    ...params,
+  });
 }

@@ -47,7 +47,8 @@ export type Where<CursorType> = [string, Comparator, CursorType];
 
 export function makeCursorPagination<RecordType, CursorType = any>(params: CursorPaginationParams<CursorType>): CursorPagination<RecordType, CursorType> {
   const comparator: Comparator = params.sortDirection === 'asc' ? '>=' : '<=';
-  const orderBy: OrderBy = [params.field, params.sortDirection];
+  const orderByColumn = params.fieldmap ? params.fieldmap[params.field] : params.field;
+  const orderBy: OrderBy = [orderByColumn, params.sortDirection];
   const where: Where<CursorType> = params.cursor ? [params.field, comparator, params.cursor] : ([1, '=', 1] as any);
 
   const specifiedLimit = params.limit;
