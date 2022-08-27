@@ -1,8 +1,9 @@
 import { IFieldResolver } from '@graphql-tools/utils';
 
-import { Repositories } from '../../repositories';
+import { Repositories, User } from '../../repositories';
 import * as schema from '../../graphql';
 
+import { adaptCursorPagination } from '../adapters';
 import { RequestContext } from './context';
 
 export function makeUsersResolver(repositories: Repositories) {
@@ -16,7 +17,9 @@ export function makeUsersResolver(repositories: Repositories) {
   };
 
   const getUsersByCursor: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByCursorArgs> = (_, { pagination }) => {
-    return repositories.usersRepository.getUsersByCursor({ pagination });
+    return repositories.usersRepository.getUsersByCursor({
+      pagination: adaptCursorPagination<User>(pagination)
+    });
   };
 
   const getUsersByOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByOffsetArgs> = (_, { pagination }) => {
@@ -24,17 +27,10 @@ export function makeUsersResolver(repositories: Repositories) {
   };
 
   const getUsersByPageOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByPageOffsetArgs> = async (_, { pagination }) => {
-    const result = await repositories.usersRepository.getUsersByPageOffset({ pagination });
-    console.log({ result });
-    return result;
+    return repositories.usersRepository.getUsersByPageOffset({ pagination });
   }
 
   const getUsers = getUsersByCursor;
-
-  const getUserFields = {
-    id: (u) => u.id,
-    name: (u) => u.name
-  };
 
   return {
     Query: {
@@ -47,6 +43,10 @@ export function makeUsersResolver(repositories: Repositories) {
     Mutation: {
       createUser
     },
-    User: getUserFields
+    User: {
+      id: (u) => u.id,
+      name: (u) => u.name,
+      creationTimestamp: (u) => u.creationTimestamp
+    }
   }
 }

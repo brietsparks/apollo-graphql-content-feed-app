@@ -26,8 +26,8 @@ export type User = {
   creationTimestamp: string;
 }
 
-export const defaultUserCursorPaginationParams: CursorPaginationParams = {
-  field: usersTable.columns.creationTimestamp,
+export const defaultUserCursorPaginationParams: CursorPaginationParams<User> = {
+  field: 'creationTimestamp',
   sortDirection: 'desc',
   limit: 10,
   fieldmap: usersTable.columns,
@@ -52,7 +52,7 @@ export interface CreateUserParams {
 }
 
 export interface GetUsersByCursorParams {
-  pagination: Partial<CursorPaginationParams>;
+  pagination: Partial<CursorPaginationParams<User>>;
 }
 
 export interface GetUsersByItemOffsetParams {
@@ -78,10 +78,10 @@ export class UsersRepository {
 
       await trx
         .into(usersTable.name)
-        .insert({
-          [usersTable.columns.id]: id,
-          [usersTable.columns.name]: params.name
-        });
+        .insert(usersTable.writeColumns({
+          id,
+          name: params.name
+        }));
 
       return { id };
     });
@@ -96,11 +96,7 @@ export class UsersRepository {
   };
 
   getUsersByCursor = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
-    const pagination = makeCursorPagination<User>({
-      ...defaultUserCursorPaginationParams,
-      ...params.pagination,
-      field: usersTable.columns[params.pagination.field] || defaultUserCursorPaginationParams.field
-    });
+    const pagination = makeUsersCursorPagination(params.pagination);
 
     const users = await this.db
       .from(usersTable.name)
@@ -165,4 +161,18 @@ export class UsersRepository {
       }
     };
   };
+}
+
+export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<User>>) {
+  const defaultParams: CursorPaginationParams<User> = {
+    field: 'creationTimestamp',
+    sortDirection: 'desc',
+    limit: 10,
+    fieldmap: usersTable.columns,
+  };
+
+  return makeCursorPagination<User>({
+    ...defaultParams,
+    ...params,
+  });
 }

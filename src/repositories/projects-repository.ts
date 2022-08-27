@@ -17,7 +17,7 @@ export interface CreateProjectParams {
 }
 
 export interface GetProjectsByCursorParams {
-  pagination: CursorPaginationParams;
+  pagination: Partial<CursorPaginationParams<Project>>;
 }
 
 export class ProjectsRepository {
@@ -37,13 +37,21 @@ export class ProjectsRepository {
 
       await trx
         .into(projectsTable.name)
-        .insert({
-          [projectsTable.columns.id]: id,
-          [projectsTable.columns.name]: params.name,
-        });
+        .insert(projectsTable.writeColumns({
+          id,
+          name: params.name
+        }));
 
       return { id };
     }));
+  };
+
+  getProject = async (id: string) => {
+    return this.db
+      .from(projectsTable.name)
+      .select(projectsTable.columns)
+      .where({ [projectsTable.columns.id]: id })
+      .first();
   };
 
   getProjectsByCursor = async (params: GetProjectsByCursorParams): Promise<CursorPaginationResult<Project>> => {
@@ -60,9 +68,9 @@ export class ProjectsRepository {
   };
 }
 
-export function makeProjectsCursorPagination(params: Partial<CursorPaginationParams>) {
-  const defaultParams: CursorPaginationParams = {
-    field: projectsTable.columns.creationTimestamp,
+export function makeProjectsCursorPagination(params: Partial<CursorPaginationParams<Project>>) {
+  const defaultParams: CursorPaginationParams<Project> = {
+    field: 'creationTimestamp',
     sortDirection: 'desc',
     limit: 10,
     fieldmap: projectsTable.columns,

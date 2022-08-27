@@ -2,6 +2,10 @@ import { Knex } from 'knex';
 import pg from 'pg';
 
 import { UsersRepository } from './users-repository';
+import { ProjectsRepository } from './projects-repository';
+
+export * from './users-repository';
+export * from './projects-repository';
 
 export type Repositories = ReturnType<typeof makeRepositories>;
 
@@ -9,9 +13,11 @@ export function makeRepositories(db: Knex) {
   configurePgParsers();
 
   const usersRepository = new UsersRepository(db);
+  const projectsRepository = new ProjectsRepository(db);
 
   return {
-    usersRepository
+    usersRepository,
+    projectsRepository,
   };
 }
 

@@ -1,5 +1,3 @@
-import { invert } from 'lodash';
-
 export type SortDirection = 'asc' | 'desc';
 
 export interface Sort<T extends string[]> {
@@ -12,12 +10,12 @@ export interface CursorPaginationResult<RecordType, CursorType = any> {
   page: CursorPage<CursorType>;
 }
 
-export interface CursorPaginationParams<CursorType = any> {
-  field: string;
+export interface CursorPaginationParams<RecordType, CursorType = any> {
+  field: keyof RecordType;
   sortDirection: SortDirection;
   cursor?: CursorType;
   limit: number;
-  fieldmap?: Record<string, string>;
+  fieldmap?: Record<keyof RecordType, string>;
 }
 
 export type CursorPagination<RecordType, CursorType> =
@@ -45,11 +43,11 @@ export type OrderBy = [string, SortDirection];
 
 export type Where<CursorType> = [string, Comparator, CursorType];
 
-export function makeCursorPagination<RecordType, CursorType = any>(params: CursorPaginationParams<CursorType>): CursorPagination<RecordType, CursorType> {
+export function makeCursorPagination<RecordType, CursorType extends RecordType[keyof RecordType] = RecordType[keyof RecordType]>(params: CursorPaginationParams<RecordType, CursorType>): CursorPagination<RecordType, CursorType> {
+  const column = params.fieldmap ? params.fieldmap[params.field] : params.field;
+  const orderBy: OrderBy = [column as string, params.sortDirection];
   const comparator: Comparator = params.sortDirection === 'asc' ? '>=' : '<=';
-  const orderByColumn = params.fieldmap ? params.fieldmap[params.field] : params.field;
-  const orderBy: OrderBy = [orderByColumn, params.sortDirection];
-  const where: Where<CursorType> = params.cursor ? [params.field, comparator, params.cursor] : ([1, '=', 1] as any);
+  const where: Where<CursorType> = params.cursor ? [column, comparator, params.cursor] : ([1, '=', 1] as any);
 
   const specifiedLimit = params.limit;
   const queriedLimit = params.limit + 1; // +1 to get the next cursor
@@ -60,7 +58,7 @@ export function makeCursorPagination<RecordType, CursorType = any>(params: Curso
     where
   };
 
-  function getPage(retrievedItems: unknown[]): CursorPage<CursorType> {
+  function getPage(retrievedItems: RecordType[]): CursorPage<CursorType> {
     if (retrievedItems.length === 0) {
       return {
         start: params.cursor,
@@ -69,12 +67,12 @@ export function makeCursorPagination<RecordType, CursorType = any>(params: Curso
       };
     }
 
-    const itemCursorField = params.fieldmap ? invert(params.fieldmap)[params.field] : params.field;
+    const itemCursorField = params.field as keyof RecordType;
 
     if (retrievedItems.length <= specifiedLimit) {
       return {
         start: params.cursor,
-        end: retrievedItems[retrievedItems.length - 1][itemCursorField],
+        end: retrievedItems[retrievedItems.length - 1][itemCursorField] as CursorType,
         next: undefined
       };
     }
@@ -82,8 +80,8 @@ export function makeCursorPagination<RecordType, CursorType = any>(params: Curso
     if (retrievedItems.length === queriedLimit) {
       return {
         start: params.cursor,
-        end: retrievedItems[specifiedLimit - 1][itemCursorField],
-        next: retrievedItems[queriedLimit - 1][itemCursorField]
+        end: retrievedItems[specifiedLimit - 1][itemCursorField] as CursorType,
+        next: retrievedItems[queriedLimit - 1][itemCursorField] as CursorType
       };
     }
 

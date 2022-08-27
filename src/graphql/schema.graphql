@@ -4,12 +4,16 @@ type Query {
   getUsersByCursor(pagination: CursorPaginationInput!): CursorPaginatedUsers!
   getUsersByOffset(pagination: OffsetPaginationInput!): OffsetPaginatedUsers!
   getUsersByPageOffset(pagination: PageOffsetPaginationInput!): OffsetPaginatedUsers!
+  getProject(id: String!): Project
+  getProjects(pagination: CursorPaginationInput!): CursorPaginatedProjects!
+  getProjectsByCursor(pagination: CursorPaginationInput!): CursorPaginatedProjects!
   getIssues(pagination: CursorPaginationInput!): PaginatedIssues!
 }
 
 type Mutation {
   createUser(params: CreateUserParams!): User!
-  createIssue(params: CreateUserParams): Issue!
+  createProject(params: CreateProjectParams!): Project!
+  createIssue(params: CreateUserParams!): Issue!
 }
 
 #
@@ -72,6 +76,21 @@ type CursorPaginatedUsers {
 
 type OffsetPaginatedUsers {
   items: [User!]!
+}
+
+type Project {
+  id: String!
+  creationTimestamp: String!
+  name: String!
+}
+
+type CursorPaginatedProjects {
+  items: [Project!]!
+  page: CursorPage!
+}
+
+input CreateProjectParams {
+  name: String!
 }
 
 type Issue {
