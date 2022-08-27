@@ -20,8 +20,12 @@ export function makeUsersResolver(repositories: Repositories) {
   };
 
   const getUsersByOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByOffsetArgs> = (_, { pagination }) => {
-    return repositories.usersRepository.getUsersByOffset({ pagination });
+    return repositories.usersRepository.getUsersByItemOffset({ pagination });
   };
+
+  const getUsersByPageOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByPageOffsetArgs> = (_, { pagination }) => {
+    return repositories.usersRepository.getUsersByPageOffset({ pagination });
+  }
 
   const getUsers = getUsersByCursor;
 
@@ -36,6 +40,7 @@ export function makeUsersResolver(repositories: Repositories) {
       getUsers,
       getUsersByCursor,
       getUsersByOffset,
+      getUsersByPageOffset,
     },
     Mutation: {
       createUser

@@ -6,13 +6,19 @@ import { usersTable } from '../database';
 import { TransactionsHelper, TransactionOptions } from './transactions';
 import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
 
-export interface OffsetPaginationParams { // todo
+export interface ItemOffsetPaginationParams { // todo
+  sortField: string;
+  sortDirection: string;
+  limit: number; // itemLimit
+  offset: number; // itemOffset
+}
+
+export interface PageOffsetPaginationParams {
   sortField: string;
   sortDirection: string;
   limit: number;
-  offset: number;
+  page: number;
 }
-
 
 export type User = {
   id: string;
@@ -27,11 +33,18 @@ export const defaultUserCursorPaginationParams: CursorPaginationParams = {
   fieldmap: usersTable.columns,
 };
 
-export const defaultUserOffsetPaginationParams: OffsetPaginationParams = {
+export const defaultUserItemOffsetPaginationParams: ItemOffsetPaginationParams = {
   sortField: usersTable.columns.creationTimestamp,
   sortDirection: 'desc',
   limit: 10,
   offset: 0
+};
+
+export const defaultUserPageOffsetPaginationParams: PageOffsetPaginationParams = {
+  sortField: usersTable.columns.creationTimestamp,
+  sortDirection: 'desc',
+  limit: 10,
+  page: 1
 };
 
 export interface CreateUserParams {
@@ -42,8 +55,12 @@ export interface GetUsersByCursorParams {
   pagination: Partial<CursorPaginationParams>;
 }
 
-export interface GetUsersByOffsetParams {
-  pagination: Partial<OffsetPaginationParams>
+export interface GetUsersByItemOffsetParams {
+  pagination: Partial<ItemOffsetPaginationParams>;
+}
+
+export interface GetUsersByPageOffsetParams {
+  pagination: Partial<PageOffsetPaginationParams>;
 }
 
 export class UsersRepository {
@@ -94,11 +111,11 @@ export class UsersRepository {
     return pagination.getResult(users);
   }
 
-  getUsersByOffset = async (params: GetUsersByOffsetParams) => {
-    const pagination: OffsetPaginationParams = {
-      ...defaultUserOffsetPaginationParams,
+  getUsersByItemOffset = async (params: GetUsersByItemOffsetParams) => {
+    const pagination: ItemOffsetPaginationParams = {
+      ...defaultUserItemOffsetPaginationParams,
       ...params.pagination,
-      sortField: usersTable.columns[params.pagination.sortField] || defaultUserOffsetPaginationParams.sortField
+      sortField: usersTable.columns[params.pagination.sortField] || defaultUserItemOffsetPaginationParams.sortField
     }
 
     const users = await this.db
@@ -108,11 +125,32 @@ export class UsersRepository {
       .limit(pagination.limit)
       .orderBy(pagination.sortField, pagination.sortDirection);
 
-    console.log({users  })
-
     return {
       items: users,
       page: pagination
     };
   }
+
+  getUsersByPageOffset = async (params: GetUsersByPageOffsetParams) => {
+    const pagination: PageOffsetPaginationParams = {
+      ...defaultUserPageOffsetPaginationParams,
+      ...params.pagination,
+      sortField: usersTable.columns[params.pagination.sortField] || defaultUserPageOffsetPaginationParams.sortField
+    };
+
+    const pageOffset = pagination.page > 0 ? pagination.page - 1 : 0;
+    const offset = pageOffset * pagination.limit;
+
+    const users = await this.db
+      .from(usersTable.name)
+      .select(usersTable.columns)
+      .offset(offset)
+      .limit(pagination.limit)
+      .orderBy(pagination.sortField, pagination.sortDirection);
+
+    return {
+      items: users,
+      page: pagination
+    };
+  };
 }
