@@ -3,7 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { readFileSync } from 'fs';
 
 import { Repositories } from '../repositories';
-import { makeResolvers } from '../resolvers';
+import { makeResolvers, makeLoaders } from '../resolvers';
 
 const typeDefs = readFileSync(require.resolve('../graphql/schema.graphql')).toString('utf-8');
 
@@ -19,6 +19,11 @@ export function makeServer(repositories: Repositories) {
     formatError: (error) => {
       console.log(JSON.stringify(error, null, 2));
       return error;
+    },
+    context: () => {
+      return {
+        loaders: makeLoaders(repositories)
+      };
     }
   });
 

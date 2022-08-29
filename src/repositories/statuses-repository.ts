@@ -22,6 +22,10 @@ export interface GetStatusesByCursorParams {
   pagination: Partial<CursorPaginationParams<Status>>;
 }
 
+export interface GetStatusesOfProjectsParams {
+  projectIds: string[];
+}
+
 export class StatusesRepository {
   private trx: TransactionsHelper;
 
@@ -66,6 +70,13 @@ export class StatusesRepository {
       .limit(pagination.limit);
 
     return pagination.getResult(statuses);
+  };
+
+  getStatusesOfProjects = async (params: GetStatusesOfProjectsParams): Promise<Status[]> => {
+    return await this.db
+      .from(statusesTable.name)
+      .select(statusesTable.columns)
+      .whereIn(statusesTable.columns.projectId, params.projectIds);
   };
 }
 

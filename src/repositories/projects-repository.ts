@@ -20,6 +20,10 @@ export interface GetProjectsByCursorParams {
   pagination: Partial<CursorPaginationParams<Project>>;
 }
 
+export interface GetProjectsByIdsParams {
+  ids: string[]
+}
+
 export class ProjectsRepository {
   private trx: TransactionsHelper;
 
@@ -63,6 +67,13 @@ export class ProjectsRepository {
       .limit(pagination.limit);
 
     return pagination.getResult(projects);
+  };
+
+  getProjectsByIds = async (params: GetProjectsByIdsParams): Promise<Project[]> => {
+    return this.db
+      .from(projectsTable.name)
+      .select(projectsTable.columns)
+      .whereIn(projectsTable.columns.id, params.ids);
   };
 }
 

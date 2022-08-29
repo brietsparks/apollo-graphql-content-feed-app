@@ -1,1 +1,5 @@
-export type RequestContext = unknown;
+import { Loaders } from './loaders';
+
+export interface RequestContext {
+  loaders: Loaders;
+}

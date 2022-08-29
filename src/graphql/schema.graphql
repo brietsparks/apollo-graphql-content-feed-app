@@ -88,6 +88,7 @@ type Project {
   id: String!
   creationTimestamp: String!
   name: String!
+  statuses: [Status!]!
 }
 
 type CursorPaginatedProjects {
@@ -102,6 +103,7 @@ input CreateProjectParams {
 type Status {
   id: String!
   projectId: String!
+  project: Project!
   creationTimestamp: String!
   name: String!
 }

@@ -24,6 +24,10 @@ export function makeProjectsResolver(repositories: Repositories) {
 
   const getProjects = getProjectsByCursor;
 
+  const getProjectStatuses: IFieldResolver<schema.Project, RequestContext> = (project, _, ctx) => {
+    return ctx.loaders.statusesLoader.getStatusesOfProjects.load(project.id);
+  };
+
   return {
     Query: {
       getProject,
@@ -36,7 +40,8 @@ export function makeProjectsResolver(repositories: Repositories) {
     Project: {
       id: (p) => p.id,
       name: (p) => p.name,
-      creationTimestamp: (p) => p.creationTimestamp
+      creationTimestamp: (p) => p.creationTimestamp,
+      statuses: getProjectStatuses
     }
   };
 }

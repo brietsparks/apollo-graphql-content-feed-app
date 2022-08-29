@@ -24,6 +24,10 @@ export function makeStatusesResolver(repositories: Repositories) {
 
   const getStatuses = getStatusesByCursor;
 
+  const getStatusProject: IFieldResolver<Status, RequestContext> = (status, _, ctx) => {
+    return ctx.loaders.projectsLoader.getProjectsByIds.load(status.projectId);
+  };
+
   return {
     Query: {
       getStatus,
@@ -36,7 +40,8 @@ export function makeStatusesResolver(repositories: Repositories) {
     Status: {
       id: (p) => p.id,
       name: (p) => p.name,
-      creationTimestamp: (p) => p.creationTimestamp
+      creationTimestamp: (p) => p.creationTimestamp,
+      project: getStatusProject,
     }
   };
 }
