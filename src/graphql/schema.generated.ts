@@ -25,6 +25,11 @@ export type CreateProjectParams = {
   name: Scalars['String'];
 };
 
+export type CreateStatusParams = {
+  name: Scalars['String'];
+  projectId: Scalars['String'];
+};
+
 export type CreateUserParams = {
   name: Scalars['String'];
 };
@@ -39,6 +44,12 @@ export type CursorPage = {
 export type CursorPaginatedProjects = {
   __typename?: 'CursorPaginatedProjects';
   items: Array<Project>;
+  page: CursorPage;
+};
+
+export type CursorPaginatedStatuses = {
+  __typename?: 'CursorPaginatedStatuses';
+  items: Array<Status>;
   page: CursorPage;
 };
 
@@ -69,6 +80,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createIssue: Issue;
   createProject: Project;
+  createStatus: Status;
   createUser: User;
 };
 
@@ -80,6 +92,11 @@ export type MutationCreateIssueArgs = {
 
 export type MutationCreateProjectArgs = {
   params: CreateProjectParams;
+};
+
+
+export type MutationCreateStatusArgs = {
+  params: CreateStatusParams;
 };
 
 
@@ -127,6 +144,9 @@ export type Query = {
   getProject?: Maybe<Project>;
   getProjects: CursorPaginatedProjects;
   getProjectsByCursor: CursorPaginatedProjects;
+  getStatus?: Maybe<Status>;
+  getStatuses: CursorPaginatedStatuses;
+  getStatusesByCursor: CursorPaginatedStatuses;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
   getUsersByCursor: CursorPaginatedUsers;
@@ -165,6 +185,21 @@ export type QueryGetProjectsByCursorArgs = {
 };
 
 
+export type QueryGetStatusArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryGetStatusesArgs = {
+  pagination: CursorPaginationInput;
+};
+
+
+export type QueryGetStatusesByCursorArgs = {
+  pagination: CursorPaginationInput;
+};
+
+
 export type QueryGetUserArgs = {
   id: Scalars['String'];
 };
@@ -197,6 +232,14 @@ export enum SortDirection {
 export type SortInput = {
   direction: SortDirection;
   field: Scalars['String'];
+};
+
+export type Status = {
+  __typename?: 'Status';
+  creationTimestamp: Scalars['String'];
+  id: Scalars['String'];
+  name: Scalars['String'];
+  projectId: Scalars['String'];
 };
 
 export type User = {
@@ -278,9 +321,11 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   CreateIssueParams: CreateIssueParams;
   CreateProjectParams: CreateProjectParams;
+  CreateStatusParams: CreateStatusParams;
   CreateUserParams: CreateUserParams;
   CursorPage: ResolverTypeWrapper<CursorPage>;
   CursorPaginatedProjects: ResolverTypeWrapper<CursorPaginatedProjects>;
+  CursorPaginatedStatuses: ResolverTypeWrapper<CursorPaginatedStatuses>;
   CursorPaginatedUsers: ResolverTypeWrapper<CursorPaginatedUsers>;
   CursorPaginationInput: CursorPaginationInput;
   Int: ResolverTypeWrapper<Scalars['Int']>;
@@ -294,6 +339,7 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   SortDirection: SortDirection;
   SortInput: SortInput;
+  Status: ResolverTypeWrapper<Status>;
   String: ResolverTypeWrapper<Scalars['String']>;
   User: ResolverTypeWrapper<User>;
 };
@@ -303,9 +349,11 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   CreateIssueParams: CreateIssueParams;
   CreateProjectParams: CreateProjectParams;
+  CreateStatusParams: CreateStatusParams;
   CreateUserParams: CreateUserParams;
   CursorPage: CursorPage;
   CursorPaginatedProjects: CursorPaginatedProjects;
+  CursorPaginatedStatuses: CursorPaginatedStatuses;
   CursorPaginatedUsers: CursorPaginatedUsers;
   CursorPaginationInput: CursorPaginationInput;
   Int: Scalars['Int'];
@@ -318,6 +366,7 @@ export type ResolversParentTypes = {
   Project: Project;
   Query: {};
   SortInput: SortInput;
+  Status: Status;
   String: Scalars['String'];
   User: User;
 };
@@ -331,6 +380,12 @@ export type CursorPageResolvers<ContextType = any, ParentType extends ResolversP
 
 export type CursorPaginatedProjectsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedProjects'] = ResolversParentTypes['CursorPaginatedProjects']> = {
   items?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
+  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CursorPaginatedStatusesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedStatuses'] = ResolversParentTypes['CursorPaginatedStatuses']> = {
+  items?: Resolver<Array<ResolversTypes['Status']>, ParentType, ContextType>;
   page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -354,6 +409,7 @@ export type IssueResolvers<ContextType = any, ParentType extends ResolversParent
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createIssue?: Resolver<ResolversTypes['Issue'], ParentType, ContextType, RequireFields<MutationCreateIssueArgs, 'params'>>;
   createProject?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'params'>>;
+  createStatus?: Resolver<ResolversTypes['Status'], ParentType, ContextType, RequireFields<MutationCreateStatusArgs, 'params'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'params'>>;
 };
 
@@ -382,11 +438,22 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryGetProjectArgs, 'id'>>;
   getProjects?: Resolver<ResolversTypes['CursorPaginatedProjects'], ParentType, ContextType, RequireFields<QueryGetProjectsArgs, 'pagination'>>;
   getProjectsByCursor?: Resolver<ResolversTypes['CursorPaginatedProjects'], ParentType, ContextType, RequireFields<QueryGetProjectsByCursorArgs, 'pagination'>>;
+  getStatus?: Resolver<Maybe<ResolversTypes['Status']>, ParentType, ContextType, RequireFields<QueryGetStatusArgs, 'id'>>;
+  getStatuses?: Resolver<ResolversTypes['CursorPaginatedStatuses'], ParentType, ContextType, RequireFields<QueryGetStatusesArgs, 'pagination'>>;
+  getStatusesByCursor?: Resolver<ResolversTypes['CursorPaginatedStatuses'], ParentType, ContextType, RequireFields<QueryGetStatusesByCursorArgs, 'pagination'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   getUsers?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersArgs, 'pagination'>>;
   getUsersByCursor?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersByCursorArgs, 'pagination'>>;
   getUsersByOffset?: Resolver<ResolversTypes['OffsetPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersByOffsetArgs, 'pagination'>>;
   getUsersByPageOffset?: Resolver<ResolversTypes['OffsetPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersByPageOffsetArgs, 'pagination'>>;
+};
+
+export type StatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['Status'] = ResolversParentTypes['Status']> = {
+  creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  projectId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -399,6 +466,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 export type Resolvers<ContextType = any> = {
   CursorPage?: CursorPageResolvers<ContextType>;
   CursorPaginatedProjects?: CursorPaginatedProjectsResolvers<ContextType>;
+  CursorPaginatedStatuses?: CursorPaginatedStatusesResolvers<ContextType>;
   CursorPaginatedUsers?: CursorPaginatedUsersResolvers<ContextType>;
   Issue?: IssueResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
@@ -406,6 +474,7 @@ export type Resolvers<ContextType = any> = {
   PaginatedIssues?: PaginatedIssuesResolvers<ContextType>;
   Project?: ProjectResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Status?: StatusResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

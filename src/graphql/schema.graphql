@@ -1,3 +1,10 @@
+type Mutation {
+  createUser(params: CreateUserParams!): User!
+  createProject(params: CreateProjectParams!): Project!
+  createStatus(params: CreateStatusParams!): Status!
+  createIssue(params: CreateIssueParams!): Issue!
+}
+
 type Query {
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
@@ -7,15 +14,12 @@ type Query {
   getProject(id: String!): Project
   getProjects(pagination: CursorPaginationInput!): CursorPaginatedProjects!
   getProjectsByCursor(pagination: CursorPaginationInput!): CursorPaginatedProjects!
+  getStatus(id: String!): Status
+  getStatuses(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
+  getStatusesByCursor(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
   getIssue(id: String): Issue
   getIssues(pagination: CursorPaginationInput!): PaginatedIssues!
   getIssuesByCursor(pagination: CursorPaginationInput!): PaginatedIssues!
-}
-
-type Mutation {
-  createUser(params: CreateUserParams!): User!
-  createProject(params: CreateProjectParams!): Project!
-  createIssue(params: CreateIssueParams!): Issue!
 }
 
 #
@@ -93,6 +97,23 @@ type CursorPaginatedProjects {
 
 input CreateProjectParams {
   name: String!
+}
+
+type Status {
+  id: String!
+  projectId: String!
+  creationTimestamp: String!
+  name: String!
+}
+
+input CreateStatusParams {
+  projectId: String!
+  name: String!
+}
+
+type CursorPaginatedStatuses {
+  items: [Status!]!
+  page: CursorPage!
 }
 
 type Issue {
