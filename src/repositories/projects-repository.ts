@@ -24,6 +24,11 @@ export interface GetProjectsByIdsParams {
   ids: string[]
 }
 
+export interface SearchProjectsParams {
+  term: string;
+  pagination: Partial<CursorPaginationParams<Project>>;
+}
+
 export class ProjectsRepository {
   private trx: TransactionsHelper;
 
@@ -74,6 +79,20 @@ export class ProjectsRepository {
       .from(projectsTable.name)
       .select(projectsTable.columns)
       .whereIn(projectsTable.columns.id, params.ids);
+  };
+
+  searchProjects = async (params: SearchProjectsParams) => {
+    const pagination = makeProjectsCursorPagination(params.pagination);
+
+    const projects = await this.db
+      .from(projectsTable.name)
+      .select(projectsTable.columns)
+      .whereLike(projectsTable.columns.name, `%${params.term}%`)
+      .andWhere(...pagination.where)
+      .orderBy(...pagination.orderBy)
+      .limit(pagination.limit);
+
+    return pagination.getResult(projects);
   };
 }
 

@@ -14,6 +14,7 @@ type Query {
   getProject(id: String!): Project
   getProjects(pagination: CursorPaginationInput!): CursorPaginatedProjects!
   getProjectsByCursor(pagination: CursorPaginationInput!): CursorPaginatedProjects!
+  searchProjects(term: String!, pagination: CursorPaginationInput!): CursorPaginatedProjects!
   getStatus(id: String!): Status
   getStatuses(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
   getStatusesByCursor(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
