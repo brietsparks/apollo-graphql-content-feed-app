@@ -25,8 +25,9 @@ export interface GetPostsParams {
   ownerId?: string;
 }
 
-export interface GetPostsByOwnerIdsParams {
-  ownerIds: string[]
+export interface GetRecentPostsByOwnerIdsParams {
+  ownerIds: string[];
+  limit?: number;
 }
 
 export interface SearchPostsParams {
@@ -87,11 +88,17 @@ export class PostsRepository {
     return pagination.getResult(posts);
   };
 
-  getPostsByOwnerIds = async (params: GetPostsByOwnerIdsParams): Promise<Post[]> => {
-    return this.db
-      .from(postsTable.name)
-      .select(postsTable.columns)
-      .whereIn(postsTable.columns.ownerId, params.ownerIds);
+  getRecentPostsByOwnerIds = async (params: GetRecentPostsByOwnerIdsParams): Promise<Post[]> => {
+    const limit = params.limit > 5 ? 5 : params.limit;
+
+    return this.db.unionAll(params.ownerIds.map(
+      (ownerId) => this.db
+        .from(postsTable.name)
+        .select(postsTable.columns)
+        .where(postsTable.columns.ownerId, ownerId)
+        .orderBy(postsTable.columns.creationTimestamp, 'desc')
+        .limit(limit)
+    ), true);
   };
 
   searchPosts = async (params: SearchPostsParams) => {

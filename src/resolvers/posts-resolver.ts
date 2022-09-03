@@ -10,7 +10,7 @@ export function makePostsResolver(repositories: Repositories) {
   const createPost: IFieldResolver<unknown, RequestContext, schema.MutationCreatePostArgs> = async (_, { params }) => {
     const creation = await repositories.postsRepository.createPost(params, { commit: true });
     return repositories.postsRepository.getPost(creation.id);
- }
+  }
 
   const getPost: IFieldResolver<unknown, RequestContext, schema.QueryGetPostArgs> = (_, { id }) => {
     return repositories.postsRepository.getPost(id);

@@ -22,6 +22,10 @@ export function makeUsersResolver(repositories: Repositories) {
     });
   };
 
+  const getRecentPostsOfUser: IFieldResolver<User, RequestContext> = async (user, _, ctx) => {
+    return ctx.loaders.postsLoader.getPostsByOwnerIds.load(user.id);
+  };
+
   return {
     Query: {
       getUser,
@@ -33,6 +37,7 @@ export function makeUsersResolver(repositories: Repositories) {
     User: {
       id: (u) => u.id,
       creationTimestamp: (u) => u.creationTimestamp,
+      recentPosts: getRecentPostsOfUser,
       name: (u) => u.name,
     }
   }

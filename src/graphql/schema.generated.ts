@@ -143,6 +143,7 @@ export type User = {
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+  recentPosts: Array<Post>;
 };
 
 
@@ -307,6 +308,7 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  recentPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

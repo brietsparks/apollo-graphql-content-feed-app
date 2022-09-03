@@ -56,6 +56,7 @@ input PageOffsetPaginationInput {
 type User {
   id: String!
   creationTimestamp: String!
+  recentPosts: [Post!]!
   name: String!
 }
 
