@@ -1,6 +1,7 @@
 type Mutation {
   createUser(params: CreateUserParams!): User!
   createPost(params: CreatePostParams!): Post!
+  createImage(params: CreateImageParams!): Image!
 }
 
 type Query {
@@ -8,6 +9,8 @@ type Query {
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
   getPost(id: String!): Post
   getPosts(params: GetPostsParams!): CursorPaginatedPosts!
+  getImage(id: String!): Image
+  getImages(params: GetImagesParams!): CursorPaginatedImages!
 }
 
 #
@@ -50,13 +53,18 @@ input PageOffsetPaginationInput {
   limit: Int
 }
 
-#
+# ------------------------
 # Entities
+# ------------------------
+
+#
+# User
 #
 type User {
   id: String!
   creationTimestamp: String!
   recentPosts: [Post!]!
+  recentImages: [Image!]!
   name: String!
 }
 
@@ -73,6 +81,9 @@ type OffsetPaginatedUsers {
   items: [User!]!
 }
 
+#
+# Post
+#
 type Post {
   id: String!
   creationTimestamp: String!
@@ -95,5 +106,33 @@ input GetPostsParams {
 
 type CursorPaginatedPosts {
   items: [Post!]!
+  page: CursorPage!
+}
+
+#
+# Image
+#
+type Image {
+  id: String!
+  creationTimestamp: String!
+  ownerId: String!
+  owner: User!
+  url: String!
+  caption: String
+}
+
+input CreateImageParams {
+  ownerId: String!
+  url: String!
+  caption: String
+}
+
+input GetImagesParams {
+  pagination: CursorPaginationInput!
+  ownerId: String
+}
+
+type CursorPaginatedImages {
+  items: [Image!]!
   page: CursorPage!
 }

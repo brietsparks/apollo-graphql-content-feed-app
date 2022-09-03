@@ -19,7 +19,8 @@ create table images
     id                 uuid primary key,
     creation_timestamp timestamptz default (now() at time zone 'utc'),
     owner_id           uuid references users (id) not null,
-    caption            varchar(255)               not null
+    url                varchar(2048)              not null,
+    caption            varchar(255)
 );
 
 create table tags

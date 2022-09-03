@@ -30,11 +30,6 @@ export interface GetRecentPostsByOwnerIdsParams {
   limit?: number;
 }
 
-export interface SearchPostsParams {
-  term: string;
-  pagination: Partial<CursorPaginationParams<Post>>;
-}
-
 export class PostsRepository {
   private trx: TransactionsHelper;
 
@@ -89,30 +84,14 @@ export class PostsRepository {
   };
 
   getRecentPostsByOwnerIds = async (params: GetRecentPostsByOwnerIdsParams): Promise<Post[]> => {
-    const limit = params.limit > 5 ? 5 : params.limit;
-
     return this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(postsTable.name)
         .select(postsTable.columns)
         .where(postsTable.columns.ownerId, ownerId)
         .orderBy(postsTable.columns.creationTimestamp, 'desc')
-        .limit(limit)
+        .limit(3)
     ), true);
-  };
-
-  searchPosts = async (params: SearchPostsParams) => {
-    const pagination = makePostsCursorPagination(params.pagination);
-
-    const posts = await this.db
-      .from(postsTable.name)
-      .select(postsTable.columns)
-      .whereLike(postsTable.columns.title, `%${params.term}%`)
-      .andWhere(...pagination.where)
-      .orderBy(...pagination.orderBy)
-      .limit(pagination.limit);
-
-    return pagination.getResult(posts);
   };
 }
 

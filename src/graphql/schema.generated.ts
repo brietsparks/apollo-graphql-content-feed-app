@@ -14,6 +14,12 @@ export type Scalars = {
   Float: number;
 };
 
+export type CreateImageParams = {
+  caption?: InputMaybe<Scalars['String']>;
+  ownerId: Scalars['String'];
+  url: Scalars['String'];
+};
+
 export type CreatePostParams = {
   body?: InputMaybe<Scalars['String']>;
   ownerId: Scalars['String'];
@@ -29,6 +35,12 @@ export type CursorPage = {
   end?: Maybe<Scalars['String']>;
   next?: Maybe<Scalars['String']>;
   start?: Maybe<Scalars['String']>;
+};
+
+export type CursorPaginatedImages = {
+  __typename?: 'CursorPaginatedImages';
+  items: Array<Image>;
+  page: CursorPage;
 };
 
 export type CursorPaginatedPosts = {
@@ -50,15 +62,36 @@ export type CursorPaginationInput = {
   sortDirection?: InputMaybe<SortDirection>;
 };
 
+export type GetImagesParams = {
+  ownerId?: InputMaybe<Scalars['String']>;
+  pagination: CursorPaginationInput;
+};
+
 export type GetPostsParams = {
   ownerId?: InputMaybe<Scalars['String']>;
   pagination: CursorPaginationInput;
 };
 
+export type Image = {
+  __typename?: 'Image';
+  caption?: Maybe<Scalars['String']>;
+  creationTimestamp: Scalars['String'];
+  id: Scalars['String'];
+  owner: User;
+  ownerId: Scalars['String'];
+  url: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  createImage: Image;
   createPost: Post;
   createUser: User;
+};
+
+
+export type MutationCreateImageArgs = {
+  params: CreateImageParams;
 };
 
 
@@ -102,10 +135,22 @@ export type Post = {
 
 export type Query = {
   __typename?: 'Query';
+  getImage?: Maybe<Image>;
+  getImages: CursorPaginatedImages;
   getPost?: Maybe<Post>;
   getPosts: CursorPaginatedPosts;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
+};
+
+
+export type QueryGetImageArgs = {
+  id: Scalars['String'];
+};
+
+
+export type QueryGetImagesArgs = {
+  params: GetImagesParams;
 };
 
 
@@ -216,13 +261,17 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  CreateImageParams: CreateImageParams;
   CreatePostParams: CreatePostParams;
   CreateUserParams: CreateUserParams;
   CursorPage: ResolverTypeWrapper<CursorPage>;
+  CursorPaginatedImages: ResolverTypeWrapper<CursorPaginatedImages>;
   CursorPaginatedPosts: ResolverTypeWrapper<CursorPaginatedPosts>;
   CursorPaginatedUsers: ResolverTypeWrapper<CursorPaginatedUsers>;
   CursorPaginationInput: CursorPaginationInput;
+  GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
+  Image: ResolverTypeWrapper<Image>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Mutation: ResolverTypeWrapper<{}>;
   OffsetPaginatedUsers: ResolverTypeWrapper<OffsetPaginatedUsers>;
@@ -239,13 +288,17 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  CreateImageParams: CreateImageParams;
   CreatePostParams: CreatePostParams;
   CreateUserParams: CreateUserParams;
   CursorPage: CursorPage;
+  CursorPaginatedImages: CursorPaginatedImages;
   CursorPaginatedPosts: CursorPaginatedPosts;
   CursorPaginatedUsers: CursorPaginatedUsers;
   CursorPaginationInput: CursorPaginationInput;
+  GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
+  Image: Image;
   Int: Scalars['Int'];
   Mutation: {};
   OffsetPaginatedUsers: OffsetPaginatedUsers;
@@ -265,6 +318,12 @@ export type CursorPageResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CursorPaginatedImagesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedImages'] = ResolversParentTypes['CursorPaginatedImages']> = {
+  items?: Resolver<Array<ResolversTypes['Image']>, ParentType, ContextType>;
+  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type CursorPaginatedPostsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedPosts'] = ResolversParentTypes['CursorPaginatedPosts']> = {
   items?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
@@ -277,7 +336,18 @@ export type CursorPaginatedUsersResolvers<ContextType = any, ParentType extends 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type ImageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Image'] = ResolversParentTypes['Image']> = {
+  caption?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  createImage?: Resolver<ResolversTypes['Image'], ParentType, ContextType, RequireFields<MutationCreateImageArgs, 'params'>>;
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'params'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'params'>>;
 };
@@ -298,6 +368,8 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getImage?: Resolver<Maybe<ResolversTypes['Image']>, ParentType, ContextType, RequireFields<QueryGetImageArgs, 'id'>>;
+  getImages?: Resolver<ResolversTypes['CursorPaginatedImages'], ParentType, ContextType, RequireFields<QueryGetImagesArgs, 'params'>>;
   getPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryGetPostArgs, 'id'>>;
   getPosts?: Resolver<ResolversTypes['CursorPaginatedPosts'], ParentType, ContextType, RequireFields<QueryGetPostsArgs, 'params'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
@@ -314,8 +386,10 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   CursorPage?: CursorPageResolvers<ContextType>;
+  CursorPaginatedImages?: CursorPaginatedImagesResolvers<ContextType>;
   CursorPaginatedPosts?: CursorPaginatedPostsResolvers<ContextType>;
   CursorPaginatedUsers?: CursorPaginatedUsersResolvers<ContextType>;
+  Image?: ImageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   OffsetPaginatedUsers?: OffsetPaginatedUsersResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;

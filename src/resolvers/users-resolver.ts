@@ -26,6 +26,10 @@ export function makeUsersResolver(repositories: Repositories) {
     return ctx.loaders.postsLoader.getPostsByOwnerIds.load(user.id);
   };
 
+  const getRecentImagesOfUser: IFieldResolver<User, RequestContext> = async (user, _, ctx) => {
+    return ctx.loaders.imagesLoader.getImagesByOwnerIds.load(user.id);
+  };
+
   return {
     Query: {
       getUser,
@@ -38,6 +42,7 @@ export function makeUsersResolver(repositories: Repositories) {
       id: (u) => u.id,
       creationTimestamp: (u) => u.creationTimestamp,
       recentPosts: getRecentPostsOfUser,
+      recentImages: getRecentImagesOfUser,
       name: (u) => u.name,
     }
   }

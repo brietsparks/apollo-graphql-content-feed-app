@@ -18,6 +18,7 @@ export const imagesTable = table('images', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   ownerId: 'owner_id',
+  url: 'url',
   caption: 'caption',
 });
 
