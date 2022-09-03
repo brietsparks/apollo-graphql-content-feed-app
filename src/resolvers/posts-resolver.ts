@@ -16,10 +16,15 @@ export function makePostsResolver(repositories: Repositories) {
     return repositories.postsRepository.getPost(id);
   };
 
-  const getPosts: IFieldResolver<unknown, RequestContext, schema.QueryGetPostsArgs> = (_, { pagination }) => {
-    return repositories.postsRepository.getPostsByCursor({
-      pagination: adaptCursorPagination<Post>(pagination)
+  const getPosts: IFieldResolver<unknown, RequestContext, schema.QueryGetPostsArgs> = (_, { params }) => {
+    return repositories.postsRepository.getPosts({
+      pagination: adaptCursorPagination<Post>(params.pagination),
+      ownerId: params.ownerId
     });
+  }
+
+  const getPostOwner: IFieldResolver<Post, RequestContext> = (post, _, ctx) => {
+    return ctx.loaders.usersLoader.getUsersByIds.load(post.ownerId);
   };
 
   return {
@@ -34,6 +39,7 @@ export function makePostsResolver(repositories: Repositories) {
       id: (p) => p.id,
       creationTimestamp: (p) => p.creationTimestamp,
       ownerId: (p) => p.ownerId,
+      owner: getPostOwner,
       title: (p) => p.title,
       body: (p) => p.body
     }

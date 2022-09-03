@@ -7,7 +7,7 @@ type Query {
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
   getPost(id: String!): Post
-  getPosts(pagination: CursorPaginationInput!): CursorPaginatedPosts!
+  getPosts(params: GetPostsParams!): CursorPaginatedPosts!
 }
 
 #
@@ -76,17 +76,23 @@ type Post {
   id: String!
   creationTimestamp: String!
   ownerId: String!
+  owner: User!
   title: String!
   body: String
-}
-
-type CursorPaginatedPosts {
-  items: [Post!]!
-  page: CursorPage!
 }
 
 input CreatePostParams {
   ownerId: String!
   title: String!
   body: String
+}
+
+input GetPostsParams {
+  pagination: CursorPaginationInput!
+  ownerId: String
+}
+
+type CursorPaginatedPosts {
+  items: [Post!]!
+  page: CursorPage!
 }

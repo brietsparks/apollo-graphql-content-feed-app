@@ -50,6 +50,11 @@ export type CursorPaginationInput = {
   sortDirection?: InputMaybe<SortDirection>;
 };
 
+export type GetPostsParams = {
+  ownerId?: InputMaybe<Scalars['String']>;
+  pagination: CursorPaginationInput;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createPost: Post;
@@ -90,6 +95,7 @@ export type Post = {
   body?: Maybe<Scalars['String']>;
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
+  owner: User;
   ownerId: Scalars['String'];
   title: Scalars['String'];
 };
@@ -109,7 +115,7 @@ export type QueryGetPostArgs = {
 
 
 export type QueryGetPostsArgs = {
-  pagination: CursorPaginationInput;
+  params: GetPostsParams;
 };
 
 
@@ -215,6 +221,7 @@ export type ResolversTypes = {
   CursorPaginatedPosts: ResolverTypeWrapper<CursorPaginatedPosts>;
   CursorPaginatedUsers: ResolverTypeWrapper<CursorPaginatedUsers>;
   CursorPaginationInput: CursorPaginationInput;
+  GetPostsParams: GetPostsParams;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Mutation: ResolverTypeWrapper<{}>;
   OffsetPaginatedUsers: ResolverTypeWrapper<OffsetPaginatedUsers>;
@@ -237,6 +244,7 @@ export type ResolversParentTypes = {
   CursorPaginatedPosts: CursorPaginatedPosts;
   CursorPaginatedUsers: CursorPaginatedUsers;
   CursorPaginationInput: CursorPaginationInput;
+  GetPostsParams: GetPostsParams;
   Int: Scalars['Int'];
   Mutation: {};
   OffsetPaginatedUsers: OffsetPaginatedUsers;
@@ -282,6 +290,7 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
   body?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -289,7 +298,7 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryGetPostArgs, 'id'>>;
-  getPosts?: Resolver<ResolversTypes['CursorPaginatedPosts'], ParentType, ContextType, RequireFields<QueryGetPostsArgs, 'pagination'>>;
+  getPosts?: Resolver<ResolversTypes['CursorPaginatedPosts'], ParentType, ContextType, RequireFields<QueryGetPostsArgs, 'params'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   getUsers?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersArgs, 'pagination'>>;
 };

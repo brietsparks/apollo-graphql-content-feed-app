@@ -9,6 +9,7 @@ import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } 
 export type Post = {
   id: string;
   creationTimestamp: Date;
+  ownerId: string;
   title: string;
   body: string | null;
 }
@@ -19,12 +20,13 @@ export interface CreatePostParams {
   body?: string | null;
 }
 
-export interface GetPostsByCursorParams {
+export interface GetPostsParams {
   pagination: Partial<CursorPaginationParams<Post>>;
+  ownerId?: string;
 }
 
-export interface GetPostsByIdsParams {
-  ids: string[]
+export interface GetPostsByOwnerIdsParams {
+  ownerIds: string[]
 }
 
 export interface SearchPostsParams {
@@ -64,24 +66,32 @@ export class PostsRepository {
       .first();
   };
 
-  getPostsByCursor = async (params: GetPostsByCursorParams): Promise<CursorPaginationResult<Post>> => {
+  getPosts = async (params: GetPostsParams): Promise<CursorPaginationResult<Post>> => {
     const pagination = makePostsCursorPagination(params.pagination);
 
-    const posts = await this.db
+    const query = this.db
       .from(postsTable.name)
       .select(postsTable.columns)
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
+    if (params.ownerId) {
+      query.andWhere({
+        [postsTable.columns.ownerId]: params.ownerId
+      });
+    }
+
+    const posts = await query;
+
     return pagination.getResult(posts);
   };
 
-  getPostsByIds = async (params: GetPostsByIdsParams): Promise<Post[]> => {
+  getPostsByOwnerIds = async (params: GetPostsByOwnerIdsParams): Promise<Post[]> => {
     return this.db
       .from(postsTable.name)
       .select(postsTable.columns)
-      .whereIn(postsTable.columns.id, params.ids);
+      .whereIn(postsTable.columns.ownerId, params.ownerIds);
   };
 
   searchPosts = async (params: SearchPostsParams) => {

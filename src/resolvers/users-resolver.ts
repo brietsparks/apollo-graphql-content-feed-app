@@ -16,13 +16,11 @@ export function makeUsersResolver(repositories: Repositories) {
     return repositories.usersRepository.getUser(id);
   };
 
-  const getUsersByCursor: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersArgs> = (_, { pagination }) => {
+  const getUsers: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersArgs> = (_, { pagination }) => {
     return repositories.usersRepository.getUsersByCursor({
       pagination: adaptCursorPagination<User>(pagination)
     });
   };
-
-  const getUsers = getUsersByCursor;
 
   return {
     Query: {
@@ -34,8 +32,8 @@ export function makeUsersResolver(repositories: Repositories) {
     },
     User: {
       id: (u) => u.id,
+      creationTimestamp: (u) => u.creationTimestamp,
       name: (u) => u.name,
-      creationTimestamp: (u) => u.creationTimestamp
     }
   }
 }
