@@ -1,8 +1,6 @@
-drop table comments;
-drop table issue_tags;
-drop table tags;
-drop table status_issues_priority;
-drop table issues;
-drop table statuses;
-drop table projects;
-drop table users;
+drop table if exists users;
+drop table if exists posts;
+drop table if exists images;
+drop table if exists tags;
+drop table if exists post_tags;
+drop table if exists image_tags;

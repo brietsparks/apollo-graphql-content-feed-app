@@ -16,19 +16,11 @@ export function makeUsersResolver(repositories: Repositories) {
     return repositories.usersRepository.getUser(id);
   };
 
-  const getUsersByCursor: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByCursorArgs> = (_, { pagination }) => {
+  const getUsersByCursor: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersArgs> = (_, { pagination }) => {
     return repositories.usersRepository.getUsersByCursor({
       pagination: adaptCursorPagination<User>(pagination)
     });
   };
-
-  const getUsersByOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByOffsetArgs> = (_, { pagination }) => {
-    return repositories.usersRepository.getUsersByItemOffset({ pagination });
-  };
-
-  const getUsersByPageOffset: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersByPageOffsetArgs> = async (_, { pagination }) => {
-    return repositories.usersRepository.getUsersByPageOffset({ pagination });
-  }
 
   const getUsers = getUsersByCursor;
 
@@ -36,9 +28,6 @@ export function makeUsersResolver(repositories: Repositories) {
     Query: {
       getUser,
       getUsers,
-      getUsersByCursor,
-      getUsersByOffset,
-      getUsersByPageOffset,
     },
     Mutation: {
       createUser

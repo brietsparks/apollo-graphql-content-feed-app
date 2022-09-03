@@ -3,27 +3,40 @@ import { table } from './util';
 export const usersTable = table('users', {
   id: 'id',
   name: 'name',
-  creationTimestamp: 'creation_timestamp'
+  creationTimestamp: 'creation_timestamp',
 });
 
-export const projectsTable = table('projects', {
-  id: 'id',
-  name: 'name',
-  creationTimestamp: 'creation_timestamp'
-});
-
-export const statusesTable = table('statuses', {
-  id: 'id',
-  projectId: 'project_id',
-  name: 'name',
-  creationTimestamp: 'creation_timestamp'
-});
-
-export const issuesTable = table('issues', {
+export const postsTable = table('posts', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
-  assigneeId: 'assignee_id',
-  statusId: 'status_id',
+  ownerId: 'owner_id',
+  title: 'title',
+  body: 'body',
+});
+
+export const imagesTable = table('images', {
+  id: 'id',
+  creationTimestamp: 'creation_timestamp',
+  ownerId: 'owner_id',
+  caption: 'caption',
+});
+
+export const tagsTable = table('tags', {
+  id: 'id',
+  creationTimestamp: 'creation_timestamp',
   name: 'name',
-  description: 'description',
+});
+
+export const postTagsTable = table('post_tags', {
+  id: 'id',
+  creationTimestamp: 'creation_timestamp',
+  postId: 'post_id',
+  tagId: 'tag_id',
+});
+
+export const imageTagsTable = table('image_tags', {
+  id: 'id',
+  creationTimestamp: 'creation_timestamp',
+  imageId: 'image_id',
+  tagId: 'tag_id',
 });

@@ -1,26 +1,13 @@
 type Mutation {
   createUser(params: CreateUserParams!): User!
-  createProject(params: CreateProjectParams!): Project!
-  createStatus(params: CreateStatusParams!): Status!
-  createIssue(params: CreateIssueParams!): Issue!
+  createPost(params: CreatePostParams!): Post!
 }
 
 type Query {
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
-  getUsersByCursor(pagination: CursorPaginationInput!): CursorPaginatedUsers!
-  getUsersByOffset(pagination: OffsetPaginationInput!): OffsetPaginatedUsers!
-  getUsersByPageOffset(pagination: PageOffsetPaginationInput!): OffsetPaginatedUsers!
-  getProject(id: String!): Project
-  getProjects(pagination: CursorPaginationInput!): CursorPaginatedProjects!
-  getProjectsByCursor(pagination: CursorPaginationInput!): CursorPaginatedProjects!
-  searchProjects(term: String!, pagination: CursorPaginationInput!): CursorPaginatedProjects!
-  getStatus(id: String!): Status
-  getStatuses(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
-  getStatusesByCursor(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
-  getIssue(id: String): Issue
-  getIssues(pagination: CursorPaginationInput!): PaginatedIssues!
-  getIssuesByCursor(pagination: CursorPaginationInput!): PaginatedIssues!
+  getPost(id: String!): Post
+  getPosts(pagination: CursorPaginationInput!): CursorPaginatedPosts!
 }
 
 #
@@ -85,57 +72,21 @@ type OffsetPaginatedUsers {
   items: [User!]!
 }
 
-type Project {
+type Post {
   id: String!
   creationTimestamp: String!
-  name: String!
-  statuses: [Status!]!
+  ownerId: String!
+  title: String!
+  body: String
 }
 
-type CursorPaginatedProjects {
-  items: [Project!]!
+type CursorPaginatedPosts {
+  items: [Post!]!
   page: CursorPage!
 }
 
-input CreateProjectParams {
-  name: String!
-}
-
-type Status {
-  id: String!
-  projectId: String!
-  project: Project!
-  creationTimestamp: String!
-  name: String!
-}
-
-input CreateStatusParams {
-  projectId: String!
-  name: String!
-}
-
-type CursorPaginatedStatuses {
-  items: [Status!]!
-  page: CursorPage!
-}
-
-type Issue {
-  id: String!
-  creationTimestamp: String!
-  assigneeId: String
-  statusId: String
-  name: String!
-  description: String
-}
-
-input CreateIssueParams {
-  name: String!
-  assigneeId: String
-  statusId: String
-  description: String
-}
-
-type PaginatedIssues {
-  items: [Issue!]!
-  page: CursorPage!
+input CreatePostParams {
+  ownerId: String!
+  title: String!
+  body: String
 }
