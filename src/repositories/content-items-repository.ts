@@ -1,12 +1,13 @@
 import { Knex } from 'knex';
 
 import { postsTable, imagesTable } from '../database';
+import { XOR } from '../util/types';
 
 import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
 import { Post } from './posts-repository';
 import { Image } from './images-repository';
 
-export type ContentItem = Post | Image;
+export type ContentItem = XOR<Post, Image>;
 
 export interface GetContentItemsParams {
   pagination: Partial<CursorPaginationParams<ContentItem>>;
@@ -19,10 +20,21 @@ export class ContentItemsRepository {
   ) {}
 
   getContentItems = async (params: GetContentItemsParams): Promise<CursorPaginationResult<ContentItem>> => {
-    const pagination = makeContentItemsCursorPagination(params.pagination);
+    const pagination = makeCursorPagination<ContentItem>({
+      ...params,
+      sortDirection: 'desc',
+      limit: params.pagination.limit || 10,
+      field: 'creationTimestamp'
+    });
 
     const query = this.db
       .from(postsTable.name)
+      .select(this.db.raw(
+        `coalesce(
+          ${postsTable.prefixedColumns.get('creationTimestamp')},
+          ${imagesTable.prefixedColumns.get('creationTimestamp')}
+        ) as creation_timestamp`
+      ))
       .select({
         ...postsTable.prefixedColumns.all,
         ...imagesTable.prefixedColumns.all,
@@ -33,7 +45,7 @@ export class ContentItemsRepository {
         imagesTable.prefixedColumns.get('id')
       )
       .where(...pagination.where)
-      .orderBy(...pagination.orderBy)
+      .orderBy(1, params.pagination.sortDirection)
       .limit(pagination.limit)
 
     if (params.ownerId) {
@@ -43,28 +55,20 @@ export class ContentItemsRepository {
       );
     }
 
-    console.log(query.toSQL().sql);
+    const rows = await query;
 
-    // const contentItems = await query;
+    const contentItems = rows
+      .map((item) => {
+        if (item[postsTable.prefixedColumns.get('id')]) {
+          return postsTable.prefixedColumns.unmarshal(item);
+        }
+        if (item[imagesTable.prefixedColumns.get('id')]) {
+          return imagesTable.prefixedColumns.unmarshal(item);
+        }
+        return null;
+      })
+      .filter(item => !!item);
 
-    // console.log({ contentItems });
-    //
-    // return pagination.getResult(contentItems);
-
-    return {} as any;
+    return pagination.getResult(contentItems as ContentItem[]);
   };
-}
-
-export function makeContentItemsCursorPagination(params: Partial<CursorPaginationParams<ContentItem>>) {
-  const defaultParams: CursorPaginationParams<ContentItem> = {
-    field: 'creationTimestamp',
-    sortDirection: 'desc',
-    limit: 10,
-    // fieldmap: { ...imagesTable.prefixedColumns.all, ...postsTable.prefixedColumns.all }, // todo
-  };
-
-  return makeCursorPagination<ContentItem>({
-    ...defaultParams,
-    ...params,
-  });
 }

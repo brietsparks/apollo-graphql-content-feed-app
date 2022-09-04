@@ -8,9 +8,9 @@ export interface Table<AliasToColumnType extends Record<string, string>> {
   columns: AliasToColumnType;
   writeColumns: (values: Partial<Record<keyof AliasToColumnType, unknown>>) => ColumnToValue<AliasToColumnType>;
   prefixedColumns: {
-    all: PrefixedAliasToColumn;
+    all: PrefixedColumns;
     get(alias: keyof AliasToColumnType): string;
-    unmarshal(prefixedValues: PrefixColumnToValue): Partial<AliasToValue<AliasToColumnType>>
+    unmarshal(prefixedValues: PrefixColumnToValue[]): Partial<AliasToValue<AliasToColumnType>>
   };
   // prefix: (aliasToColumn?: Partial<AliasToColumnType>) => PrefixedAliasToColumn;
   // unmarshal: (rows: Record<string, unknown>) => PrefixColumnToValue;
@@ -22,7 +22,7 @@ export type ColumnToValue<AliasToColumnType extends Record<string, string>> = Re
 
 export type PrefixColumnToValue = Record<string, unknown>;
 
-export type PrefixedAliasToColumn = Record<string, string>;
+export type PrefixedColumns = Record<string, string>;
 
 export type ColumnToAlias<AliasToColumnType extends Record<string, string>> =
   Record<ValueOf<AliasToColumnType>, keyof AliasToColumnType>;
@@ -44,29 +44,21 @@ export function table<AliasToColumnType extends Record<string, string>>(tableNam
     }, {} as Record<AliasToColumnType[keyof AliasToColumnType], unknown>);
   }
 
-  const allPrefixedColumns: PrefixedAliasToColumn = {};
+  const allPrefixedColumns: PrefixedColumns = {};
   for (const column of Object.values(aliasToColumn)) {
     allPrefixedColumns[`${tableName}.${column}`] = `${tableName}.${column}`;
   }
 
-  function prefix(mapping: Partial<AliasToColumnType> = aliasToColumn): PrefixedAliasToColumn {
-    const prefixed = {};
-    for (const column of Object.values(mapping)) {
-      prefixed[`${tableName}.${column}`] = `${tableName}.${column}`;
-    }
-    return prefixed;
-  }
+  const unmarshal = (row: PrefixColumnToValue[]): Partial<AliasToValue<AliasToColumnType>> => {
+    const unmarshalledRow = {};
 
-  const unmarshal = (prefixedValues: PrefixColumnToValue): Partial<AliasToValue<AliasToColumnType>> => {
-    const values = {};
-
-    for (const [prefixedColumn, value] of Object.entries(prefixedValues)) {
+    for (const prefixedColumn of Object.values(allPrefixedColumns)) {
       const column = prefixedColumn.substring(prefixedColumn.indexOf('.') + 1)
       const alias = columnToAliasMapping[column];
-      values[alias] = value;
+      unmarshalledRow[alias] = row[prefixedColumn];
     }
 
-    return values;
+    return unmarshalledRow;
   }
 
   const prefixedColumns = {

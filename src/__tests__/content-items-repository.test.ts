@@ -17,11 +17,26 @@ describe('ContentItemsRepository', () => {
     test('no ownerId', async () => {
       const userCreation = await app.repositories.usersRepository.createUser({ name: faker.name.firstName() },{ commit: true });
 
-      const c1 = await app.repositories.postsRepository.createPost({ ownerId: userCreation.id, title: faker.random.alphaNumeric() }, { commit: true });
-      const c2 = await app.repositories.imagesRepository.createImage({ ownerId: userCreation.id, url: faker.random.alphaNumeric() }, { commit: true });
-      const c3 = await app.repositories.postsRepository.createPost({ ownerId: userCreation.id, title: faker.random.alphaNumeric() }, { commit: true });
-      const c4 = await app.repositories.imagesRepository.createImage({ ownerId: userCreation.id, url: faker.random.alphaNumeric() }, { commit: true });
-      const c5 = await app.repositories.postsRepository.createPost({ ownerId: userCreation.id, title: faker.random.alphaNumeric() }, { commit: true });
+      const c1 = await app.repositories.postsRepository.createPost({
+        ownerId: userCreation.id,
+        title: `c1.${faker.random.alphaNumeric()}`
+      }, { commit: true });
+      const c2 = await app.repositories.imagesRepository.createImage({
+        ownerId: userCreation.id,
+        url: `c2.${faker.random.alphaNumeric()}`
+      }, { commit: true });
+      const c3 = await app.repositories.postsRepository.createPost({
+        ownerId: userCreation.id,
+        title: `c3.${faker.random.alphaNumeric()}`
+      }, { commit: true });
+      const c4 = await app.repositories.imagesRepository.createImage({
+        ownerId: userCreation.id,
+        url: `c4.${faker.random.alphaNumeric()}`
+      }, { commit: true });
+      const c5 = await app.repositories.postsRepository.createPost({
+        ownerId: userCreation.id,
+        title: `c5.${faker.random.alphaNumeric()}`
+      }, { commit: true });
 
       const result = await app.repositories.contentItemsRepository.getContentItems({
         pagination: {
@@ -30,7 +45,7 @@ describe('ContentItemsRepository', () => {
         ownerId: userCreation.id
       });
 
-      console.log({ result });
+      console.log(JSON.stringify({ result }, null, 2));
     });
   });
 });
