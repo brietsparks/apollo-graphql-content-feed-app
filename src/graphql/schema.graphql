@@ -11,6 +11,7 @@ type Query {
   getPosts(params: GetPostsParams!): CursorPaginatedPosts!
   getImage(id: String!): Image
   getImages(params: GetImagesParams!): CursorPaginatedImages!
+  getContentItems(params: GetContentItemsParams!): CursorPaginatedContentItems!
 }
 
 #
@@ -65,6 +66,7 @@ type User {
   creationTimestamp: String!
   recentPosts: [Post!]!
   recentImages: [Image!]!
+  recentContentItems: [ContentItem!]!
   name: String!
 }
 
@@ -134,5 +136,20 @@ input GetImagesParams {
 
 type CursorPaginatedImages {
   items: [Image!]!
+  page: CursorPage!
+}
+
+#
+# Content
+#
+union ContentItem = Post | Image
+
+input GetContentItemsParams {
+  pagination: CursorPaginationInput!
+  ownerId: String
+}
+
+type CursorPaginatedContentItems {
+  items: [ContentItem!]!
   page: CursorPage!
 }
