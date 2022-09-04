@@ -7,7 +7,10 @@ import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } 
 import { Post } from './posts-repository';
 import { Image } from './images-repository';
 
-export type ContentItem = XOR<Post, Image>;
+export type ContentItem = XOR<
+  Post & { _type: 'post' },
+  Image & { _type: 'image' }
+>;
 
 export interface GetContentItemsParams {
   pagination: Partial<CursorPaginationParams<ContentItem>>;
@@ -45,7 +48,7 @@ export class ContentItemsRepository {
         imagesTable.prefixedColumns.get('id')
       )
       .where(...pagination.where)
-      .orderBy(1, params.pagination.sortDirection)
+      .orderBy(1, params.pagination.sortDirection || 'desc')
       .limit(pagination.limit)
 
     if (params.ownerId) {
@@ -60,10 +63,16 @@ export class ContentItemsRepository {
     const contentItems = rows
       .map((item) => {
         if (item[postsTable.prefixedColumns.get('id')]) {
-          return postsTable.prefixedColumns.unmarshal(item);
+          return {
+            ...postsTable.prefixedColumns.unmarshal(item),
+            _type: 'post'
+          };
         }
         if (item[imagesTable.prefixedColumns.get('id')]) {
-          return imagesTable.prefixedColumns.unmarshal(item);
+          return {
+            ...imagesTable.prefixedColumns.unmarshal(item),
+            _type: 'image'
+          };
         }
         return null;
       })
