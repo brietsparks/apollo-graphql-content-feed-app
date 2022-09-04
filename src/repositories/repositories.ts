@@ -2,6 +2,7 @@ import { Knex } from 'knex';
 import pg from 'pg';
 
 import { UsersRepository } from './users-repository';
+import { TagsRepository } from './tags-repository';
 import { PostsRepository } from './posts-repository';
 import { ImagesRepository } from './images-repository';
 import { ContentItemsRepository } from './content-items-repository';
@@ -17,6 +18,7 @@ export function makeRepositories(db: Knex) {
   configurePgParsers();
 
   const usersRepository = new UsersRepository(db);
+  const tagsRepository = new TagsRepository(db);
   const postsRepository = new PostsRepository(db);
   const imagesRepository = new ImagesRepository(db);
   const contentItemsRepository = new ContentItemsRepository(db);

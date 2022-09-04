@@ -26,7 +26,12 @@ export type CreateImageParams = {
 export type CreatePostParams = {
   body?: InputMaybe<Scalars['String']>;
   ownerId: Scalars['String'];
+  tagIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   title: Scalars['String'];
+};
+
+export type CreateTagParams = {
+  name: Scalars['String'];
 };
 
 export type CreateUserParams = {
@@ -84,6 +89,7 @@ export type GetImagesParams = {
 export type GetPostsParams = {
   ownerId?: InputMaybe<Scalars['String']>;
   pagination: CursorPaginationInput;
+  tagId?: InputMaybe<Scalars['String']>;
 };
 
 export type Image = {
@@ -93,6 +99,7 @@ export type Image = {
   id: Scalars['String'];
   owner: User;
   ownerId: Scalars['String'];
+  tags: Array<Tag>;
   url: Scalars['String'];
 };
 
@@ -144,6 +151,7 @@ export type Post = {
   id: Scalars['String'];
   owner: User;
   ownerId: Scalars['String'];
+  tags: Array<Tag>;
   title: Scalars['String'];
 };
 
@@ -201,6 +209,14 @@ export enum SortDirection {
 export type SortInput = {
   direction: SortDirection;
   field: Scalars['String'];
+};
+
+export type Tag = {
+  __typename?: 'Tag';
+  creationTimestamp: Scalars['String'];
+  id: Scalars['String'];
+  name: Scalars['String'];
+  recentPosts: Array<Post>;
 };
 
 export type User = {
@@ -286,6 +302,7 @@ export type ResolversTypes = {
   ContentItem: ResolversTypes['Image'] | ResolversTypes['Post'];
   CreateImageParams: CreateImageParams;
   CreatePostParams: CreatePostParams;
+  CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
   CursorPage: ResolverTypeWrapper<CursorPage>;
   CursorPaginatedContentItems: ResolverTypeWrapper<Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversTypes['ContentItem']> }>;
@@ -307,6 +324,7 @@ export type ResolversTypes = {
   SortDirection: SortDirection;
   SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']>;
+  Tag: ResolverTypeWrapper<Tag>;
   User: ResolverTypeWrapper<Omit<User, 'recentContentItems'> & { recentContentItems: Array<ResolversTypes['ContentItem']> }>;
 };
 
@@ -316,6 +334,7 @@ export type ResolversParentTypes = {
   ContentItem: ResolversParentTypes['Image'] | ResolversParentTypes['Post'];
   CreateImageParams: CreateImageParams;
   CreatePostParams: CreatePostParams;
+  CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
   CursorPage: CursorPage;
   CursorPaginatedContentItems: Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversParentTypes['ContentItem']> };
@@ -336,6 +355,7 @@ export type ResolversParentTypes = {
   Query: {};
   SortInput: SortInput;
   String: Scalars['String'];
+  Tag: Tag;
   User: Omit<User, 'recentContentItems'> & { recentContentItems: Array<ResolversParentTypes['ContentItem']> };
 };
 
@@ -380,6 +400,7 @@ export type ImageResolvers<ContextType = any, ParentType extends ResolversParent
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['Tag']>, ParentType, ContextType>;
   url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -401,6 +422,7 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['Tag']>, ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -413,6 +435,14 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getPosts?: Resolver<ResolversTypes['CursorPaginatedPosts'], ParentType, ContextType, RequireFields<QueryGetPostsArgs, 'params'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   getUsers?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersArgs, 'pagination'>>;
+};
+
+export type TagResolvers<ContextType = any, ParentType extends ResolversParentTypes['Tag'] = ResolversParentTypes['Tag']> = {
+  creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  recentPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
@@ -437,6 +467,7 @@ export type Resolvers<ContextType = any> = {
   OffsetPaginatedUsers?: OffsetPaginatedUsersResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Tag?: TagResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

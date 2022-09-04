@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { v4 as uuid } from 'uuid';
 
-import { postsTable } from '../database';
+import { postsTable, postTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
 import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
@@ -16,6 +16,7 @@ export type Post = {
 
 export interface CreatePostParams {
   ownerId: string;
+  tagIds?: string[];
   title: string;
   body?: string | null;
 }
@@ -23,6 +24,7 @@ export interface CreatePostParams {
 export interface GetPostsParams {
   pagination: Partial<CursorPaginationParams<Post>>;
   ownerId?: string;
+  tagId?: string;
 }
 
 export interface GetRecentPostsByOwnerIdsParams {
@@ -30,31 +32,43 @@ export interface GetRecentPostsByOwnerIdsParams {
   limit?: number;
 }
 
+export interface AttachTagsToPostParams {
+  tagIds: string[];
+  postId: string;
+}
+
 export class PostsRepository {
   private trx: TransactionsHelper;
 
-  constructor(
-    private db: Knex
-  ) {
+  constructor(private db: Knex) {
     this.trx = new TransactionsHelper(db);
   }
 
   createPost = async (params: CreatePostParams, opts: TransactionOptions) => {
-    return this.trx.query(opts, (async (trx) => {
+    return this.trx.query(opts, async (trx) => {
       const id = uuid();
 
       await trx
         .into(postsTable.name)
         .insert(postsTable.writeColumns({
           id,
-          ...params,
+          ownerId: params.ownerId,
+          title: params.title,
+          body: params.body,
         }));
 
+      if (params.tagIds) {
+        await this.attachTagsToPost({
+          postId: id,
+          tagIds: params.tagIds
+        }, { ...opts, trx });
+      }
+
       return { id };
-    }));
+    });
   };
 
-  getPost = async (id: string) => {
+  getPost = async (id: string): Promise<Post> => {
     return this.db
       .from(postsTable.name)
       .select(postsTable.columns)
@@ -67,19 +81,27 @@ export class PostsRepository {
 
     const query = this.db
       .from(postsTable.name)
-      .select(postsTable.columns)
+      .select(postsTable.prefixedColumns.all)
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere({
-        [postsTable.columns.ownerId]: params.ownerId
+        [postsTable.prefixedColumns.get('ownerId')]: params.ownerId
       });
     }
 
-    const posts = await query;
+    if (params.tagId) {
+      query.innerJoin(
+        postTagsTable.name,
+        postTagsTable.prefixedColumns.get('postId'),
+        postsTable.prefixedColumns.get('id')
+      )
+    }
 
+    const rows = await query;
+    const posts = rows.map(row => postsTable.prefixedColumns.unmarshal(row) as Post);
     return pagination.getResult(posts);
   };
 
@@ -92,6 +114,22 @@ export class PostsRepository {
         .orderBy(postsTable.columns.creationTimestamp, 'desc')
         .limit(3)
     ), true);
+  };
+
+  attachTagsToPost = async (params: AttachTagsToPostParams, opts: TransactionOptions) => {
+    return this.trx.query(opts,async (trx) => {
+      const insert = params.tagIds.map(tagId => postTagsTable.writeColumns({
+        id: uuid(),
+        tagId,
+        postId: params.postId,
+      }));
+
+      await trx
+        .into(postTagsTable.name)
+        .insert(insert);
+
+      return insert.map(row => row.id);
+    });
   };
 }
 
