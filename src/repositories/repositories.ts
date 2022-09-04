@@ -4,10 +4,12 @@ import pg from 'pg';
 import { UsersRepository } from './users-repository';
 import { PostsRepository } from './posts-repository';
 import { ImagesRepository } from './images-repository';
+import { ContentItemsRepository } from './content-items-repository';
 
 export * from './users-repository';
 export * from './posts-repository';
 export * from './images-repository';
+export * from './content-items-repository';
 
 export type Repositories = ReturnType<typeof makeRepositories>;
 
@@ -17,11 +19,13 @@ export function makeRepositories(db: Knex) {
   const usersRepository = new UsersRepository(db);
   const postsRepository = new PostsRepository(db);
   const imagesRepository = new ImagesRepository(db);
+  const contentItemsRepository = new ContentItemsRepository(db);
 
   return {
     usersRepository,
     postsRepository,
     imagesRepository,
+    contentItemsRepository,
   };
 }
 

@@ -4,6 +4,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -13,6 +14,8 @@ export type Scalars = {
   Int: number;
   Float: number;
 };
+
+export type ContentItem = Image | Post;
 
 export type CreateImageParams = {
   caption?: InputMaybe<Scalars['String']>;
@@ -35,6 +38,12 @@ export type CursorPage = {
   end?: Maybe<Scalars['String']>;
   next?: Maybe<Scalars['String']>;
   start?: Maybe<Scalars['String']>;
+};
+
+export type CursorPaginatedContentItems = {
+  __typename?: 'CursorPaginatedContentItems';
+  items: Array<ContentItem>;
+  page: CursorPage;
 };
 
 export type CursorPaginatedImages = {
@@ -60,6 +69,11 @@ export type CursorPaginationInput = {
   field?: InputMaybe<Scalars['String']>;
   limit?: InputMaybe<Scalars['Int']>;
   sortDirection?: InputMaybe<SortDirection>;
+};
+
+export type GetContentItemsParams = {
+  ownerId?: InputMaybe<Scalars['String']>;
+  pagination: CursorPaginationInput;
 };
 
 export type GetImagesParams = {
@@ -135,12 +149,18 @@ export type Post = {
 
 export type Query = {
   __typename?: 'Query';
+  getContentItems: CursorPaginatedContentItems;
   getImage?: Maybe<Image>;
   getImages: CursorPaginatedImages;
   getPost?: Maybe<Post>;
   getPosts: CursorPaginatedPosts;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
+};
+
+
+export type QueryGetContentItemsArgs = {
+  params: GetContentItemsParams;
 };
 
 
@@ -188,6 +208,8 @@ export type User = {
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+  recentContentItems: Array<ContentItem>;
+  recentImages: Array<Image>;
   recentPosts: Array<Post>;
 };
 
@@ -261,14 +283,17 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  ContentItem: ResolversTypes['Image'] | ResolversTypes['Post'];
   CreateImageParams: CreateImageParams;
   CreatePostParams: CreatePostParams;
   CreateUserParams: CreateUserParams;
   CursorPage: ResolverTypeWrapper<CursorPage>;
+  CursorPaginatedContentItems: ResolverTypeWrapper<Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversTypes['ContentItem']> }>;
   CursorPaginatedImages: ResolverTypeWrapper<CursorPaginatedImages>;
   CursorPaginatedPosts: ResolverTypeWrapper<CursorPaginatedPosts>;
   CursorPaginatedUsers: ResolverTypeWrapper<CursorPaginatedUsers>;
   CursorPaginationInput: CursorPaginationInput;
+  GetContentItemsParams: GetContentItemsParams;
   GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
   Image: ResolverTypeWrapper<Image>;
@@ -282,20 +307,23 @@ export type ResolversTypes = {
   SortDirection: SortDirection;
   SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']>;
-  User: ResolverTypeWrapper<User>;
+  User: ResolverTypeWrapper<Omit<User, 'recentContentItems'> & { recentContentItems: Array<ResolversTypes['ContentItem']> }>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  ContentItem: ResolversParentTypes['Image'] | ResolversParentTypes['Post'];
   CreateImageParams: CreateImageParams;
   CreatePostParams: CreatePostParams;
   CreateUserParams: CreateUserParams;
   CursorPage: CursorPage;
+  CursorPaginatedContentItems: Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversParentTypes['ContentItem']> };
   CursorPaginatedImages: CursorPaginatedImages;
   CursorPaginatedPosts: CursorPaginatedPosts;
   CursorPaginatedUsers: CursorPaginatedUsers;
   CursorPaginationInput: CursorPaginationInput;
+  GetContentItemsParams: GetContentItemsParams;
   GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
   Image: Image;
@@ -308,13 +336,23 @@ export type ResolversParentTypes = {
   Query: {};
   SortInput: SortInput;
   String: Scalars['String'];
-  User: User;
+  User: Omit<User, 'recentContentItems'> & { recentContentItems: Array<ResolversParentTypes['ContentItem']> };
+};
+
+export type ContentItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['ContentItem'] = ResolversParentTypes['ContentItem']> = {
+  __resolveType: TypeResolveFn<'Image' | 'Post', ParentType, ContextType>;
 };
 
 export type CursorPageResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPage'] = ResolversParentTypes['CursorPage']> = {
   end?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   next?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   start?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CursorPaginatedContentItemsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedContentItems'] = ResolversParentTypes['CursorPaginatedContentItems']> = {
+  items?: Resolver<Array<ResolversTypes['ContentItem']>, ParentType, ContextType>;
+  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -368,6 +406,7 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getContentItems?: Resolver<ResolversTypes['CursorPaginatedContentItems'], ParentType, ContextType, RequireFields<QueryGetContentItemsArgs, 'params'>>;
   getImage?: Resolver<Maybe<ResolversTypes['Image']>, ParentType, ContextType, RequireFields<QueryGetImageArgs, 'id'>>;
   getImages?: Resolver<ResolversTypes['CursorPaginatedImages'], ParentType, ContextType, RequireFields<QueryGetImagesArgs, 'params'>>;
   getPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryGetPostArgs, 'id'>>;
@@ -380,12 +419,16 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  recentContentItems?: Resolver<Array<ResolversTypes['ContentItem']>, ParentType, ContextType>;
+  recentImages?: Resolver<Array<ResolversTypes['Image']>, ParentType, ContextType>;
   recentPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
+  ContentItem?: ContentItemResolvers<ContextType>;
   CursorPage?: CursorPageResolvers<ContextType>;
+  CursorPaginatedContentItems?: CursorPaginatedContentItemsResolvers<ContextType>;
   CursorPaginatedImages?: CursorPaginatedImagesResolvers<ContextType>;
   CursorPaginatedPosts?: CursorPaginatedPostsResolvers<ContextType>;
   CursorPaginatedUsers?: CursorPaginatedUsersResolvers<ContextType>;
