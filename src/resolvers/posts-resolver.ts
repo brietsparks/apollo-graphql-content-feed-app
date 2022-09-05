@@ -19,12 +19,17 @@ export function makePostsResolver(repositories: Repositories) {
   const getPosts: IFieldResolver<unknown, RequestContext, schema.QueryGetPostsArgs> = (_, { params }) => {
     return repositories.postsRepository.getPosts({
       pagination: adaptCursorPagination<Post>(params.pagination),
-      ownerId: params.ownerId
+      ownerId: params.ownerId,
+      tagId: params.tagId,
     });
-  }
+  };
 
   const getPostOwner: IFieldResolver<Post, RequestContext> = (post, _, ctx) => {
     return ctx.loaders.usersLoader.getUsersByIds.load(post.ownerId);
+  };
+
+  const getPostTags: IFieldResolver<Post, RequestContext> = (post, _, ctx) => {
+    return ctx.loaders.tagsLoader.getTagsOfPosts.load(post.id);
   };
 
   return {
@@ -40,6 +45,7 @@ export function makePostsResolver(repositories: Repositories) {
       creationTimestamp: (p) => p.creationTimestamp,
       ownerId: (p) => p.ownerId,
       owner: getPostOwner,
+      tags: getPostTags,
       title: (p) => p.title,
       body: (p) => p.body
     }

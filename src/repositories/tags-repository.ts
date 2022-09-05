@@ -11,6 +11,11 @@ export type Tag = {
   name: string;
 }
 
+export type PostTag =
+  Tag & {
+  postId: string;
+}
+
 export interface CreateTagParams {
   name: string;
 }
@@ -60,7 +65,7 @@ export class TagsRepository {
       .select(tagsTable.columns)
   };
 
-  getTagsOfPosts = async (postIds: string[]) => {
+  getTagsOfPosts = async (postIds: string[]): Promise<PostTag[]> => {
     const rows = await this.db
       .from(tagsTable.name)
       .innerJoin(
@@ -73,6 +78,10 @@ export class TagsRepository {
       .distinctOn(tagsTable.prefixedColumns.get('id'))
       .whereIn(postTagsTable.prefixedColumns.get('postId'), postIds);
 
-    return rows.map(row => tagsTable.prefixedColumns.unmarshal(row));
+    return rows.map(row => {
+      const tag = tagsTable.prefixedColumns.unmarshal(row);
+      const { postId } = postTagsTable.prefixedColumns.unmarshal(row);
+      return { ...tag, postId } as PostTag;
+    });
   };
 }

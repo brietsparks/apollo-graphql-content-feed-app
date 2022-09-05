@@ -8,6 +8,7 @@ import { ImagesRepository } from './images-repository';
 import { ContentItemsRepository } from './content-items-repository';
 
 export * from './users-repository';
+export * from './tags-repository';
 export * from './posts-repository';
 export * from './images-repository';
 export * from './content-items-repository';

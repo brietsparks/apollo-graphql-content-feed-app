@@ -1,5 +1,6 @@
 type Mutation {
   createUser(params: CreateUserParams!): User!
+  createTag(params: CreateTagParams!): Tag!
   createPost(params: CreatePostParams!): Post!
   createImage(params: CreateImageParams!): Image!
 }
@@ -7,6 +8,7 @@ type Mutation {
 type Query {
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
+  getTag(id: String!): Tag
   getPost(id: String!): Post
   getPosts(params: GetPostsParams!): CursorPaginatedPosts!
   getImage(id: String!): Image

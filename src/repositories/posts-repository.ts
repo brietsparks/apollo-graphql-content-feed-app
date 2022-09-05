@@ -93,11 +93,15 @@ export class PostsRepository {
     }
 
     if (params.tagId) {
-      query.innerJoin(
-        postTagsTable.name,
-        postTagsTable.prefixedColumns.get('postId'),
-        postsTable.prefixedColumns.get('id')
-      )
+      query
+        .innerJoin(
+          postTagsTable.name,
+          postTagsTable.prefixedColumns.get('postId'),
+          postsTable.prefixedColumns.get('id')
+        )
+        .andWhere({
+          [postTagsTable.prefixedColumns.get('tagId')]: params.tagId
+        });
     }
 
     const rows = await query;
@@ -135,10 +139,12 @@ export class PostsRepository {
 
 export function makePostsCursorPagination(params: Partial<CursorPaginationParams<Post>>) {
   const defaultParams: CursorPaginationParams<Post> = {
-    field: 'creationTimestamp',
+    // @ts-ignore
+    field: postsTable.prefixedColumns.get('creationTimestamp'),
     sortDirection: 'desc',
     limit: 10,
-    fieldmap: postsTable.columns,
+    // @ts-ignore
+    fieldmap: postsTable.prefixedColumns.all,
   };
 
   return makeCursorPagination<Post>({
