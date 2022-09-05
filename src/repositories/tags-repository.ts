@@ -70,6 +70,7 @@ export class TagsRepository {
       )
       .select(tagsTable.prefixedColumns.all)
       .select(postTagsTable.prefixedColumns.all)
+      .distinctOn(tagsTable.prefixedColumns.get('id'))
       .whereIn(postTagsTable.prefixedColumns.get('postId'), postIds);
 
     return rows.map(row => tagsTable.prefixedColumns.unmarshal(row));

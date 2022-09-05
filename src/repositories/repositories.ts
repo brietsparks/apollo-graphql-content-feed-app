@@ -25,6 +25,7 @@ export function makeRepositories(db: Knex) {
 
   return {
     usersRepository,
+    tagsRepository,
     postsRepository,
     imagesRepository,
     contentItemsRepository,
