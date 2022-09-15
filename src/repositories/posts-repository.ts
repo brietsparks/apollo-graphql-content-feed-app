@@ -50,7 +50,7 @@ export class PostsRepository {
 
       await trx
         .into(postsTable.name)
-        .insert(postsTable.writeColumns({
+        .insert(postsTable.toColumnCase({
           id,
           ownerId: params.ownerId,
           title: params.title,
@@ -72,7 +72,7 @@ export class PostsRepository {
     return this.db
       .from(postsTable.name)
       .select(postsTable.columns)
-      .where({ [postsTable.columns.id]: id })
+      .where({ [postsTable.column('id')]: id })
       .first();
   };
 
@@ -81,14 +81,14 @@ export class PostsRepository {
 
     const query = this.db
       .from(postsTable.name)
-      .select(postsTable.prefixedColumns.all)
+      .select(postsTable.columns())
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere({
-        [postsTable.prefixedColumns.get('ownerId')]: params.ownerId
+        [postsTable.column('ownerId')]: params.ownerId
       });
     }
 
@@ -97,7 +97,7 @@ export class PostsRepository {
         .innerJoin(
           postTagsTable.name,
           postTagsTable.prefixedColumns.get('postId'),
-          postsTable.prefixedColumns.get('id')
+          postsTable.column('id')
         )
         .andWhere({
           [postTagsTable.prefixedColumns.get('tagId')]: params.tagId
@@ -107,7 +107,7 @@ export class PostsRepository {
     const rows = await query;
     const paginatedRows = pagination.getResult(rows);
     const posts = paginatedRows.items.map(paginatedRow => {
-      return postsTable.prefixedColumns.unmarshal(paginatedRow) as Post
+      return postsTable.toAttributeCase<Post>(paginatedRow)
     });
     return {
       items: posts,
@@ -119,9 +119,9 @@ export class PostsRepository {
     return this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(postsTable.name)
-        .select(postsTable.columns)
-        .where(postsTable.columns.ownerId, ownerId)
-        .orderBy(postsTable.columns.creationTimestamp, 'desc')
+        .select(postsTable.columns())
+        .where(postsTable.column('ownerId'), ownerId)
+        .orderBy(postsTable.column('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
   };
@@ -145,7 +145,7 @@ export class PostsRepository {
 
 export function makePostsCursorPagination(params: Partial<CursorPaginationParams<Post>>) {
   const defaultParams: CursorPaginationParams = {
-    field: postsTable.prefixedColumns.get('creationTimestamp'),
+    field: postsTable.column('creationTimestamp'),
     sortDirection: 'desc',
     limit: 10,
   };

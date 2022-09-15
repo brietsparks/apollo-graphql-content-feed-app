@@ -1,4 +1,5 @@
 import { table } from './util';
+import { Table } from './table-util';
 
 export const usersTable = table('users', {
   id: 'id',
@@ -6,7 +7,7 @@ export const usersTable = table('users', {
   creationTimestamp: 'creation_timestamp',
 });
 
-export const postsTable = table('posts', {
+export const postsTable = new Table('posts', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   ownerId: 'owner_id',

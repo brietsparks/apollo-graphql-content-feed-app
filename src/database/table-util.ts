@@ -1,7 +1,6 @@
 type Attribute<T> = keyof T;
 type PrefixedColumnLookup<T> = Record<Attribute<T>, string>;
 type AttributeLookup<T> = Record<string, Attribute<T>>;
-
 type AttributeCasedRow<T> = Record<Attribute<T>, unknown>;
 
 export class Table<T extends Record<string, string>> {
@@ -18,17 +17,22 @@ export class Table<T extends Record<string, string>> {
   }
 
   columns(...attributes: Attribute<T>[]) {
-    if (!attributes.length) {
-      return this.getAllPrefixedColumns();
+    const columnsArr = attributes.length
+      ? attributes.map(attribute => this.getPrefixedColumn(attribute))
+      : Object.values(this.prefixedColumnLookup)
+
+    const columns: Record<string, string> = {};
+    for (const column of columnsArr) {
+      columns[column] = column;
     }
-    return attributes.map(attribute => this.getPrefixedColumn(attribute));
+    return columns;
   }
 
   column(attribute: Attribute<T>) {
-    return this.columns(attribute)[0];
+    return this.prefixedColumnLookup[attribute];
   }
 
-  toAttributeCase<U extends Record<Attribute<T>, unknown>>(row: Record<string, unknown>): U {
+  toAttributeCase<U extends Partial<Record<Attribute<T>, unknown>>>(row: Record<string, unknown>): U {
     const attributeCasedRow: Partial<AttributeCasedRow<T>> = {};
     for (const [prefixColumn, value] of Object.entries(row)) {
       const attribute = this.getAttribute(prefixColumn);
@@ -37,7 +41,7 @@ export class Table<T extends Record<string, string>> {
     return attributeCasedRow as U;
   }
 
-  toColumnCase(row: AttributeCasedRow<T>): Record<string, unknown> {
+  toColumnCase(row: Partial<AttributeCasedRow<T>>): Record<string, unknown> {
     const columnCasedRow: Record<string, unknown> = {};
     for (const [attribute, value] of Object.entries(row)) {
       const prefixedColumn = this.getPrefixedColumn(attribute);
@@ -60,77 +64,11 @@ export class Table<T extends Record<string, string>> {
     };
   }
 
-  private build
-
   private getPrefixedColumn(attribute: Attribute<T>) {
     return this.prefixedColumnLookup[attribute];
-  }
-
-  private getAllPrefixedColumns() {
-    return Object.values(this.prefixedColumnLookup);
   }
 
   private getAttribute(prefixedColumn: string) {
     return this.attributeLookup[prefixedColumn];
   }
 }
-
-const postsTable = new Table('posts', {
-  id: 'id',
-  creationTimestamp: 'creation_timestamp',
-  oogabooga: 'ooga_booga'
-});
-
-postsTable.columns('creationTimestamp', 'id', 'oogabooga');
-
-/*
-.select(postsTable.columns)
-
-.select(
-  'posts.id',
-  'posts.creationTimestamp'
-)
-*/
-
-/*
-postTagsTable.prefixedColumns.get('postId')
-
-'posts.id'
-
-{ postId: 'posts.id' }
-*/
-
-/*
-CursorPaginationParams<Post>
-
-{
-  'posts.id': unknown,
-  'posts.creationTimestamp': unknown
-}
-*/
-
-/*
-dtoa
-unmarshall({
-  'posts.id': '...',
-  'posts.creation_timestamp': '...'
-})
-
-{
-  'posts.id': 'id',
-  'posts.creation_timestamp': 'creationTimestamp'
-}
-*/
-
-/*
-atod
-write({
-  id: '...'
-  creationTimestamp: '...'
-})
-
-{
-  'id': 'posts.id',
-  'creationTimestamp': 'posts.creation_timestamp'
-}
-*/
