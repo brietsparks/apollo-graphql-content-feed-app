@@ -10,7 +10,7 @@ export interface CursorPaginationResult<RecordType, CursorType = any> {
   page: CursorPage<CursorType>;
 }
 
-export interface CursorPaginationParams<RecordType, CursorType = any> {
+export interface CursorPaginationParams<RecordType = Record<string, string>, CursorType = any> {
   field: keyof RecordType;
   sortDirection: SortDirection;
   cursor?: CursorType;

@@ -10,7 +10,7 @@ export interface Table<AliasToColumnType extends Record<string, string>> {
   prefixedColumns: {
     all: PrefixedColumns;
     get(alias: keyof AliasToColumnType): string;
-    unmarshal(prefixedValues: PrefixColumnToValue[]): Partial<AliasToValue<AliasToColumnType>>
+    unmarshal(prefixedValues: PrefixColumnToValue): Partial<AliasToValue<AliasToColumnType>>
   };
   // prefix: (aliasToColumn?: Partial<AliasToColumnType>) => PrefixedAliasToColumn;
   // unmarshal: (rows: Record<string, unknown>) => PrefixColumnToValue;
@@ -49,7 +49,7 @@ export function table<AliasToColumnType extends Record<string, string>>(tableNam
     allPrefixedColumns[`${tableName}.${column}`] = `${tableName}.${column}`;
   }
 
-  const unmarshal = (row: PrefixColumnToValue[]): Partial<AliasToValue<AliasToColumnType>> => {
+  const unmarshal = (row: PrefixColumnToValue): Partial<AliasToValue<AliasToColumnType>> => {
     const unmarshalledRow = {};
 
     for (const prefixedColumn of Object.values(allPrefixedColumns)) {

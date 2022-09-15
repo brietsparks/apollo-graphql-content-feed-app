@@ -105,8 +105,14 @@ export class PostsRepository {
     }
 
     const rows = await query;
-    const posts = rows.map(row => postsTable.prefixedColumns.unmarshal(row) as Post);
-    return pagination.getResult(posts);
+    const paginatedRows = pagination.getResult(rows);
+    const posts = paginatedRows.items.map(paginatedRow => {
+      return postsTable.prefixedColumns.unmarshal(paginatedRow) as Post
+    });
+    return {
+      items: posts,
+      page: paginatedRows.page
+    };
   };
 
   getRecentPostsByOwnerIds = async (params: GetRecentPostsByOwnerIdsParams): Promise<Post[]> => {
@@ -138,16 +144,13 @@ export class PostsRepository {
 }
 
 export function makePostsCursorPagination(params: Partial<CursorPaginationParams<Post>>) {
-  const defaultParams: CursorPaginationParams<Post> = {
-    // @ts-ignore
+  const defaultParams: CursorPaginationParams = {
     field: postsTable.prefixedColumns.get('creationTimestamp'),
     sortDirection: 'desc',
     limit: 10,
-    // @ts-ignore
-    fieldmap: postsTable.prefixedColumns.all,
   };
 
-  return makeCursorPagination<Post>({
+  return makeCursorPagination({
     ...defaultParams,
     ...params,
   });
