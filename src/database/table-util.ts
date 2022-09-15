@@ -1,32 +1,66 @@
-type ValueOf<T> = T[keyof T];
 type Attribute<T> = keyof T;
 type PrefixedColumnLookup<T> = Record<Attribute<T>, string>;
+type AttributeLookup<T> = Record<string, Attribute<T>>;
+
+type AttributeCasedRow<T> = Record<Attribute<T>, unknown>;
 
 export class Table<T extends Record<string, string>> {
-  attributes: Attribute<T>;
   prefixedColumnLookup: PrefixedColumnLookup<T>;
+  attributeLookup: AttributeLookup<T>;
 
   constructor(
     public name: string,
     private config: T,
   ) {
-    this.prefixedColumnLookup = this.buildPrefixedColumnLookup(config);
+    const { prefixedColumnLookup, attributeLookup } = this.buildLookups(config);
+    this.prefixedColumnLookup = prefixedColumnLookup;
+    this.attributeLookup = attributeLookup;
   }
 
   columns(...attributes: Attribute<T>[]) {
-    if (!attributes) {
+    if (!attributes.length) {
       return this.getAllPrefixedColumns();
     }
     return attributes.map(attribute => this.getPrefixedColumn(attribute));
   }
 
-  private buildPrefixedColumnLookup(config: T) {
-    const prefixedColumnLookup: Partial<PrefixedColumnLookup<T>> = {}
-    for (const [attribute, column] of Object.entries(config)) {
-      prefixedColumnLookup[attribute as Attribute<T>] = `${this.name}.${column}`;
-    }
-    return prefixedColumnLookup as PrefixedColumnLookup<T>;
+  column(attribute: Attribute<T>) {
+    return this.columns(attribute)[0];
   }
+
+  toAttributeCase<U extends Record<Attribute<T>, unknown>>(row: Record<string, unknown>): U {
+    const attributeCasedRow: Partial<AttributeCasedRow<T>> = {};
+    for (const [prefixColumn, value] of Object.entries(row)) {
+      const attribute = this.getAttribute(prefixColumn);
+      attributeCasedRow[attribute] = value;
+    }
+    return attributeCasedRow as U;
+  }
+
+  toColumnCase(row: AttributeCasedRow<T>): Record<string, unknown> {
+    const columnCasedRow: Record<string, unknown> = {};
+    for (const [attribute, value] of Object.entries(row)) {
+      const prefixedColumn = this.getPrefixedColumn(attribute);
+      columnCasedRow[prefixedColumn] = value;
+    }
+    return columnCasedRow;
+  }
+
+  private buildLookups(config: T) {
+    const prefixedColumnLookup: Partial<PrefixedColumnLookup<T>> = {}
+    const attributeLookup: Partial<AttributeLookup<T>> = {};
+    for (const [attribute, column] of Object.entries(config)) {
+      const prefixedColumn = `${this.name}.${column}`;
+      prefixedColumnLookup[attribute as Attribute<T>] = prefixedColumn;
+      attributeLookup[prefixedColumn] = attribute;
+    }
+    return {
+      prefixedColumnLookup: prefixedColumnLookup as PrefixedColumnLookup<T>,
+      attributeLookup: attributeLookup as AttributeLookup<T>,
+    };
+  }
+
+  private build
 
   private getPrefixedColumn(attribute: Attribute<T>) {
     return this.prefixedColumnLookup[attribute];
@@ -34,6 +68,10 @@ export class Table<T extends Record<string, string>> {
 
   private getAllPrefixedColumns() {
     return Object.values(this.prefixedColumnLookup);
+  }
+
+  private getAttribute(prefixedColumn: string) {
+    return this.attributeLookup[prefixedColumn];
   }
 }
 
