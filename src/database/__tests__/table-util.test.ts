@@ -7,12 +7,12 @@ test('Table', () => {
   });
 
   expect(postsTable.name).toEqual('posts');
-  expect(postsTable.column('id')).toEqual('posts.id');
-  expect(postsTable.column('creationTimestamp')).toEqual('posts.creation_timestamp');
-  expect(postsTable.columns('id')).toEqual(['posts.id']);
-  expect(postsTable.columns('creationTimestamp')).toEqual(['posts.creation_timestamp']);
-  expect(postsTable.columns('id', 'creationTimestamp')).toEqual(['posts.id', 'posts.creation_timestamp']);
-  expect(postsTable.columns()).toEqual(['posts.id', 'posts.creation_timestamp']);
+  expect(postsTable.prefixedColumn('id')).toEqual('posts.id');
+  expect(postsTable.prefixedColumn('creationTimestamp')).toEqual('posts.creation_timestamp');
+  expect(postsTable.prefixedColumns('id')).toEqual(['posts.id']);
+  expect(postsTable.prefixedColumns('creationTimestamp')).toEqual(['posts.creation_timestamp']);
+  expect(postsTable.prefixedColumns('id', 'creationTimestamp')).toEqual(['posts.id', 'posts.creation_timestamp']);
+  expect(postsTable.prefixedColumns()).toEqual(['posts.id', 'posts.creation_timestamp']);
 
   const attributeCasedRow = {
     id: 'a',

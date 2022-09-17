@@ -34,17 +34,17 @@ export class ContentItemsRepository {
       .from(postsTable.name)
       .select(this.db.raw(
         `coalesce(
-          ${postsTable.column('creationTimestamp')},
+          ${postsTable.prefixedColumn('creationTimestamp')},
           ${imagesTable.prefixedColumns.get('creationTimestamp')}
         ) as creation_timestamp`
       ))
       .select(
-        postsTable.columns(),
+        postsTable.prefixedColumns(),
         { ...imagesTable.prefixedColumns.all }
       )
       .fullOuterJoin(
         imagesTable.name,
-        postsTable.column('id'),
+        postsTable.prefixedColumn('id'),
         imagesTable.prefixedColumns.get('id')
       )
       .where(...pagination.where)
@@ -53,7 +53,7 @@ export class ContentItemsRepository {
 
     if (params.ownerId) {
       query.andWhere(q => q
-        .orWhere({ [postsTable.column('ownerId')]: params.ownerId })
+        .orWhere({ [postsTable.prefixedColumn('ownerId')]: params.ownerId })
         .orWhere({ [imagesTable.prefixedColumns.get('ownerId')]: params.ownerId })
       );
     }
@@ -62,7 +62,7 @@ export class ContentItemsRepository {
 
     const contentItems = rows
       .map((item) => {
-        if (item[postsTable.column('id')]) {
+        if (item[postsTable.prefixedColumn('id')]) {
           return {
             ...postsTable.toAttributeCase(item),
             _type: 'post'

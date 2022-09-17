@@ -71,8 +71,8 @@ export class PostsRepository {
   getPost = async (id: string): Promise<Post> => {
     return this.db
       .from(postsTable.name)
-      .select(postsTable.columns)
-      .where({ [postsTable.column('id')]: id })
+      .select(postsTable.rawColumns())
+      .where({ [postsTable.rawColumn('id')]: id })
       .first();
   };
 
@@ -81,14 +81,14 @@ export class PostsRepository {
 
     const query = this.db
       .from(postsTable.name)
-      .select(postsTable.columns())
+      .select(postsTable.prefixedColumns())
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere({
-        [postsTable.column('ownerId')]: params.ownerId
+        [postsTable.prefixedColumn('ownerId')]: params.ownerId
       });
     }
 
@@ -97,7 +97,7 @@ export class PostsRepository {
         .innerJoin(
           postTagsTable.name,
           postTagsTable.prefixedColumns.get('postId'),
-          postsTable.column('id')
+          postsTable.prefixedColumn('id')
         )
         .andWhere({
           [postTagsTable.prefixedColumns.get('tagId')]: params.tagId
@@ -119,9 +119,9 @@ export class PostsRepository {
     return this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(postsTable.name)
-        .select(postsTable.columns())
-        .where(postsTable.column('ownerId'), ownerId)
-        .orderBy(postsTable.column('creationTimestamp'), 'desc')
+        .select(postsTable.prefixedColumns())
+        .where(postsTable.prefixedColumn('ownerId'), ownerId)
+        .orderBy(postsTable.prefixedColumn('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
   };
@@ -145,7 +145,7 @@ export class PostsRepository {
 
 export function makePostsCursorPagination(params: Partial<CursorPaginationParams<Post>>) {
   const defaultParams: CursorPaginationParams = {
-    field: postsTable.column('creationTimestamp'),
+    field: postsTable.prefixedColumn('creationTimestamp'),
     sortDirection: 'desc',
     limit: 10,
   };

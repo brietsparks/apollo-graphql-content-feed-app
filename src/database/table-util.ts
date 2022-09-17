@@ -1,4 +1,6 @@
-type Attribute<T> = keyof T;
+export type Attribute<T> = keyof T;
+export type RawColumn<T> = T[keyof T];
+
 type PrefixedColumnLookup<T> = Record<Attribute<T>, string>;
 type AttributeLookup<T> = Record<string, Attribute<T>>;
 type AttributeCasedRow<T> = Record<Attribute<T>, unknown>;
@@ -9,30 +11,42 @@ export class Table<T extends Record<string, string>> {
 
   constructor(
     public name: string,
-    private config: T,
+    private columnLookup: T,
   ) {
-    const { prefixedColumnLookup, attributeLookup } = this.buildLookups(config);
+    const { prefixedColumnLookup, attributeLookup } = this.buildLookups(columnLookup);
     this.prefixedColumnLookup = prefixedColumnLookup;
     this.attributeLookup = attributeLookup;
   }
 
-  columns(...attributes: Attribute<T>[]) {
-    const columnsArr = attributes.length
+  rawColumns = (...attributes: Attribute<T>[]) => {
+    const rawColumns: Partial<Record<Attribute<T>, RawColumn<T>>> = {};
+    for (const attribute of attributes) {
+      rawColumns[attribute] = this.columnLookup[attribute];
+    }
+    return rawColumns;
+  };
+
+  rawColumn(attribute: Attribute<T>) {
+    return this.columnLookup[attribute];
+  }
+
+  prefixedColumns = (...attributes: Attribute<T>[]) => {
+    const prefixedColumnsArr = attributes.length
       ? attributes.map(attribute => this.getPrefixedColumn(attribute))
       : Object.values(this.prefixedColumnLookup)
 
-    const columns: Record<string, string> = {};
-    for (const column of columnsArr) {
-      columns[column] = column;
+    const prefixedColumns: Record<string, string> = {};
+    for (const prefixedColumn of prefixedColumnsArr) {
+      prefixedColumns[prefixedColumn] = prefixedColumn;
     }
-    return columns;
+    return prefixedColumns;
   }
 
-  column(attribute: Attribute<T>) {
+  prefixedColumn = (attribute: Attribute<T>) => {
     return this.prefixedColumnLookup[attribute];
   }
 
-  toAttributeCase<U extends Partial<Record<Attribute<T>, unknown>>>(row: Record<string, unknown>): U {
+  toAttributeCase = <U extends Partial<Record<Attribute<T>, unknown>>>(row: Record<string, unknown>): U => {
     const attributeCasedRow: Partial<AttributeCasedRow<T>> = {};
     for (const [prefixColumn, value] of Object.entries(row)) {
       const attribute = this.getAttribute(prefixColumn);
@@ -41,19 +55,19 @@ export class Table<T extends Record<string, string>> {
     return attributeCasedRow as U;
   }
 
-  toColumnCase(row: Partial<AttributeCasedRow<T>>): Record<string, unknown> {
-    const columnCasedRow: Record<string, unknown> = {};
+  toColumnCase = (row: Partial<AttributeCasedRow<T>>): Record<RawColumn<T>, unknown> => {
+    const columnCasedRow: Partial<Record<RawColumn<T>, unknown>> = {};
     for (const [attribute, value] of Object.entries(row)) {
-      const prefixedColumn = this.getPrefixedColumn(attribute);
-      columnCasedRow[prefixedColumn] = value;
+      const rawColumn = this.rawColumn(attribute);
+      columnCasedRow[rawColumn] = value;
     }
-    return columnCasedRow;
+    return columnCasedRow as Record<RawColumn<T>, unknown>;
   }
 
-  private buildLookups(config: T) {
+  private buildLookups(columnLookup: T) {
     const prefixedColumnLookup: Partial<PrefixedColumnLookup<T>> = {}
     const attributeLookup: Partial<AttributeLookup<T>> = {};
-    for (const [attribute, column] of Object.entries(config)) {
+    for (const [attribute, column] of Object.entries(columnLookup)) {
       const prefixedColumn = `${this.name}.${column}`;
       prefixedColumnLookup[attribute as Attribute<T>] = prefixedColumn;
       attributeLookup[prefixedColumn] = attribute;
