@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { postsTable, postTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+// import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
 
 export type Post = {
   id: string;
@@ -22,7 +23,7 @@ export interface CreatePostParams {
 }
 
 export interface GetPostsParams {
-  pagination: Partial<CursorPaginationParams<Post>>;
+  pagination?: Partial<CursorPaginationParams<keyof Post>>;
   ownerId?: string;
   tagId?: string;
 }
@@ -105,13 +106,11 @@ export class PostsRepository {
     }
 
     const rows = await query;
-    const paginatedRows = pagination.getResult(rows);
-    const posts = paginatedRows.items.map(paginatedRow => {
-      return postsTable.toAttributeCase<Post>(paginatedRow)
-    });
+    const paginationResult = pagination.getResult(rows);
+    const posts = paginationResult.items.map(paginatedRow => postsTable.toAttributeCase<Post>(paginatedRow));
     return {
       items: posts,
-      page: paginatedRows.page
+      cursors: paginationResult.cursors
     };
   };
 
@@ -143,15 +142,11 @@ export class PostsRepository {
   };
 }
 
-export function makePostsCursorPagination(params: Partial<CursorPaginationParams<Post>>) {
-  const defaultParams: CursorPaginationParams = {
-    field: postsTable.prefixedColumn('creationTimestamp'),
-    sortDirection: 'desc',
-    limit: 10,
-  };
-
+export function makePostsCursorPagination(params: Partial<CursorPaginationParams<keyof Post>> = {}) {
   return makeCursorPagination({
-    ...defaultParams,
-    ...params,
+    field: postsTable.prefixedColumn(params.field || 'creationTimestamp'),
+    sortDirection: params.sortDirection || 'desc',
+    limit: params.limit || 10,
+    cursor: params.cursor,
   });
 }

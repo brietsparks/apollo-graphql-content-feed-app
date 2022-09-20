@@ -19,6 +19,10 @@ export class Table<T extends Record<string, string>> {
   }
 
   rawColumns = (...attributes: Attribute<T>[]) => {
+    if (!attributes.length) {
+      return this.columnLookup;
+    }
+
     const rawColumns: Partial<Record<Attribute<T>, RawColumn<T>>> = {};
     for (const attribute of attributes) {
       rawColumns[attribute] = this.columnLookup[attribute];
