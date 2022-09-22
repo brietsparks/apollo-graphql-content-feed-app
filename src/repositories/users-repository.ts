@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { usersTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
 
 export type User = {
   id: string;
@@ -17,7 +17,7 @@ export interface CreateUserParams {
 }
 
 export interface GetUsersByCursorParams {
-  pagination: Partial<CursorPaginationParams<User>>;
+  pagination: Partial<CursorPaginationParams<keyof User>>;
 }
 
 export interface GetProjectsByIdsParams {
@@ -39,7 +39,7 @@ export class UsersRepository {
 
       await trx
         .into(usersTable.name)
-        .insert(usersTable.writeColumns({
+        .insert(usersTable.toColumnCase({
           id,
           name: params.name
         }));
@@ -51,8 +51,8 @@ export class UsersRepository {
   getUser = async (id: string) => {
     return this.db
       .from(usersTable.name)
-      .select(usersTable.columns)
-      .where({ [usersTable.columns.id]: id })
+      .select(usersTable.rawColumns())
+      .where({ [usersTable.rawColumn('id')]: id })
       .first();
   };
 
@@ -61,7 +61,7 @@ export class UsersRepository {
 
     const users = await this.db
       .from(usersTable.name)
-      .select(usersTable.columns)
+      .select(usersTable.rawColumns())
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
@@ -72,21 +72,16 @@ export class UsersRepository {
   getUsersByIds = async (params: GetProjectsByIdsParams): Promise<User[]> => {
     return this.db
       .from(usersTable.name)
-      .select(usersTable.columns)
-      .whereIn(usersTable.columns.id, params.ids);
+      .select(usersTable.rawColumns())
+      .whereIn(usersTable.rawColumn('id'), params.ids);
   };
 }
 
-export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<User>>) {
-  const defaultParams: CursorPaginationParams<User> = {
-    field: 'creationTimestamp',
-    sortDirection: 'desc',
-    limit: 10,
-    fieldmap: usersTable.columns,
-  };
-
-  return makeCursorPagination<User>({
-    ...defaultParams,
-    ...params,
+export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<keyof User>>) {
+  return makeCursorPagination({
+    field: usersTable.rawColumn(params.field || 'creationTimestamp'),
+    sortDirection: params.sortDirection || 'desc',
+    limit: params.limit || 4,
+    cursor: params.cursor,
   });
 }

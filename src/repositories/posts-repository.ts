@@ -5,7 +5,6 @@ import { postsTable, postTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
 import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
-// import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
 
 export type Post = {
   id: string;
@@ -118,9 +117,9 @@ export class PostsRepository {
     return this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(postsTable.name)
-        .select(postsTable.prefixedColumns())
-        .where(postsTable.prefixedColumn('ownerId'), ownerId)
-        .orderBy(postsTable.prefixedColumn('creationTimestamp'), 'desc')
+        .select(postsTable.rawColumns())
+        .where(postsTable.rawColumn('ownerId'), ownerId)
+        .orderBy(postsTable.rawColumn('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
   };

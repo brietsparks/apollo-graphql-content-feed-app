@@ -1,7 +1,7 @@
 import { table } from './util';
 import { Table } from './table-util';
 
-export const usersTable = table('users', {
+export const usersTable = new Table('users', {
   id: 'id',
   name: 'name',
   creationTimestamp: 'creation_timestamp',
