@@ -25,7 +25,7 @@ describe('table', () => {
       creationTimestamp: 'mock-timestamp'
     })).toEqual({
       id: 'mock-id',
-      creation_timestampz: 'mock-timestamp'
+      creation_timestamp: 'mock-timestamp'
     });
   });
 

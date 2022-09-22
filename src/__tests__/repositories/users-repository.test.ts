@@ -23,7 +23,7 @@ describe('UsersRepository', () => {
     expect(retrieval).toEqual({
       id: expect.any(String),
       name: params.name,
-      creationTimestamp: expect.any(Date)
+      creationTimestamp: expect.any(String)
     });
   });
 });

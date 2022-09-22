@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 
 import { getTestApp, TestApp } from '../test-setup';
-import { CursorPaginationResult } from '../repositories/lib/pagination';
-import { Post } from '../repositories';
+import { CursorPaginationResult } from '../../repositories/lib/pagination';
+import { Post } from '../../repositories';
 
 describe('PostsRepository', () => {
   let app: TestApp;

@@ -18,7 +18,6 @@ describe('TagsRepository', () => {
       app.repositories.tagsRepository.createTag({ name: 't2' }, { commit: true }),
       app.repositories.tagsRepository.createTag({ name: 't3' }, { commit: true }),
       app.repositories.tagsRepository.createTag({ name: 't4' }, { commit: true }),
-
     ]);
 
     const [p1, p2, p3] = await Promise.all([
@@ -43,12 +42,12 @@ describe('TagsRepository', () => {
       app.repositories.tagsRepository.getTag(t1.id),
       app.repositories.tagsRepository.getTag(t2.id),
       app.repositories.tagsRepository.getTag(t3.id),
-    ])
+    ]);
 
     const result = await app.repositories.tagsRepository.getTagsOfPosts([p1.id, p2.id, p3.id]);
 
     const expected = [tag1, tag2, tag3];
-    expect(result).toEqual(expect.arrayContaining(expected));
+    expect(result).toEqual((expected));
     expect(result.length).toEqual(expected.length);
   });
 });
