@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 
 import { getTestApp, TestApp } from '../test-setup';
+import { CursorPaginationResult } from '../repositories/lib/pagination';
+import { Post } from '../repositories';
 
 describe('PostsRepository', () => {
   let app: TestApp;
@@ -45,9 +47,14 @@ describe('PostsRepository', () => {
       app.repositories.postsRepository.getPost(p4.id),
       app.repositories.postsRepository.getPost(p5.id),
       app.repositories.postsRepository.getPost(p6.id),
-    ])
+    ]);
 
-    let posts = await app.repositories.postsRepository.getPosts({
+    let posts: CursorPaginationResult<Post>;
+
+    posts = await app.repositories.postsRepository.getPosts({});
+    expect(posts.items).toEqual([post6, post5, post4, post3]);
+
+    posts = await app.repositories.postsRepository.getPosts({
       pagination: {
         limit: 3
       }

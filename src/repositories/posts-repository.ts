@@ -146,7 +146,7 @@ export function makePostsCursorPagination(params: Partial<CursorPaginationParams
   return makeCursorPagination({
     field: postsTable.prefixedColumn(params.field || 'creationTimestamp'),
     sortDirection: params.sortDirection || 'desc',
-    limit: params.limit || 10,
+    limit: params.limit || 4,
     cursor: params.cursor,
   });
 }

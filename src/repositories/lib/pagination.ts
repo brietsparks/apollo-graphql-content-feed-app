@@ -35,7 +35,7 @@ export type Where = [string, string, Cursor];
 export function makeCursorPagination<ColumnType extends string = string>(params: CursorPaginationParams<ColumnType>) {
   const orderBy: OrderBy = [params.field, params.sortDirection];
   const comparator = params.sortDirection === 'asc' ? '>=' : '<=';
-  const where: Where = params.cursor ? [params.field, comparator, params.cursor] : ([1, '=', 1] as any);
+  const where: Where = params.cursor ? [params.field, comparator, params.cursor] : [true] as any;
 
   const specifiedLimit = params.limit;
   const queriedLimit = params.limit + 1; // +1 to get the next cursor
@@ -73,7 +73,7 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
       };
     }
 
-    throw new Error('invalid cursor pagination state in getPage. This is probably a bug with the library');
+    throw new Error('invalid cursor pagination state in getCursors. This is probably a bug with the library');
   }
 
   function getRows<RowType extends Record<string, unknown>>(rows: RowType[]): RowType[] {
