@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { imagesTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
 
 export type Image = {
   id: string;
@@ -21,7 +21,7 @@ export interface CreateImageParams {
 }
 
 export interface GetImagesParams {
-  pagination: Partial<CursorPaginationParams<Image>>;
+  pagination: Partial<CursorPaginationParams<keyof Image>>;
   ownerId?: string;
 }
 
@@ -45,7 +45,7 @@ export class ImagesRepository {
 
       await trx
         .into(imagesTable.name)
-        .insert(imagesTable.writeColumns({
+        .insert(imagesTable.toColumnCase({
           id,
           ...params,
         }));
@@ -57,8 +57,8 @@ export class ImagesRepository {
   getImage = async (id: string) => {
     return this.db
       .from(imagesTable.name)
-      .select(imagesTable.columns)
-      .where({ [imagesTable.columns.id]: id })
+      .select(imagesTable.rawColumns())
+      .where({ [imagesTable.rawColumn('id')]: id })
       .first();
   };
 
@@ -67,14 +67,14 @@ export class ImagesRepository {
 
     const query = this.db
       .from(imagesTable.name)
-      .select(imagesTable.columns)
+      .select(imagesTable.rawColumns())
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere({
-        [imagesTable.columns.ownerId]: params.ownerId
+        [imagesTable.rawColumn('ownerId')]: params.ownerId
       });
     }
 
@@ -87,24 +87,19 @@ export class ImagesRepository {
     return this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(imagesTable.name)
-        .select(imagesTable.columns)
-        .where(imagesTable.columns.ownerId, ownerId)
-        .orderBy(imagesTable.columns.creationTimestamp, 'desc')
+        .select(imagesTable.rawColumns())
+        .where(imagesTable.rawColumn('ownerId'), ownerId)
+        .orderBy(imagesTable.rawColumn('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
   };
 }
 
-export function makeImagesCursorPagination(params: Partial<CursorPaginationParams<Image>>) {
-  const defaultParams: CursorPaginationParams<Image> = {
-    field: 'creationTimestamp',
-    sortDirection: 'desc',
-    limit: 10,
-    fieldmap: imagesTable.columns,
-  };
-
-  return makeCursorPagination<Image>({
-    ...defaultParams,
-    ...params,
+export function makeImagesCursorPagination(params: Partial<CursorPaginationParams>) {
+  return makeCursorPagination({
+    field: params.field || imagesTable.rawColumn('creationTimestamp'),
+    sortDirection: params.sortDirection || 'desc',
+    limit: params.limit || 4,
+    cursor: params.cursor
   });
 }

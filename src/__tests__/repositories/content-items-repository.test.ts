@@ -38,14 +38,22 @@ describe('ContentItemsRepository', () => {
         title: `c5.${faker.random.alphaNumeric()}`
       }, { commit: true });
 
+      const [content3, content4, content5] = await Promise.all([
+        app.repositories.postsRepository.getPost(c3.id),
+        app.repositories.imagesRepository.getImage(c4.id),
+        app.repositories.postsRepository.getPost(c5.id)
+      ])
+
       const result = await app.repositories.contentItemsRepository.getContentItems({
-        pagination: {
-          limit: 3
-        },
+        pagination: { limit: 3 },
         ownerId: userCreation.id
       });
 
-      console.log(JSON.stringify({ result }, null, 2));
+      expect(result.items).toEqual([
+        { ...content5, _type: 'post' },
+        { ...content4, _type: 'image' },
+        { ...content3, _type: 'post' },
+      ]);
     });
   });
 });

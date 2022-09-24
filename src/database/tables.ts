@@ -1,4 +1,3 @@
-import { table } from './util';
 import { Table } from './table-util';
 
 export const usersTable = new Table('users', {
@@ -15,7 +14,7 @@ export const postsTable = new Table('posts', {
   body: 'body',
 });
 
-export const imagesTable = table('images', {
+export const imagesTable = new Table('images', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   ownerId: 'owner_id',
@@ -23,20 +22,20 @@ export const imagesTable = table('images', {
   caption: 'caption',
 });
 
-export const tagsTable = table('tags', {
+export const tagsTable = new Table('tags', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   name: 'name',
 });
 
-export const postTagsTable = table('post_tags', {
+export const postTagsTable = new Table('post_tags', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   postId: 'post_id',
   tagId: 'tag_id',
 });
 
-export const imageTagsTable = table('image_tags', {
+export const imageTagsTable = new Table('image_tags', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   imageId: 'image_id',

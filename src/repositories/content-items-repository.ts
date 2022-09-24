@@ -35,17 +35,17 @@ export class ContentItemsRepository {
       .select(this.db.raw(
         `coalesce(
           ${postsTable.prefixedColumn('creationTimestamp')},
-          ${imagesTable.prefixedColumns.get('creationTimestamp')}
+          ${imagesTable.prefixedColumn('creationTimestamp')}
         ) as creation_timestamp`
       ))
       .select(
         postsTable.prefixedColumns(),
-        { ...imagesTable.prefixedColumns.all }
+        { ...imagesTable.prefixedColumns() }
       )
       .fullOuterJoin(
         imagesTable.name,
         postsTable.prefixedColumn('id'),
-        imagesTable.prefixedColumns.get('id')
+        imagesTable.prefixedColumn('id')
       )
       .where(...pagination.where)
       .orderBy(1, params.pagination.sortDirection || 'desc')
@@ -54,7 +54,7 @@ export class ContentItemsRepository {
     if (params.ownerId) {
       query.andWhere(q => q
         .orWhere({ [postsTable.prefixedColumn('ownerId')]: params.ownerId })
-        .orWhere({ [imagesTable.prefixedColumns.get('ownerId')]: params.ownerId })
+        .orWhere({ [imagesTable.prefixedColumn('ownerId')]: params.ownerId })
       );
     }
 
@@ -68,9 +68,9 @@ export class ContentItemsRepository {
             _type: 'post'
           };
         }
-        if (item[imagesTable.prefixedColumns.get('id')]) {
+        if (item[imagesTable.prefixedColumn('id')]) {
           return {
-            ...imagesTable.prefixedColumns.unmarshal(item),
+            ...imagesTable.toAttributeCase(item),
             _type: 'image'
           };
         }

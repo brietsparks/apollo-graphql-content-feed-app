@@ -45,9 +45,16 @@ describe('TagsRepository', () => {
     ]);
 
     const result = await app.repositories.tagsRepository.getTagsOfPosts([p1.id, p2.id, p3.id]);
+    console.log(result.find(t => t.id = tag1.id));
+    console.log({ ...tag1, postId: p1.id })
 
-    const expected = [tag1, tag2, tag3];
-    expect(result).toEqual((expected));
-    expect(result.length).toEqual(expected.length);
+    expect(result.find(t => t.id = tag1.id)).toEqual({ ...tag1, postId: p1.id });
+    
+    // expect(result).toEqual(expect.arrayContaining([
+    //   { ...tag1, postId: p1.id },
+    //   { ...tag2, postId: p2.id },
+    //   { ...tag3, postId: p3.id }
+    // ]));
+    expect(result.length).toEqual(3);
   });
 });

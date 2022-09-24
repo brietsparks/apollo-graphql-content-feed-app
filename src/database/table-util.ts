@@ -54,7 +54,9 @@ export class Table<T extends Record<string, string>> {
     const attributeCasedRow: Partial<AttributeCasedRow<T>> = {};
     for (const [prefixColumn, value] of Object.entries(row)) {
       const attribute = this.getAttribute(prefixColumn);
-      attributeCasedRow[attribute] = value;
+      if (attribute) {
+        attributeCasedRow[attribute] = value;
+      }
     }
     return attributeCasedRow as U;
   }
@@ -63,7 +65,9 @@ export class Table<T extends Record<string, string>> {
     const columnCasedRow: Partial<Record<RawColumn<T>, unknown>> = {};
     for (const [attribute, value] of Object.entries(row)) {
       const rawColumn = this.rawColumn(attribute);
-      columnCasedRow[rawColumn] = value;
+      if (rawColumn) {
+        columnCasedRow[rawColumn] = value;
+      }
     }
     return columnCasedRow as Record<RawColumn<T>, unknown>;
   }

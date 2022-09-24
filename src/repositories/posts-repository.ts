@@ -96,11 +96,11 @@ export class PostsRepository {
       query
         .innerJoin(
           postTagsTable.name,
-          postTagsTable.prefixedColumns.get('postId'),
+          postTagsTable.prefixedColumn('postId'),
           postsTable.prefixedColumn('id')
         )
         .andWhere({
-          [postTagsTable.prefixedColumns.get('tagId')]: params.tagId
+          [postTagsTable.prefixedColumn('tagId')]: params.tagId
         });
     }
 
@@ -126,7 +126,7 @@ export class PostsRepository {
 
   attachTagsToPost = async (params: AttachTagsToPostParams, opts: TransactionOptions) => {
     return this.trx.query(opts,async (trx) => {
-      const insert = params.tagIds.map(tagId => postTagsTable.writeColumns({
+      const insert = params.tagIds.map(tagId => postTagsTable.toColumnCase({
         id: uuid(),
         tagId,
         postId: params.postId,

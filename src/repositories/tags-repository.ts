@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { v4 as uuid } from 'uuid';
 
-import { tagsTable, postTagsTable, imageTagsTable } from '../database';
+import { tagsTable, postTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
 
@@ -35,7 +35,7 @@ export class TagsRepository {
 
       await trx
         .into(tagsTable.name)
-        .insert(tagsTable.writeColumns({
+        .insert(tagsTable.toColumnCase({
           id,
           ...params,
         }));
@@ -47,40 +47,41 @@ export class TagsRepository {
   getTag = async (id: string) => {
     return this.db
       .from(tagsTable.name)
-      .select(tagsTable.columns)
-      .where({ [tagsTable.columns.id]: id })
+      .select(tagsTable.rawColumns())
+      .where({ [tagsTable.rawColumn('id')]: id })
       .first();
   };
 
   getTags = async (ids: string[]) => {
     return this.db
       .from(tagsTable.name)
-      .select(tagsTable.columns)
-      .whereIn(tagsTable.columns.id, ids);
+      .select(tagsTable.rawColumns())
+      .whereIn(tagsTable.rawColumn('id'), ids);
   }
 
   getAllTags = async (): Promise<Tag[]> => {
     return this.db
       .from(tagsTable.name)
-      .select(tagsTable.columns)
+      .select(tagsTable.rawColumns())
   };
 
   getTagsOfPosts = async (postIds: string[]): Promise<PostTag[]> => {
-    const rows = await this.db
+    const q = this.db
       .from(tagsTable.name)
       .innerJoin(
         postTagsTable.name,
-        postTagsTable.prefixedColumns.get('tagId'),
-        tagsTable.prefixedColumns.get('id')
+        postTagsTable.prefixedColumn('tagId'),
+        tagsTable.prefixedColumn('id')
       )
-      .select(tagsTable.prefixedColumns.all)
-      .select(postTagsTable.prefixedColumns.all)
-      .distinctOn(tagsTable.prefixedColumns.get('id'))
-      .whereIn(postTagsTable.prefixedColumns.get('postId'), postIds);
+      .select(tagsTable.prefixedColumns())
+      .select(postTagsTable.prefixedColumns())
+      .distinctOn(tagsTable.prefixedColumn('id'))
+      .whereIn(postTagsTable.prefixedColumn('postId'), postIds);
 
+    const rows = await q;
     return rows.map(row => {
-      const tag = tagsTable.prefixedColumns.unmarshal(row);
-      const { postId } = postTagsTable.prefixedColumns.unmarshal(row);
+      const tag = tagsTable.toAttributeCase(row);
+      const { postId } = postTagsTable.toAttributeCase(row);
       return { ...tag, postId } as PostTag;
     });
   };
