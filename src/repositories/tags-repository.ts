@@ -66,7 +66,7 @@ export class TagsRepository {
   };
 
   getTagsOfPosts = async (postIds: string[]): Promise<PostTag[]> => {
-    const q = this.db
+    const rows = await this.db
       .from(tagsTable.name)
       .innerJoin(
         postTagsTable.name,
@@ -75,10 +75,9 @@ export class TagsRepository {
       )
       .select(tagsTable.prefixedColumns())
       .select(postTagsTable.prefixedColumns())
-      .distinctOn(tagsTable.prefixedColumn('id'))
-      .whereIn(postTagsTable.prefixedColumn('postId'), postIds);
+      .whereIn(postTagsTable.prefixedColumn('postId'), postIds)
+      .orderBy(postTagsTable.prefixedColumn('creationTimestamp'));
 
-    const rows = await q;
     return rows.map(row => {
       const tag = tagsTable.toAttributeCase(row);
       const { postId } = postTagsTable.toAttributeCase(row);
