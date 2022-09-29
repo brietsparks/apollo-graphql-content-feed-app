@@ -1,9 +1,9 @@
 import { StartedTestContainer } from 'testcontainers';
 import { Knex } from 'knex';
 
-import { createPgTestcontainer, makeKnexClient } from '../database';
+import { createPgTestcontainer, makeKnexClient } from '../../database';
 
-import { makeCursorPagination } from '../repositories/pagination';
+import { makeCursorPagination } from '../../repositories/pagination';
 
 describe('makePagination', () => {
   let testcontainer: StartedTestContainer;
@@ -12,7 +12,7 @@ describe('makePagination', () => {
   beforeAll(async () => {
     const result = await createPgTestcontainer();
     testcontainer = result.testcontainer;
-    db = makeKnexClient({
+    db = await makeKnexClient({
       connection: result.params
     });
 

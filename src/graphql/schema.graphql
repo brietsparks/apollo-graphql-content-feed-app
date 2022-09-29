@@ -1,26 +1,19 @@
 type Mutation {
   createUser(params: CreateUserParams!): User!
-  createProject(params: CreateProjectParams!): Project!
-  createStatus(params: CreateStatusParams!): Status!
-  createIssue(params: CreateIssueParams!): Issue!
+  createTag(params: CreateTagParams!): Tag!
+  createPost(params: CreatePostParams!): Post!
+  createImage(params: CreateImageParams!): Image!
 }
 
 type Query {
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
-  getUsersByCursor(pagination: CursorPaginationInput!): CursorPaginatedUsers!
-  getUsersByOffset(pagination: OffsetPaginationInput!): OffsetPaginatedUsers!
-  getUsersByPageOffset(pagination: PageOffsetPaginationInput!): OffsetPaginatedUsers!
-  getProject(id: String!): Project
-  getProjects(pagination: CursorPaginationInput!): CursorPaginatedProjects!
-  getProjectsByCursor(pagination: CursorPaginationInput!): CursorPaginatedProjects!
-  searchProjects(term: String!, pagination: CursorPaginationInput!): CursorPaginatedProjects!
-  getStatus(id: String!): Status
-  getStatuses(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
-  getStatusesByCursor(pagination: CursorPaginationInput!): CursorPaginatedStatuses!
-  getIssue(id: String): Issue
-  getIssues(pagination: CursorPaginationInput!): PaginatedIssues!
-  getIssuesByCursor(pagination: CursorPaginationInput!): PaginatedIssues!
+  getTag(id: String!): Tag
+  getPost(id: String!): Post
+  getPosts(params: GetPostsParams!): CursorPaginatedPosts!
+  getImage(id: String!): Image
+  getImages(params: GetImagesParams!): CursorPaginatedImages!
+  getContentItems(params: GetContentItemsParams!): CursorPaginatedContentItems!
 }
 
 #
@@ -43,7 +36,7 @@ input CursorPaginationInput {
   limit: Int
 }
 
-type CursorPage {
+type Cursors {
   start: String
   end: String
   next: String
@@ -59,16 +52,23 @@ input OffsetPaginationInput {
 input PageOffsetPaginationInput {
   sortField: String
   sortDirection: SortDirection
-  page: Int
+  cursors: Int
   limit: Int
 }
 
-#
+# ------------------------
 # Entities
+# ------------------------
+
+#
+# User
 #
 type User {
   id: String!
   creationTimestamp: String!
+  recentPosts: [Post!]!
+  recentImages: [Image!]!
+  recentContentItems: [ContentItem!]!
   name: String!
 }
 
@@ -78,64 +78,100 @@ input CreateUserParams {
 
 type CursorPaginatedUsers {
   items: [User!]!
-  page: CursorPage!
+  cursors: Cursors!
 }
 
 type OffsetPaginatedUsers {
   items: [User!]!
 }
 
-type Project {
+#
+# Post
+#
+type Post {
+  id: String!
+  creationTimestamp: String!
+  ownerId: String!
+  owner: User!
+  tags: [Tag!]!
+  title: String!
+  body: String
+}
+
+input CreatePostParams {
+  ownerId: String!
+  tagIds: [String]
+  title: String!
+  body: String
+}
+
+input GetPostsParams {
+  pagination: CursorPaginationInput!
+  ownerId: String
+  tagId: String
+}
+
+type CursorPaginatedPosts {
+  items: [Post!]!
+  cursors: Cursors!
+}
+
+#
+# Image
+#
+type Image {
+  id: String!
+  creationTimestamp: String!
+  ownerId: String!
+  owner: User!
+  tags: [Tag!]!
+  url: String!
+  caption: String
+}
+
+input CreateImageParams {
+  ownerId: String!
+  url: String!
+  caption: String
+}
+
+input GetImagesParams {
+  pagination: CursorPaginationInput!
+  ownerId: String
+}
+
+type CursorPaginatedImages {
+  items: [Image!]!
+  cursors: Cursors!
+}
+
+#
+# Content
+#
+union ContentItem = Post | Image
+
+input GetContentItemsParams {
+  pagination: CursorPaginationInput!
+  ownerId: String
+}
+
+type CursorPaginatedContentItems {
+  items: [ContentItem!]!
+  cursors: Cursors!
+}
+
+
+#
+# Tag
+#
+type Tag {
   id: String!
   creationTimestamp: String!
   name: String!
-  statuses: [Status!]!
+  recentPosts: [Post!]!
 }
 
-type CursorPaginatedProjects {
-  items: [Project!]!
-  page: CursorPage!
-}
-
-input CreateProjectParams {
+input CreateTagParams {
   name: String!
 }
 
-type Status {
-  id: String!
-  projectId: String!
-  project: Project!
-  creationTimestamp: String!
-  name: String!
-}
-
-input CreateStatusParams {
-  projectId: String!
-  name: String!
-}
-
-type CursorPaginatedStatuses {
-  items: [Status!]!
-  page: CursorPage!
-}
-
-type Issue {
-  id: String!
-  creationTimestamp: String!
-  assigneeId: String
-  statusId: String
-  name: String!
-  description: String
-}
-
-input CreateIssueParams {
-  name: String!
-  assigneeId: String
-  statusId: String
-  description: String
-}
-
-type PaginatedIssues {
-  items: [Issue!]!
-  page: CursorPage!
-}

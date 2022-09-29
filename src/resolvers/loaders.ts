@@ -1,15 +1,22 @@
 import { Repositories } from '../repositories';
 
-import { makeProjectsLoader } from './projects-loader';
-import { makeStatusesLoader } from './statuses-loader';
+import { makeUsersLoader } from './users-loader';
+import { makeTagsLoader } from './tags-loader';
+import { makePostsLoader } from './posts-loader';
+import { makeImagesLoader } from './images-loader';
 
 export type Loaders = ReturnType<typeof makeLoaders>;
 
 export function makeLoaders(repositories: Repositories) {
-  const projectsLoader = makeProjectsLoader(repositories.projectsRepository);
-  const statusesLoader = makeStatusesLoader(repositories.statusesRepository);
+  const usersLoader = makeUsersLoader(repositories.usersRepository);
+  const tagsLoader = makeTagsLoader(repositories.tagsRepository);
+  const postsLoader = makePostsLoader(repositories.postsRepository);
+  const imagesLoader = makeImagesLoader(repositories.imagesRepository);
+
   return {
-    projectsLoader,
-    statusesLoader,
+    usersLoader,
+    tagsLoader,
+    postsLoader,
+    imagesLoader,
   };
 }

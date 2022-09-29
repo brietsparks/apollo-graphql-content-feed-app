@@ -2,14 +2,16 @@ import { Knex } from 'knex';
 import pg from 'pg';
 
 import { UsersRepository } from './users-repository';
-import { ProjectsRepository } from './projects-repository';
-import { StatusesRepository } from './statuses-repository';
-import { IssuesRepository } from './issues-repository';
+import { TagsRepository } from './tags-repository';
+import { PostsRepository } from './posts-repository';
+import { ImagesRepository } from './images-repository';
+import { ContentItemsRepository } from './content-items-repository';
 
 export * from './users-repository';
-export * from './projects-repository';
-export * from './statuses-repository';
-export * from './issues-repository';
+export * from './tags-repository';
+export * from './posts-repository';
+export * from './images-repository';
+export * from './content-items-repository';
 
 export type Repositories = ReturnType<typeof makeRepositories>;
 
@@ -17,15 +19,17 @@ export function makeRepositories(db: Knex) {
   configurePgParsers();
 
   const usersRepository = new UsersRepository(db);
-  const projectsRepository = new ProjectsRepository(db);
-  const statusesRepository = new StatusesRepository(db);
-  const issuesRepository = new IssuesRepository(db);
+  const tagsRepository = new TagsRepository(db);
+  const postsRepository = new PostsRepository(db);
+  const imagesRepository = new ImagesRepository(db);
+  const contentItemsRepository = new ContentItemsRepository(db);
 
   return {
     usersRepository,
-    projectsRepository,
-    statusesRepository,
-    issuesRepository,
+    tagsRepository,
+    postsRepository,
+    imagesRepository,
+    contentItemsRepository,
   };
 }
 

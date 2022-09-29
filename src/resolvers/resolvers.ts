@@ -1,32 +1,31 @@
 import { Repositories } from '../repositories';
 
 import { makeUsersResolver } from './users-resolver';
-import { makeProjectsResolver } from './projects-resolver';
-import { makeIssuesResolver } from './issues-resolver';
-import { makeStatusesResolver } from './statuses-resolver';
+import { makePostsResolver } from './posts-resolver';
+import { makeImagesResolver } from './images-resolver';
+import { makeContentItemsResolver } from './content-items-resolver';
 
 export function makeResolvers(repositories: Repositories) {
   const usersResolver = makeUsersResolver(repositories);
-  const projectsResolver = makeProjectsResolver(repositories);
-  const issuesResolver = makeIssuesResolver(repositories);
-  const statusesResolver = makeStatusesResolver(repositories);
+  const postsResolver = makePostsResolver(repositories);
+  const imagesReolver = makeImagesResolver(repositories);
+  const contentItemsResolver = makeContentItemsResolver(repositories);
 
   return {
     Query: {
       ...usersResolver.Query,
-      ...projectsResolver.Query,
-      ...issuesResolver.Query,
-      ...statusesResolver.Query
+      ...postsResolver.Query,
+      ...imagesReolver.Query,
+      ...contentItemsResolver.Query,
     },
     Mutation: {
       ...usersResolver.Mutation,
-      ...projectsResolver.Mutation,
-      ...issuesResolver.Mutation,
-      ...statusesResolver.Mutation,
+      ...postsResolver.Mutation,
+      ...imagesReolver.Mutation,
     },
     User: usersResolver.User,
-    Project: projectsResolver.Project,
-    Issue: issuesResolver.Issue,
-    Status: statusesResolver.Status,
+    Post: postsResolver.Post,
+    Image: imagesReolver.Image,
+    ContentItem: contentItemsResolver.ContentItem,
   }
 }

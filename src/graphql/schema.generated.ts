@@ -4,6 +4,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 export type RequireFields<T, K extends keyof T> = { [X in Exclude<keyof T, K>]?: T[X] } & { [P in K]-?: NonNullable<T[P]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
@@ -14,20 +15,23 @@ export type Scalars = {
   Float: number;
 };
 
-export type CreateIssueParams = {
-  assigneeId?: InputMaybe<Scalars['String']>;
-  description?: InputMaybe<Scalars['String']>;
-  name: Scalars['String'];
-  statusId?: InputMaybe<Scalars['String']>;
+export type ContentItem = Image | Post;
+
+export type CreateImageParams = {
+  caption?: InputMaybe<Scalars['String']>;
+  ownerId: Scalars['String'];
+  url: Scalars['String'];
 };
 
-export type CreateProjectParams = {
-  name: Scalars['String'];
+export type CreatePostParams = {
+  body?: InputMaybe<Scalars['String']>;
+  ownerId: Scalars['String'];
+  tagIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
+  title: Scalars['String'];
 };
 
-export type CreateStatusParams = {
+export type CreateTagParams = {
   name: Scalars['String'];
-  projectId: Scalars['String'];
 };
 
 export type CreateUserParams = {
@@ -41,15 +45,21 @@ export type CursorPage = {
   start?: Maybe<Scalars['String']>;
 };
 
-export type CursorPaginatedProjects = {
-  __typename?: 'CursorPaginatedProjects';
-  items: Array<Project>;
+export type CursorPaginatedContentItems = {
+  __typename?: 'CursorPaginatedContentItems';
+  items: Array<ContentItem>;
   page: CursorPage;
 };
 
-export type CursorPaginatedStatuses = {
-  __typename?: 'CursorPaginatedStatuses';
-  items: Array<Status>;
+export type CursorPaginatedImages = {
+  __typename?: 'CursorPaginatedImages';
+  items: Array<Image>;
+  page: CursorPage;
+};
+
+export type CursorPaginatedPosts = {
+  __typename?: 'CursorPaginatedPosts';
+  items: Array<Post>;
   page: CursorPage;
 };
 
@@ -66,37 +76,54 @@ export type CursorPaginationInput = {
   sortDirection?: InputMaybe<SortDirection>;
 };
 
-export type Issue = {
-  __typename?: 'Issue';
-  assigneeId?: Maybe<Scalars['String']>;
+export type GetContentItemsParams = {
+  ownerId?: InputMaybe<Scalars['String']>;
+  pagination: CursorPaginationInput;
+};
+
+export type GetImagesParams = {
+  ownerId?: InputMaybe<Scalars['String']>;
+  pagination: CursorPaginationInput;
+};
+
+export type GetPostsParams = {
+  ownerId?: InputMaybe<Scalars['String']>;
+  pagination: CursorPaginationInput;
+  tagId?: InputMaybe<Scalars['String']>;
+};
+
+export type Image = {
+  __typename?: 'Image';
+  caption?: Maybe<Scalars['String']>;
   creationTimestamp: Scalars['String'];
-  description?: Maybe<Scalars['String']>;
   id: Scalars['String'];
-  name: Scalars['String'];
-  statusId?: Maybe<Scalars['String']>;
+  owner: User;
+  ownerId: Scalars['String'];
+  tags: Array<Tag>;
+  url: Scalars['String'];
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createIssue: Issue;
-  createProject: Project;
-  createStatus: Status;
+  createImage: Image;
+  createPost: Post;
+  createTag: Tag;
   createUser: User;
 };
 
 
-export type MutationCreateIssueArgs = {
-  params: CreateIssueParams;
+export type MutationCreateImageArgs = {
+  params: CreateImageParams;
 };
 
 
-export type MutationCreateProjectArgs = {
-  params: CreateProjectParams;
+export type MutationCreatePostArgs = {
+  params: CreatePostParams;
 };
 
 
-export type MutationCreateStatusArgs = {
-  params: CreateStatusParams;
+export type MutationCreateTagArgs = {
+  params: CreateTagParams;
 };
 
 
@@ -123,81 +150,57 @@ export type PageOffsetPaginationInput = {
   sortField?: InputMaybe<Scalars['String']>;
 };
 
-export type PaginatedIssues = {
-  __typename?: 'PaginatedIssues';
-  items: Array<Issue>;
-  page: CursorPage;
-};
-
-export type Project = {
-  __typename?: 'Project';
+export type Post = {
+  __typename?: 'Post';
+  body?: Maybe<Scalars['String']>;
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
-  name: Scalars['String'];
-  statuses: Array<Status>;
+  owner: User;
+  ownerId: Scalars['String'];
+  tags: Array<Tag>;
+  title: Scalars['String'];
 };
 
 export type Query = {
   __typename?: 'Query';
-  getIssue?: Maybe<Issue>;
-  getIssues: PaginatedIssues;
-  getIssuesByCursor: PaginatedIssues;
-  getProject?: Maybe<Project>;
-  getProjects: CursorPaginatedProjects;
-  getProjectsByCursor: CursorPaginatedProjects;
-  getStatus?: Maybe<Status>;
-  getStatuses: CursorPaginatedStatuses;
-  getStatusesByCursor: CursorPaginatedStatuses;
+  getContentItems: CursorPaginatedContentItems;
+  getImage?: Maybe<Image>;
+  getImages: CursorPaginatedImages;
+  getPost?: Maybe<Post>;
+  getPosts: CursorPaginatedPosts;
+  getTag?: Maybe<Tag>;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
-  getUsersByCursor: CursorPaginatedUsers;
-  getUsersByOffset: OffsetPaginatedUsers;
-  getUsersByPageOffset: OffsetPaginatedUsers;
 };
 
 
-export type QueryGetIssueArgs = {
-  id?: InputMaybe<Scalars['String']>;
+export type QueryGetContentItemsArgs = {
+  params: GetContentItemsParams;
 };
 
 
-export type QueryGetIssuesArgs = {
-  pagination: CursorPaginationInput;
-};
-
-
-export type QueryGetIssuesByCursorArgs = {
-  pagination: CursorPaginationInput;
-};
-
-
-export type QueryGetProjectArgs = {
+export type QueryGetImageArgs = {
   id: Scalars['String'];
 };
 
 
-export type QueryGetProjectsArgs = {
-  pagination: CursorPaginationInput;
+export type QueryGetImagesArgs = {
+  params: GetImagesParams;
 };
 
 
-export type QueryGetProjectsByCursorArgs = {
-  pagination: CursorPaginationInput;
-};
-
-
-export type QueryGetStatusArgs = {
+export type QueryGetPostArgs = {
   id: Scalars['String'];
 };
 
 
-export type QueryGetStatusesArgs = {
-  pagination: CursorPaginationInput;
+export type QueryGetPostsArgs = {
+  params: GetPostsParams;
 };
 
 
-export type QueryGetStatusesByCursorArgs = {
-  pagination: CursorPaginationInput;
+export type QueryGetTagArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -210,21 +213,6 @@ export type QueryGetUsersArgs = {
   pagination: CursorPaginationInput;
 };
 
-
-export type QueryGetUsersByCursorArgs = {
-  pagination: CursorPaginationInput;
-};
-
-
-export type QueryGetUsersByOffsetArgs = {
-  pagination: OffsetPaginationInput;
-};
-
-
-export type QueryGetUsersByPageOffsetArgs = {
-  pagination: PageOffsetPaginationInput;
-};
-
 export enum SortDirection {
   Asc = 'asc',
   Desc = 'desc'
@@ -235,13 +223,12 @@ export type SortInput = {
   field: Scalars['String'];
 };
 
-export type Status = {
-  __typename?: 'Status';
+export type Tag = {
+  __typename?: 'Tag';
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
-  project: Project;
-  projectId: Scalars['String'];
+  recentPosts: Array<Post>;
 };
 
 export type User = {
@@ -249,6 +236,9 @@ export type User = {
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+  recentContentItems: Array<ContentItem>;
+  recentImages: Array<Image>;
+  recentPosts: Array<Post>;
 };
 
 
@@ -321,56 +311,68 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
-  CreateIssueParams: CreateIssueParams;
-  CreateProjectParams: CreateProjectParams;
-  CreateStatusParams: CreateStatusParams;
+  ContentItem: ResolversTypes['Image'] | ResolversTypes['Post'];
+  CreateImageParams: CreateImageParams;
+  CreatePostParams: CreatePostParams;
+  CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
   CursorPage: ResolverTypeWrapper<CursorPage>;
-  CursorPaginatedProjects: ResolverTypeWrapper<CursorPaginatedProjects>;
-  CursorPaginatedStatuses: ResolverTypeWrapper<CursorPaginatedStatuses>;
+  CursorPaginatedContentItems: ResolverTypeWrapper<Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversTypes['ContentItem']> }>;
+  CursorPaginatedImages: ResolverTypeWrapper<CursorPaginatedImages>;
+  CursorPaginatedPosts: ResolverTypeWrapper<CursorPaginatedPosts>;
   CursorPaginatedUsers: ResolverTypeWrapper<CursorPaginatedUsers>;
   CursorPaginationInput: CursorPaginationInput;
+  GetContentItemsParams: GetContentItemsParams;
+  GetImagesParams: GetImagesParams;
+  GetPostsParams: GetPostsParams;
+  Image: ResolverTypeWrapper<Image>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
-  Issue: ResolverTypeWrapper<Issue>;
   Mutation: ResolverTypeWrapper<{}>;
   OffsetPaginatedUsers: ResolverTypeWrapper<OffsetPaginatedUsers>;
   OffsetPaginationInput: OffsetPaginationInput;
   PageOffsetPaginationInput: PageOffsetPaginationInput;
-  PaginatedIssues: ResolverTypeWrapper<PaginatedIssues>;
-  Project: ResolverTypeWrapper<Project>;
+  Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<{}>;
   SortDirection: SortDirection;
   SortInput: SortInput;
-  Status: ResolverTypeWrapper<Status>;
   String: ResolverTypeWrapper<Scalars['String']>;
-  User: ResolverTypeWrapper<User>;
+  Tag: ResolverTypeWrapper<Tag>;
+  User: ResolverTypeWrapper<Omit<User, 'recentContentItems'> & { recentContentItems: Array<ResolversTypes['ContentItem']> }>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
-  CreateIssueParams: CreateIssueParams;
-  CreateProjectParams: CreateProjectParams;
-  CreateStatusParams: CreateStatusParams;
+  ContentItem: ResolversParentTypes['Image'] | ResolversParentTypes['Post'];
+  CreateImageParams: CreateImageParams;
+  CreatePostParams: CreatePostParams;
+  CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
   CursorPage: CursorPage;
-  CursorPaginatedProjects: CursorPaginatedProjects;
-  CursorPaginatedStatuses: CursorPaginatedStatuses;
+  CursorPaginatedContentItems: Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversParentTypes['ContentItem']> };
+  CursorPaginatedImages: CursorPaginatedImages;
+  CursorPaginatedPosts: CursorPaginatedPosts;
   CursorPaginatedUsers: CursorPaginatedUsers;
   CursorPaginationInput: CursorPaginationInput;
+  GetContentItemsParams: GetContentItemsParams;
+  GetImagesParams: GetImagesParams;
+  GetPostsParams: GetPostsParams;
+  Image: Image;
   Int: Scalars['Int'];
-  Issue: Issue;
   Mutation: {};
   OffsetPaginatedUsers: OffsetPaginatedUsers;
   OffsetPaginationInput: OffsetPaginationInput;
   PageOffsetPaginationInput: PageOffsetPaginationInput;
-  PaginatedIssues: PaginatedIssues;
-  Project: Project;
+  Post: Post;
   Query: {};
   SortInput: SortInput;
-  Status: Status;
   String: Scalars['String'];
-  User: User;
+  Tag: Tag;
+  User: Omit<User, 'recentContentItems'> & { recentContentItems: Array<ResolversParentTypes['ContentItem']> };
+};
+
+export type ContentItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['ContentItem'] = ResolversParentTypes['ContentItem']> = {
+  __resolveType: TypeResolveFn<'Image' | 'Post', ParentType, ContextType>;
 };
 
 export type CursorPageResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPage'] = ResolversParentTypes['CursorPage']> = {
@@ -380,14 +382,20 @@ export type CursorPageResolvers<ContextType = any, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type CursorPaginatedProjectsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedProjects'] = ResolversParentTypes['CursorPaginatedProjects']> = {
-  items?: Resolver<Array<ResolversTypes['Project']>, ParentType, ContextType>;
+export type CursorPaginatedContentItemsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedContentItems'] = ResolversParentTypes['CursorPaginatedContentItems']> = {
+  items?: Resolver<Array<ResolversTypes['ContentItem']>, ParentType, ContextType>;
   page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type CursorPaginatedStatusesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedStatuses'] = ResolversParentTypes['CursorPaginatedStatuses']> = {
-  items?: Resolver<Array<ResolversTypes['Status']>, ParentType, ContextType>;
+export type CursorPaginatedImagesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedImages'] = ResolversParentTypes['CursorPaginatedImages']> = {
+  items?: Resolver<Array<ResolversTypes['Image']>, ParentType, ContextType>;
+  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CursorPaginatedPostsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedPosts'] = ResolversParentTypes['CursorPaginatedPosts']> = {
+  items?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -398,20 +406,21 @@ export type CursorPaginatedUsersResolvers<ContextType = any, ParentType extends 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type IssueResolvers<ContextType = any, ParentType extends ResolversParentTypes['Issue'] = ResolversParentTypes['Issue']> = {
-  assigneeId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+export type ImageResolvers<ContextType = any, ParentType extends ResolversParentTypes['Image'] = ResolversParentTypes['Image']> = {
+  caption?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  statusId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['Tag']>, ParentType, ContextType>;
+  url?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createIssue?: Resolver<ResolversTypes['Issue'], ParentType, ContextType, RequireFields<MutationCreateIssueArgs, 'params'>>;
-  createProject?: Resolver<ResolversTypes['Project'], ParentType, ContextType, RequireFields<MutationCreateProjectArgs, 'params'>>;
-  createStatus?: Resolver<ResolversTypes['Status'], ParentType, ContextType, RequireFields<MutationCreateStatusArgs, 'params'>>;
+  createImage?: Resolver<ResolversTypes['Image'], ParentType, ContextType, RequireFields<MutationCreateImageArgs, 'params'>>;
+  createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'params'>>;
+  createTag?: Resolver<ResolversTypes['Tag'], ParentType, ContextType, RequireFields<MutationCreateTagArgs, 'params'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'params'>>;
 };
 
@@ -420,43 +429,33 @@ export type OffsetPaginatedUsersResolvers<ContextType = any, ParentType extends 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type PaginatedIssuesResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaginatedIssues'] = ResolversParentTypes['PaginatedIssues']> = {
-  items?: Resolver<Array<ResolversTypes['Issue']>, ParentType, ContextType>;
-  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
-export type ProjectResolvers<ContextType = any, ParentType extends ResolversParentTypes['Project'] = ResolversParentTypes['Project']> = {
+export type PostResolvers<ContextType = any, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
+  body?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  statuses?: Resolver<Array<ResolversTypes['Status']>, ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes['Tag']>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
-  getIssue?: Resolver<Maybe<ResolversTypes['Issue']>, ParentType, ContextType, RequireFields<QueryGetIssueArgs, never>>;
-  getIssues?: Resolver<ResolversTypes['PaginatedIssues'], ParentType, ContextType, RequireFields<QueryGetIssuesArgs, 'pagination'>>;
-  getIssuesByCursor?: Resolver<ResolversTypes['PaginatedIssues'], ParentType, ContextType, RequireFields<QueryGetIssuesByCursorArgs, 'pagination'>>;
-  getProject?: Resolver<Maybe<ResolversTypes['Project']>, ParentType, ContextType, RequireFields<QueryGetProjectArgs, 'id'>>;
-  getProjects?: Resolver<ResolversTypes['CursorPaginatedProjects'], ParentType, ContextType, RequireFields<QueryGetProjectsArgs, 'pagination'>>;
-  getProjectsByCursor?: Resolver<ResolversTypes['CursorPaginatedProjects'], ParentType, ContextType, RequireFields<QueryGetProjectsByCursorArgs, 'pagination'>>;
-  getStatus?: Resolver<Maybe<ResolversTypes['Status']>, ParentType, ContextType, RequireFields<QueryGetStatusArgs, 'id'>>;
-  getStatuses?: Resolver<ResolversTypes['CursorPaginatedStatuses'], ParentType, ContextType, RequireFields<QueryGetStatusesArgs, 'pagination'>>;
-  getStatusesByCursor?: Resolver<ResolversTypes['CursorPaginatedStatuses'], ParentType, ContextType, RequireFields<QueryGetStatusesByCursorArgs, 'pagination'>>;
+  getContentItems?: Resolver<ResolversTypes['CursorPaginatedContentItems'], ParentType, ContextType, RequireFields<QueryGetContentItemsArgs, 'params'>>;
+  getImage?: Resolver<Maybe<ResolversTypes['Image']>, ParentType, ContextType, RequireFields<QueryGetImageArgs, 'id'>>;
+  getImages?: Resolver<ResolversTypes['CursorPaginatedImages'], ParentType, ContextType, RequireFields<QueryGetImagesArgs, 'params'>>;
+  getPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryGetPostArgs, 'id'>>;
+  getPosts?: Resolver<ResolversTypes['CursorPaginatedPosts'], ParentType, ContextType, RequireFields<QueryGetPostsArgs, 'params'>>;
+  getTag?: Resolver<Maybe<ResolversTypes['Tag']>, ParentType, ContextType, RequireFields<QueryGetTagArgs, 'id'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   getUsers?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersArgs, 'pagination'>>;
-  getUsersByCursor?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersByCursorArgs, 'pagination'>>;
-  getUsersByOffset?: Resolver<ResolversTypes['OffsetPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersByOffsetArgs, 'pagination'>>;
-  getUsersByPageOffset?: Resolver<ResolversTypes['OffsetPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersByPageOffsetArgs, 'pagination'>>;
 };
 
-export type StatusResolvers<ContextType = any, ParentType extends ResolversParentTypes['Status'] = ResolversParentTypes['Status']> = {
+export type TagResolvers<ContextType = any, ParentType extends ResolversParentTypes['Tag'] = ResolversParentTypes['Tag']> = {
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  project?: Resolver<ResolversTypes['Project'], ParentType, ContextType>;
-  projectId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  recentPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -464,21 +463,25 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  recentContentItems?: Resolver<Array<ResolversTypes['ContentItem']>, ParentType, ContextType>;
+  recentImages?: Resolver<Array<ResolversTypes['Image']>, ParentType, ContextType>;
+  recentPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
+  ContentItem?: ContentItemResolvers<ContextType>;
   CursorPage?: CursorPageResolvers<ContextType>;
-  CursorPaginatedProjects?: CursorPaginatedProjectsResolvers<ContextType>;
-  CursorPaginatedStatuses?: CursorPaginatedStatusesResolvers<ContextType>;
+  CursorPaginatedContentItems?: CursorPaginatedContentItemsResolvers<ContextType>;
+  CursorPaginatedImages?: CursorPaginatedImagesResolvers<ContextType>;
+  CursorPaginatedPosts?: CursorPaginatedPostsResolvers<ContextType>;
   CursorPaginatedUsers?: CursorPaginatedUsersResolvers<ContextType>;
-  Issue?: IssueResolvers<ContextType>;
+  Image?: ImageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   OffsetPaginatedUsers?: OffsetPaginatedUsersResolvers<ContextType>;
-  PaginatedIssues?: PaginatedIssuesResolvers<ContextType>;
-  Project?: ProjectResolvers<ContextType>;
+  Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  Status?: StatusResolvers<ContextType>;
+  Tag?: TagResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

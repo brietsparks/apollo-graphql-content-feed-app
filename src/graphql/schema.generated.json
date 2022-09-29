@@ -19,13 +19,34 @@
         "possibleTypes": null
       },
       {
+        "kind": "UNION",
+        "name": "ContentItem",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": [
+          {
+            "kind": "OBJECT",
+            "name": "Image",
+            "ofType": null
+          },
+          {
+            "kind": "OBJECT",
+            "name": "Post",
+            "ofType": null
+          }
+        ]
+      },
+      {
         "kind": "INPUT_OBJECT",
-        "name": "CreateIssueParams",
+        "name": "CreateImageParams",
         "description": null,
         "fields": null,
         "inputFields": [
           {
-            "name": "assigneeId",
+            "name": "caption",
             "description": null,
             "type": {
               "kind": "SCALAR",
@@ -37,19 +58,7 @@
             "deprecationReason": null
           },
           {
-            "name": "description",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "name",
+            "name": "ownerId",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -65,30 +74,7 @@
             "deprecationReason": null
           },
           {
-            "name": "statusId",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "interfaces": null,
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "INPUT_OBJECT",
-        "name": "CreateProjectParams",
-        "description": null,
-        "fields": null,
-        "inputFields": [
-          {
-            "name": "name",
+            "name": "url",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -110,12 +96,24 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "CreateStatusParams",
+        "name": "CreatePostParams",
         "description": null,
         "fields": null,
         "inputFields": [
           {
-            "name": "name",
+            "name": "body",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ownerId",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -131,7 +129,50 @@
             "deprecationReason": null
           },
           {
-            "name": "projectId",
+            "name": "tagIds",
+            "description": null,
+            "type": {
+              "kind": "LIST",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "title",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "CreateTagParams",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "name",
             "description": null,
             "type": {
               "kind": "NON_NULL",
@@ -227,7 +268,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "CursorPaginatedProjects",
+        "name": "CursorPaginatedContentItems",
         "description": null,
         "fields": [
           {
@@ -244,8 +285,8 @@
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Project",
+                    "kind": "UNION",
+                    "name": "ContentItem",
                     "ofType": null
                   }
                 }
@@ -278,7 +319,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "CursorPaginatedStatuses",
+        "name": "CursorPaginatedImages",
         "description": null,
         "fields": [
           {
@@ -296,7 +337,58 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "Status",
+                    "name": "Image",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "page",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "CursorPage",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "CursorPaginatedPosts",
+        "description": null,
+        "fields": [
+          {
+            "name": "items",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Post",
                     "ofType": null
                   }
                 }
@@ -438,22 +530,141 @@
         "possibleTypes": null
       },
       {
-        "kind": "SCALAR",
-        "name": "Int",
-        "description": "The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.",
+        "kind": "INPUT_OBJECT",
+        "name": "GetContentItemsParams",
+        "description": null,
         "fields": null,
-        "inputFields": null,
+        "inputFields": [
+          {
+            "name": "ownerId",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pagination",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "CursorPaginationInput",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "GetImagesParams",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "ownerId",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pagination",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "CursorPaginationInput",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "INPUT_OBJECT",
+        "name": "GetPostsParams",
+        "description": null,
+        "fields": null,
+        "inputFields": [
+          {
+            "name": "ownerId",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "pagination",
+            "description": null,
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "INPUT_OBJECT",
+                "name": "CursorPaginationInput",
+                "ofType": null
+              }
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "tagId",
+            "description": null,
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "defaultValue": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
       {
         "kind": "OBJECT",
-        "name": "Issue",
+        "name": "Image",
         "description": null,
         "fields": [
           {
-            "name": "assigneeId",
+            "name": "caption",
             "description": null,
             "args": [],
             "type": {
@@ -481,18 +692,6 @@
             "deprecationReason": null
           },
           {
-            "name": "description",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "id",
             "description": null,
             "args": [],
@@ -509,7 +708,23 @@
             "deprecationReason": null
           },
           {
-            "name": "name",
+            "name": "owner",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ownerId",
             "description": null,
             "args": [],
             "type": {
@@ -525,13 +740,41 @@
             "deprecationReason": null
           },
           {
-            "name": "statusId",
+            "name": "tags",
             "description": null,
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
-              "ofType": null
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Tag",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "url",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
+              }
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -543,12 +786,22 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "Int",
+        "description": "The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "Mutation",
         "description": null,
         "fields": [
           {
-            "name": "createIssue",
+            "name": "createImage",
             "description": null,
             "args": [
               {
@@ -559,7 +812,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CreateIssueParams",
+                    "name": "CreateImageParams",
                     "ofType": null
                   }
                 },
@@ -573,7 +826,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Issue",
+                "name": "Image",
                 "ofType": null
               }
             },
@@ -581,7 +834,7 @@
             "deprecationReason": null
           },
           {
-            "name": "createProject",
+            "name": "createPost",
             "description": null,
             "args": [
               {
@@ -592,7 +845,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CreateProjectParams",
+                    "name": "CreatePostParams",
                     "ofType": null
                   }
                 },
@@ -606,7 +859,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Project",
+                "name": "Post",
                 "ofType": null
               }
             },
@@ -614,7 +867,7 @@
             "deprecationReason": null
           },
           {
-            "name": "createStatus",
+            "name": "createTag",
             "description": null,
             "args": [
               {
@@ -625,7 +878,7 @@
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CreateStatusParams",
+                    "name": "CreateTagParams",
                     "ofType": null
                   }
                 },
@@ -639,7 +892,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Status",
+                "name": "Tag",
                 "ofType": null
               }
             },
@@ -840,60 +1093,21 @@
       },
       {
         "kind": "OBJECT",
-        "name": "PaginatedIssues",
+        "name": "Post",
         "description": null,
         "fields": [
           {
-            "name": "items",
+            "name": "body",
             "description": null,
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "OBJECT",
-                    "name": "Issue",
-                    "ofType": null
-                  }
-                }
-              }
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
-          {
-            "name": "page",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "CursorPage",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          }
-        ],
-        "inputFields": null,
-        "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "OBJECT",
-        "name": "Project",
-        "description": null,
-        "fields": [
           {
             "name": "creationTimestamp",
             "description": null,
@@ -927,7 +1141,23 @@
             "deprecationReason": null
           },
           {
-            "name": "name",
+            "name": "owner",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "OBJECT",
+                "name": "User",
+                "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ownerId",
             "description": null,
             "args": [],
             "type": {
@@ -943,7 +1173,7 @@
             "deprecationReason": null
           },
           {
-            "name": "statuses",
+            "name": "tags",
             "description": null,
             "args": [],
             "type": {
@@ -957,10 +1187,26 @@
                   "name": null,
                   "ofType": {
                     "kind": "OBJECT",
-                    "name": "Status",
+                    "name": "Tag",
                     "ofType": null
                   }
                 }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "title",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "SCALAR",
+                "name": "String",
+                "ofType": null
               }
             },
             "isDeprecated": false,
@@ -978,43 +1224,18 @@
         "description": null,
         "fields": [
           {
-            "name": "getIssue",
+            "name": "getContentItems",
             "description": null,
             "args": [
               {
-                "name": "id",
-                "description": null,
-                "type": {
-                  "kind": "SCALAR",
-                  "name": "String",
-                  "ofType": null
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Issue",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "getIssues",
-            "description": null,
-            "args": [
-              {
-                "name": "pagination",
+                "name": "params",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CursorPaginationInput",
+                    "name": "GetContentItemsParams",
                     "ofType": null
                   }
                 },
@@ -1028,7 +1249,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "PaginatedIssues",
+                "name": "CursorPaginatedContentItems",
                 "ofType": null
               }
             },
@@ -1036,40 +1257,7 @@
             "deprecationReason": null
           },
           {
-            "name": "getIssuesByCursor",
-            "description": null,
-            "args": [
-              {
-                "name": "pagination",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "CursorPaginationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "PaginatedIssues",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "getProject",
+            "name": "getImage",
             "description": null,
             "args": [
               {
@@ -1091,25 +1279,25 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "Project",
+              "name": "Image",
               "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "getProjects",
+            "name": "getImages",
             "description": null,
             "args": [
               {
-                "name": "pagination",
+                "name": "params",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CursorPaginationInput",
+                    "name": "GetImagesParams",
                     "ofType": null
                   }
                 },
@@ -1123,7 +1311,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "CursorPaginatedProjects",
+                "name": "CursorPaginatedImages",
                 "ofType": null
               }
             },
@@ -1131,40 +1319,7 @@
             "deprecationReason": null
           },
           {
-            "name": "getProjectsByCursor",
-            "description": null,
-            "args": [
-              {
-                "name": "pagination",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "CursorPaginationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "CursorPaginatedProjects",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "getStatus",
+            "name": "getPost",
             "description": null,
             "args": [
               {
@@ -1186,25 +1341,25 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "Status",
+              "name": "Post",
               "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
           },
           {
-            "name": "getStatuses",
+            "name": "getPosts",
             "description": null,
             "args": [
               {
-                "name": "pagination",
+                "name": "params",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
                     "kind": "INPUT_OBJECT",
-                    "name": "CursorPaginationInput",
+                    "name": "GetPostsParams",
                     "ofType": null
                   }
                 },
@@ -1218,7 +1373,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "CursorPaginatedStatuses",
+                "name": "CursorPaginatedPosts",
                 "ofType": null
               }
             },
@@ -1226,18 +1381,18 @@
             "deprecationReason": null
           },
           {
-            "name": "getStatusesByCursor",
+            "name": "getTag",
             "description": null,
             "args": [
               {
-                "name": "pagination",
+                "name": "id",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
                   "name": null,
                   "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "CursorPaginationInput",
+                    "kind": "SCALAR",
+                    "name": "String",
                     "ofType": null
                   }
                 },
@@ -1247,13 +1402,9 @@
               }
             ],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "CursorPaginatedStatuses",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "Tag",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -1314,105 +1465,6 @@
               "ofType": {
                 "kind": "OBJECT",
                 "name": "CursorPaginatedUsers",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "getUsersByCursor",
-            "description": null,
-            "args": [
-              {
-                "name": "pagination",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "CursorPaginationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "CursorPaginatedUsers",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "getUsersByOffset",
-            "description": null,
-            "args": [
-              {
-                "name": "pagination",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "OffsetPaginationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OffsetPaginatedUsers",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "getUsersByPageOffset",
-            "description": null,
-            "args": [
-              {
-                "name": "pagination",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "INPUT_OBJECT",
-                    "name": "PageOffsetPaginationInput",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null,
-                "isDeprecated": false,
-                "deprecationReason": null
-              }
-            ],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "OffsetPaginatedUsers",
                 "ofType": null
               }
             },
@@ -1492,8 +1544,18 @@
         "possibleTypes": null
       },
       {
+        "kind": "SCALAR",
+        "name": "String",
+        "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
-        "name": "Status",
+        "name": "Tag",
         "description": null,
         "fields": [
           {
@@ -1545,32 +1607,24 @@
             "deprecationReason": null
           },
           {
-            "name": "project",
+            "name": "recentPosts",
             "description": null,
             "args": [],
             "type": {
               "kind": "NON_NULL",
               "name": null,
               "ofType": {
-                "kind": "OBJECT",
-                "name": "Project",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "projectId",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
-                "ofType": null
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Post",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,
@@ -1579,16 +1633,6 @@
         ],
         "inputFields": null,
         "interfaces": [],
-        "enumValues": null,
-        "possibleTypes": null
-      },
-      {
-        "kind": "SCALAR",
-        "name": "String",
-        "description": "The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.",
-        "fields": null,
-        "inputFields": null,
-        "interfaces": null,
         "enumValues": null,
         "possibleTypes": null
       },
@@ -1640,6 +1684,78 @@
                 "kind": "SCALAR",
                 "name": "String",
                 "ofType": null
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "recentContentItems",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "UNION",
+                    "name": "ContentItem",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "recentImages",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Image",
+                    "ofType": null
+                  }
+                }
+              }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "recentPosts",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "NON_NULL",
+              "name": null,
+              "ofType": {
+                "kind": "LIST",
+                "name": null,
+                "ofType": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Post",
+                    "ofType": null
+                  }
+                }
               }
             },
             "isDeprecated": false,

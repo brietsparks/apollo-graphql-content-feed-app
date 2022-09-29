@@ -4,21 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { usersTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
-
-export interface ItemOffsetPaginationParams { // todo
-  sortField: string;
-  sortDirection: string;
-  limit: number; // itemLimit
-  offset: number; // itemOffset
-}
-
-export interface PageOffsetPaginationParams {
-  sortField: string;
-  sortDirection: string;
-  limit: number;
-  page: number;
-}
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
 
 export type User = {
   id: string;
@@ -26,41 +12,16 @@ export type User = {
   creationTimestamp: string;
 }
 
-export const defaultUserCursorPaginationParams: CursorPaginationParams<User> = {
-  field: 'creationTimestamp',
-  sortDirection: 'desc',
-  limit: 10,
-  fieldmap: usersTable.columns,
-};
-
-export const defaultUserItemOffsetPaginationParams: ItemOffsetPaginationParams = {
-  sortField: usersTable.columns.creationTimestamp,
-  sortDirection: 'desc',
-  limit: 10,
-  offset: 0
-};
-
-export const defaultUserPageOffsetPaginationParams: PageOffsetPaginationParams = {
-  sortField: usersTable.columns.creationTimestamp,
-  sortDirection: 'desc',
-  limit: 10,
-  page: 1
-};
-
 export interface CreateUserParams {
   name: string;
 }
 
 export interface GetUsersByCursorParams {
-  pagination: Partial<CursorPaginationParams<User>>;
+  pagination: Partial<CursorPaginationParams<keyof User>>;
 }
 
-export interface GetUsersByItemOffsetParams {
-  pagination: Partial<ItemOffsetPaginationParams>;
-}
-
-export interface GetUsersByPageOffsetParams {
-  pagination: Partial<PageOffsetPaginationParams>;
+export interface GetProjectsByIdsParams {
+  ids: string[]
 }
 
 export class UsersRepository {
@@ -78,7 +39,7 @@ export class UsersRepository {
 
       await trx
         .into(usersTable.name)
-        .insert(usersTable.writeColumns({
+        .insert(usersTable.toColumnCase({
           id,
           name: params.name
         }));
@@ -90,8 +51,8 @@ export class UsersRepository {
   getUser = async (id: string) => {
     return this.db
       .from(usersTable.name)
-      .select(usersTable.columns)
-      .where({ [usersTable.columns.id]: id })
+      .select(usersTable.rawColumns())
+      .where({ [usersTable.rawColumn('id')]: id })
       .first();
   };
 
@@ -100,7 +61,7 @@ export class UsersRepository {
 
     const users = await this.db
       .from(usersTable.name)
-      .select(usersTable.columns)
+      .select(usersTable.rawColumns())
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
@@ -108,71 +69,19 @@ export class UsersRepository {
     return pagination.getResult(users);
   }
 
-  getUsersByItemOffset = async (params: GetUsersByItemOffsetParams) => {
-    const pagination: ItemOffsetPaginationParams = {
-      ...defaultUserItemOffsetPaginationParams,
-      ...params.pagination,
-      sortField: usersTable.columns[params.pagination.sortField] || defaultUserItemOffsetPaginationParams.sortField
-    }
-
-    const users = await this.db
+  getUsersByIds = async (params: GetProjectsByIdsParams): Promise<User[]> => {
+    return this.db
       .from(usersTable.name)
-      .select(usersTable.columns)
-      .offset(pagination.offset)
-      .limit(pagination.limit)
-      .orderBy(pagination.sortField, pagination.sortDirection);
-
-    return {
-      items: users,
-      page: pagination
-    };
-  }
-
-  getUsersByPageOffset = async (params: GetUsersByPageOffsetParams) => {
-    const pagination: PageOffsetPaginationParams = {
-      ...defaultUserPageOffsetPaginationParams,
-      ...params.pagination,
-      sortField: usersTable.columns[params.pagination.sortField] || defaultUserPageOffsetPaginationParams.sortField
-    };
-
-    const currentPage = pagination.page > 0 ? pagination.page : 1;
-    const pageOffset = currentPage - 1;
-    const offset = pageOffset * pagination.limit;
-
-    const users = await this.db
-      .from(usersTable.name)
-      .select(usersTable.columns)
-      .offset(offset)
-      .limit(pagination.limit)
-      .orderBy(pagination.sortField, pagination.sortDirection);
-
-    const usersCount = await this.db
-      .from(usersTable.name)
-      .count('*');
-
-    const lastPage = Math.ceil(usersCount[0].count / pagination.limit);
-
-    return {
-      items: users,
-      page: {
-        current: currentPage,
-        last: lastPage,
-        totalItems: usersCount[0].count
-      }
-    };
+      .select(usersTable.rawColumns())
+      .whereIn(usersTable.rawColumn('id'), params.ids);
   };
 }
 
-export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<User>>) {
-  const defaultParams: CursorPaginationParams<User> = {
-    field: 'creationTimestamp',
-    sortDirection: 'desc',
-    limit: 10,
-    fieldmap: usersTable.columns,
-  };
-
-  return makeCursorPagination<User>({
-    ...defaultParams,
-    ...params,
+export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<keyof User>>) {
+  return makeCursorPagination({
+    field: usersTable.rawColumn(params.field || 'creationTimestamp'),
+    sortDirection: params.sortDirection || 'desc',
+    limit: params.limit || 4,
+    cursor: params.cursor,
   });
 }

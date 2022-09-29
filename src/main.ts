@@ -1,33 +1,37 @@
 import { createApp } from './app';
 
-const action = process.argv[2];
+void main();
 
-const app = createApp({
-  db: {
-    user: 'appuser',
-    password: 'apppassword',
-    host: '127.0.0.1',
-    database: 'example_app',
-    port: 5432
-  }
-});
+export async function main() {
+  const action = process.argv[2];
 
-const vars = {
-  port: 3000
-};
-
-if (!action || action === 'serve') {
-  app.server.start().then(s => {
-    s.listen(vars.port, () => {
-      console.log(`listening on port ${vars.port}`)
-    });
+  const app = await createApp({
+    db: {
+      user: 'appuser',
+      password: 'apppassword',
+      host: '127.0.0.1',
+      database: 'example_app',
+      port: 5432
+    }
   });
-}
 
-if (action === 'db:up') {
-  app.db.migrate.up().then(process.exit);
-}
+  const vars = {
+    port: 3000
+  };
 
-if (action === 'db:down') {
-  app.db.migrate.down().then(process.exit);
+  if (!action || action === 'serve') {
+    app.server.start().then(s => {
+      s.listen(vars.port, () => {
+        console.log(`listening on port ${vars.port}`)
+      });
+    });
+  }
+
+  if (action === 'db:up') {
+    app.db.migrate.up().then(process.exit);
+  }
+
+  if (action === 'db:down') {
+    app.db.migrate.down().then(process.exit);
+  }
 }

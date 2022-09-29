@@ -1,5 +1,5 @@
-import { createPgTestcontainer } from './database';
-import { createApp, App } from './app';
+import { createPgTestcontainer } from '../database';
+import { createApp, App } from '../app';
 
 export interface TestApp extends App {
   stop: () => void;
@@ -14,7 +14,7 @@ export async function getTestApp() {
 
   const { testcontainer: pgTestcontainer, params: pgParams } = await createPgTestcontainer();
 
-  const app = createApp({ db: pgParams });
+  const app = await createApp({ db: pgParams });
 
   await app.db.migrate.latest();
 

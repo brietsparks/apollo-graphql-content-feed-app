@@ -5,36 +5,22 @@ create table users
     name               varchar(255) not null
 );
 
-create table projects
+create table posts
 (
     id                 uuid primary key,
     creation_timestamp timestamptz default (now() at time zone 'utc'),
-    -- owner_id            uuid not null references users(id), -- ...eventually
-    name               varchar(100)
+    owner_id           uuid references users (id) not null,
+    title              varchar(255)               not null,
+    body               varchar(1000)
 );
 
-create table statuses
+create table images
 (
     id                 uuid primary key,
     creation_timestamp timestamptz default (now() at time zone 'utc'),
-    project_id         uuid not null references projects (id),
-    name               varchar(100)
-);
-
-create table issues
-(
-    id                 uuid primary key,
-    creation_timestamp timestamptz default (now() at time zone 'utc'),
-    assignee_id        uuid references users (id),
-    status_id          uuid references statuses (id),
-    name               varchar(100) not null,
-    description        text
-);
-
-create table status_issues_priority
-(
-    status_id        uuid primary key references statuses(id),
-    ranked_issue_ids uuid[] not null
+    owner_id           uuid references users (id) not null,
+    url                varchar(2048)              not null,
+    caption            varchar(255)
 );
 
 create table tags
@@ -44,22 +30,18 @@ create table tags
     name               varchar(100)
 );
 
-create table issue_tags
+create table post_tags
 (
     id                 uuid primary key,
     creation_timestamp timestamptz default (now() at time zone 'utc'),
-    issue_id           uuid not null references issues (id),
-    tag_id             uuid not null references tags (id),
-    unique (issue_id, tag_id)
+    post_id            uuid references posts (id),
+    tag_id             uuid references tags (id)
 );
 
-create table comments
+create table image_tags
 (
     id                 uuid primary key,
     creation_timestamp timestamptz default (now() at time zone 'utc'),
-    author_id          uuid not null references users (id),
-    issue_id           uuid not null references issues (id),
-    message            varchar(200)
+    image_id           uuid references images (id),
+    tag_id             uuid references tags (id)
 );
-
-
