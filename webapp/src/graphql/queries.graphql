@@ -1,0 +1,22 @@
+query getUser($params: String!) {
+  getUser(id: $params) {
+    id
+    creationTimestamp
+    name
+  }
+}
+
+query getUsers($params: CursorPaginationInput!) {
+  getUsers(pagination: $params) {
+    items {
+      id
+      name
+      creationTimestamp
+    }
+    cursors {
+      start
+      end
+      next
+    }
+  }
+}

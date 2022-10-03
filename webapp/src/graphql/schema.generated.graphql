@@ -1,0 +1,153 @@
+union ContentItem = Image | Post
+
+input CreateImageParams {
+  caption: String
+  ownerId: String!
+  url: String!
+}
+
+input CreatePostParams {
+  body: String
+  ownerId: String!
+  tagIds: [String]
+  title: String!
+}
+
+input CreateTagParams {
+  name: String!
+}
+
+input CreateUserParams {
+  name: String!
+}
+
+type CursorPaginatedContentItems {
+  cursors: Cursors!
+  items: [ContentItem!]!
+}
+
+type CursorPaginatedImages {
+  cursors: Cursors!
+  items: [Image!]!
+}
+
+type CursorPaginatedPosts {
+  cursors: Cursors!
+  items: [Post!]!
+}
+
+type CursorPaginatedUsers {
+  cursors: Cursors!
+  items: [User!]!
+}
+
+input CursorPaginationInput {
+  cursor: String
+  field: String
+  limit: Int
+  sortDirection: SortDirection
+}
+
+type Cursors {
+  end: String
+  next: String
+  start: String
+}
+
+input GetContentItemsParams {
+  ownerId: String
+  pagination: CursorPaginationInput!
+}
+
+input GetImagesParams {
+  ownerId: String
+  pagination: CursorPaginationInput!
+}
+
+input GetPostsParams {
+  ownerId: String
+  pagination: CursorPaginationInput!
+  tagId: String
+}
+
+type Image {
+  caption: String
+  creationTimestamp: String!
+  id: String!
+  owner: User!
+  ownerId: String!
+  tags: [Tag!]!
+  url: String!
+}
+
+type Mutation {
+  createImage(params: CreateImageParams!): Image!
+  createPost(params: CreatePostParams!): Post!
+  createTag(params: CreateTagParams!): Tag!
+  createUser(params: CreateUserParams!): User!
+}
+
+type OffsetPaginatedUsers {
+  items: [User!]!
+}
+
+input OffsetPaginationInput {
+  limit: Int
+  offset: Int
+  sortDirection: SortDirection
+  sortField: String
+}
+
+input PageOffsetPaginationInput {
+  cursors: Int
+  limit: Int
+  sortDirection: SortDirection
+  sortField: String
+}
+
+type Post {
+  body: String
+  creationTimestamp: String!
+  id: String!
+  owner: User!
+  ownerId: String!
+  tags: [Tag!]!
+  title: String!
+}
+
+type Query {
+  getContentItems(params: GetContentItemsParams!): CursorPaginatedContentItems!
+  getImage(id: String!): Image
+  getImages(params: GetImagesParams!): CursorPaginatedImages!
+  getPost(id: String!): Post
+  getPosts(params: GetPostsParams!): CursorPaginatedPosts!
+  getTag(id: String!): Tag
+  getUser(id: String!): User
+  getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
+}
+
+enum SortDirection {
+  asc
+  desc
+}
+
+input SortInput {
+  direction: SortDirection!
+  field: String!
+}
+
+type Tag {
+  creationTimestamp: String!
+  id: String!
+  name: String!
+  recentPosts: [Post!]!
+}
+
+type User {
+  creationTimestamp: String!
+  id: String!
+  name: String!
+  recentContentItems: [ContentItem!]!
+  recentImages: [Image!]!
+  recentPosts: [Post!]!
+}

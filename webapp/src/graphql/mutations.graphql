@@ -1,0 +1,7 @@
+mutation createUser($params: CreateUserParams!) {
+  createUser(params: $params) {
+    id
+    creationTimestamp
+    name
+  }
+}
