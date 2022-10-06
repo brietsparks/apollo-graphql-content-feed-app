@@ -9,18 +9,21 @@ export interface ApolloProviderProps {
 }
 
 export function ApolloProvider({ url, children }: ApolloProviderProps) {
+  const client = useRef(getApolloClient(url)).current;
+  return (
+    <BaseApolloProvider client={client}>
+      {children}
+    </BaseApolloProvider>
+  );
+}
+
+export function getApolloClient(url: string) {
   const httpLink = createHttpLink({
     uri: url,
   });
 
-  const apolloClient = useRef(new ApolloClient({
+  return new ApolloClient({
     cache: apolloCache,
-    link: httpLink
-  })).current;
-
-  return (
-    <BaseApolloProvider client={apolloClient}>
-      {children}
-    </BaseApolloProvider>
-  )
+    link: httpLink,
+  });
 }
