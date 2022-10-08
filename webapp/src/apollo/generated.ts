@@ -56,6 +56,12 @@ export type CursorPaginatedPosts = {
   items: Array<Post>;
 };
 
+export type CursorPaginatedTags = {
+  __typename?: 'CursorPaginatedTags';
+  cursors: Cursors;
+  items: Array<Tag>;
+};
+
 export type CursorPaginatedUsers = {
   __typename?: 'CursorPaginatedUsers';
   cursors: Cursors;
@@ -171,6 +177,7 @@ export type Query = {
   getTag?: Maybe<Tag>;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
+  searchTags: CursorPaginatedTags;
 };
 
 
@@ -213,6 +220,16 @@ export type QueryGetUsersArgs = {
   pagination: CursorPaginationInput;
 };
 
+
+export type QuerySearchTagsArgs = {
+  params: SearchTagsParams;
+};
+
+export type SearchTagsParams = {
+  pagination: CursorPaginationInput;
+  term: Scalars['String'];
+};
+
 export enum SortDirection {
   Asc = 'asc',
   Desc = 'desc'
@@ -247,6 +264,20 @@ export type CreateUserMutationVariables = Exact<{
 
 
 export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, creationTimestamp: string, name: string } };
+
+export type CreateTagMutationVariables = Exact<{
+  params: CreateTagParams;
+}>;
+
+
+export type CreateTagMutation = { __typename?: 'Mutation', createTag: { __typename?: 'Tag', id: string, creationTimestamp: string, name: string } };
+
+export type CreatePostMutationVariables = Exact<{
+  params: CreatePostParams;
+}>;
+
+
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: string, creationTimestamp: string, title: string, body?: string | null } };
 
 export type GetUserQueryVariables = Exact<{
   params: Scalars['String'];
@@ -298,6 +329,77 @@ export function useCreateUserMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreateUserMutationHookResult = ReturnType<typeof useCreateUserMutation>;
 export type CreateUserMutationResult = Apollo.MutationResult<CreateUserMutation>;
 export type CreateUserMutationOptions = Apollo.BaseMutationOptions<CreateUserMutation, CreateUserMutationVariables>;
+export const CreateTagDocument = gql`
+    mutation createTag($params: CreateTagParams!) {
+  createTag(params: $params) {
+    id
+    creationTimestamp
+    name
+  }
+}
+    `;
+export type CreateTagMutationFn = Apollo.MutationFunction<CreateTagMutation, CreateTagMutationVariables>;
+
+/**
+ * __useCreateTagMutation__
+ *
+ * To run a mutation, you first call `useCreateTagMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateTagMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createTagMutation, { data, loading, error }] = useCreateTagMutation({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useCreateTagMutation(baseOptions?: Apollo.MutationHookOptions<CreateTagMutation, CreateTagMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateTagMutation, CreateTagMutationVariables>(CreateTagDocument, options);
+      }
+export type CreateTagMutationHookResult = ReturnType<typeof useCreateTagMutation>;
+export type CreateTagMutationResult = Apollo.MutationResult<CreateTagMutation>;
+export type CreateTagMutationOptions = Apollo.BaseMutationOptions<CreateTagMutation, CreateTagMutationVariables>;
+export const CreatePostDocument = gql`
+    mutation createPost($params: CreatePostParams!) {
+  createPost(params: $params) {
+    id
+    creationTimestamp
+    title
+    body
+  }
+}
+    `;
+export type CreatePostMutationFn = Apollo.MutationFunction<CreatePostMutation, CreatePostMutationVariables>;
+
+/**
+ * __useCreatePostMutation__
+ *
+ * To run a mutation, you first call `useCreatePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreatePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createPostMutation, { data, loading, error }] = useCreatePostMutation({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<CreatePostMutation, CreatePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument, options);
+      }
+export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
+export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
+export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
 export const GetUserDocument = gql`
     query getUser($params: String!) {
   getUser(id: $params) {

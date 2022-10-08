@@ -5,3 +5,20 @@ mutation createUser($params: CreateUserParams!) {
     name
   }
 }
+
+mutation createTag($params: CreateTagParams!) {
+  createTag(params: $params) {
+    id
+    creationTimestamp
+    name
+  }
+}
+
+mutation createPost($params: CreatePostParams!) {
+  createPost(params: $params) {
+    id
+    creationTimestamp
+    title
+    body
+  }
+}

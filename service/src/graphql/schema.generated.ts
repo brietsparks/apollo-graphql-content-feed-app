@@ -38,35 +38,34 @@ export type CreateUserParams = {
   name: Scalars['String'];
 };
 
-export type CursorPage = {
-  __typename?: 'CursorPage';
-  end?: Maybe<Scalars['String']>;
-  next?: Maybe<Scalars['String']>;
-  start?: Maybe<Scalars['String']>;
-};
-
 export type CursorPaginatedContentItems = {
   __typename?: 'CursorPaginatedContentItems';
+  cursors: Cursors;
   items: Array<ContentItem>;
-  page: CursorPage;
 };
 
 export type CursorPaginatedImages = {
   __typename?: 'CursorPaginatedImages';
+  cursors: Cursors;
   items: Array<Image>;
-  page: CursorPage;
 };
 
 export type CursorPaginatedPosts = {
   __typename?: 'CursorPaginatedPosts';
+  cursors: Cursors;
   items: Array<Post>;
-  page: CursorPage;
+};
+
+export type CursorPaginatedTags = {
+  __typename?: 'CursorPaginatedTags';
+  cursors: Cursors;
+  items: Array<Tag>;
 };
 
 export type CursorPaginatedUsers = {
   __typename?: 'CursorPaginatedUsers';
+  cursors: Cursors;
   items: Array<User>;
-  page: CursorPage;
 };
 
 export type CursorPaginationInput = {
@@ -74,6 +73,13 @@ export type CursorPaginationInput = {
   field?: InputMaybe<Scalars['String']>;
   limit?: InputMaybe<Scalars['Int']>;
   sortDirection?: InputMaybe<SortDirection>;
+};
+
+export type Cursors = {
+  __typename?: 'Cursors';
+  end?: Maybe<Scalars['String']>;
+  next?: Maybe<Scalars['String']>;
+  start?: Maybe<Scalars['String']>;
 };
 
 export type GetContentItemsParams = {
@@ -144,8 +150,8 @@ export type OffsetPaginationInput = {
 };
 
 export type PageOffsetPaginationInput = {
+  cursors?: InputMaybe<Scalars['Int']>;
   limit?: InputMaybe<Scalars['Int']>;
-  page?: InputMaybe<Scalars['Int']>;
   sortDirection?: InputMaybe<SortDirection>;
   sortField?: InputMaybe<Scalars['String']>;
 };
@@ -171,6 +177,7 @@ export type Query = {
   getTag?: Maybe<Tag>;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
+  searchTags: CursorPaginatedTags;
 };
 
 
@@ -211,6 +218,16 @@ export type QueryGetUserArgs = {
 
 export type QueryGetUsersArgs = {
   pagination: CursorPaginationInput;
+};
+
+
+export type QuerySearchTagsArgs = {
+  params: SearchTagsParams;
+};
+
+export type SearchTagsParams = {
+  pagination: CursorPaginationInput;
+  term: Scalars['String'];
 };
 
 export enum SortDirection {
@@ -316,12 +333,13 @@ export type ResolversTypes = {
   CreatePostParams: CreatePostParams;
   CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
-  CursorPage: ResolverTypeWrapper<CursorPage>;
   CursorPaginatedContentItems: ResolverTypeWrapper<Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversTypes['ContentItem']> }>;
   CursorPaginatedImages: ResolverTypeWrapper<CursorPaginatedImages>;
   CursorPaginatedPosts: ResolverTypeWrapper<CursorPaginatedPosts>;
+  CursorPaginatedTags: ResolverTypeWrapper<CursorPaginatedTags>;
   CursorPaginatedUsers: ResolverTypeWrapper<CursorPaginatedUsers>;
   CursorPaginationInput: CursorPaginationInput;
+  Cursors: ResolverTypeWrapper<Cursors>;
   GetContentItemsParams: GetContentItemsParams;
   GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
@@ -333,6 +351,7 @@ export type ResolversTypes = {
   PageOffsetPaginationInput: PageOffsetPaginationInput;
   Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<{}>;
+  SearchTagsParams: SearchTagsParams;
   SortDirection: SortDirection;
   SortInput: SortInput;
   String: ResolverTypeWrapper<Scalars['String']>;
@@ -348,12 +367,13 @@ export type ResolversParentTypes = {
   CreatePostParams: CreatePostParams;
   CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
-  CursorPage: CursorPage;
   CursorPaginatedContentItems: Omit<CursorPaginatedContentItems, 'items'> & { items: Array<ResolversParentTypes['ContentItem']> };
   CursorPaginatedImages: CursorPaginatedImages;
   CursorPaginatedPosts: CursorPaginatedPosts;
+  CursorPaginatedTags: CursorPaginatedTags;
   CursorPaginatedUsers: CursorPaginatedUsers;
   CursorPaginationInput: CursorPaginationInput;
+  Cursors: Cursors;
   GetContentItemsParams: GetContentItemsParams;
   GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
@@ -365,6 +385,7 @@ export type ResolversParentTypes = {
   PageOffsetPaginationInput: PageOffsetPaginationInput;
   Post: Post;
   Query: {};
+  SearchTagsParams: SearchTagsParams;
   SortInput: SortInput;
   String: Scalars['String'];
   Tag: Tag;
@@ -375,34 +396,40 @@ export type ContentItemResolvers<ContextType = any, ParentType extends Resolvers
   __resolveType: TypeResolveFn<'Image' | 'Post', ParentType, ContextType>;
 };
 
-export type CursorPageResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPage'] = ResolversParentTypes['CursorPage']> = {
-  end?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  next?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  start?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type CursorPaginatedContentItemsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedContentItems'] = ResolversParentTypes['CursorPaginatedContentItems']> = {
+  cursors?: Resolver<ResolversTypes['Cursors'], ParentType, ContextType>;
   items?: Resolver<Array<ResolversTypes['ContentItem']>, ParentType, ContextType>;
-  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CursorPaginatedImagesResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedImages'] = ResolversParentTypes['CursorPaginatedImages']> = {
+  cursors?: Resolver<ResolversTypes['Cursors'], ParentType, ContextType>;
   items?: Resolver<Array<ResolversTypes['Image']>, ParentType, ContextType>;
-  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CursorPaginatedPostsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedPosts'] = ResolversParentTypes['CursorPaginatedPosts']> = {
+  cursors?: Resolver<ResolversTypes['Cursors'], ParentType, ContextType>;
   items?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
-  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CursorPaginatedTagsResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedTags'] = ResolversParentTypes['CursorPaginatedTags']> = {
+  cursors?: Resolver<ResolversTypes['Cursors'], ParentType, ContextType>;
+  items?: Resolver<Array<ResolversTypes['Tag']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type CursorPaginatedUsersResolvers<ContextType = any, ParentType extends ResolversParentTypes['CursorPaginatedUsers'] = ResolversParentTypes['CursorPaginatedUsers']> = {
+  cursors?: Resolver<ResolversTypes['Cursors'], ParentType, ContextType>;
   items?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
-  page?: Resolver<ResolversTypes['CursorPage'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CursorsResolvers<ContextType = any, ParentType extends ResolversParentTypes['Cursors'] = ResolversParentTypes['Cursors']> = {
+  end?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  next?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  start?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -449,6 +476,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getTag?: Resolver<Maybe<ResolversTypes['Tag']>, ParentType, ContextType, RequireFields<QueryGetTagArgs, 'id'>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   getUsers?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersArgs, 'pagination'>>;
+  searchTags?: Resolver<ResolversTypes['CursorPaginatedTags'], ParentType, ContextType, RequireFields<QuerySearchTagsArgs, 'params'>>;
 };
 
 export type TagResolvers<ContextType = any, ParentType extends ResolversParentTypes['Tag'] = ResolversParentTypes['Tag']> = {
@@ -471,11 +499,12 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   ContentItem?: ContentItemResolvers<ContextType>;
-  CursorPage?: CursorPageResolvers<ContextType>;
   CursorPaginatedContentItems?: CursorPaginatedContentItemsResolvers<ContextType>;
   CursorPaginatedImages?: CursorPaginatedImagesResolvers<ContextType>;
   CursorPaginatedPosts?: CursorPaginatedPostsResolvers<ContextType>;
+  CursorPaginatedTags?: CursorPaginatedTagsResolvers<ContextType>;
   CursorPaginatedUsers?: CursorPaginatedUsersResolvers<ContextType>;
+  Cursors?: CursorsResolvers<ContextType>;
   Image?: ImageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   OffsetPaginatedUsers?: OffsetPaginatedUsersResolvers<ContextType>;

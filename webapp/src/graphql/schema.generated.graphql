@@ -36,6 +36,11 @@ type CursorPaginatedPosts {
   items: [Post!]!
 }
 
+type CursorPaginatedTags {
+  cursors: Cursors!
+  items: [Tag!]!
+}
+
 type CursorPaginatedUsers {
   cursors: Cursors!
   items: [User!]!
@@ -124,6 +129,12 @@ type Query {
   getTag(id: String!): Tag
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
+  searchTags(params: SearchTagsParams!): CursorPaginatedTags!
+}
+
+input SearchTagsParams {
+  pagination: CursorPaginationInput!
+  term: String!
 }
 
 enum SortDirection {

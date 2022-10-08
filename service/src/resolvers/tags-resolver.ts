@@ -16,17 +16,17 @@ export function makeTagsResolver(repositories: Repositories) {
     return repositories.tagsRepository.getTag(id);
   };
 
-  // const getTags: IFieldResolver<unknown, RequestContext, schema.QueryGetTagsArgs> = (_, { params }) => {
-  //   return repositories.tagsRepository.getTags({
-  //     pagination: adaptCursorPagination<Tag>(params.pagination),
-  //     ownerId: params.ownerId
-  //   });
-  // };
+  const searchTags: IFieldResolver<unknown, RequestContext, schema.QuerySearchTagsArgs> = (_, { params }) => {
+    return repositories.tagsRepository.searchTags({
+      term: params.term,
+      pagination: adaptCursorPagination<Tag>(params.pagination)
+    });
+  };
 
   return {
     Query: {
       getTag,
-      // getTags,
+      searchTags,
     },
     Mutation: {
       createTag
@@ -34,7 +34,7 @@ export function makeTagsResolver(repositories: Repositories) {
     Tag: {
       id: (t) => t.id,
       creationTimestamp: (t) => t.creationTimestamp,
-      name: (t) => t.title,
+      name: (t) => t.name,
     }
   }
 }

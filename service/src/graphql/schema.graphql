@@ -9,6 +9,7 @@ type Query {
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
   getTag(id: String!): Tag
+  searchTags(params: SearchTagsParams!): CursorPaginatedTags!
   getPost(id: String!): Post
   getPosts(params: GetPostsParams!): CursorPaginatedPosts!
   getImage(id: String!): Image
@@ -171,7 +172,16 @@ type Tag {
   recentPosts: [Post!]!
 }
 
+type CursorPaginatedTags {
+  items: [Tag!]!
+  cursors: Cursors!
+}
+
 input CreateTagParams {
   name: String!
 }
 
+input SearchTagsParams {
+  pagination: CursorPaginationInput!
+  term: String!
+}

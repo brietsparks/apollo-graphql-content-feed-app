@@ -5,13 +5,14 @@ import {getDataFromTree} from "@apollo/client/react/ssr";
 import { API_URL } from '~/config';
 import { addApolloState, initializeApollo, GetUsersDocument } from '~/apollo';
 
-import { UserCreationFormWidget, UsersListWidget } from '~/widgets';
+import { UserCreationFormWidget, UsersListWidget, TagCreationFormWidget } from '~/widgets';
 
 const Home: NextPage = () => {
   return (
     <>
       <UserCreationFormWidget />
       <UsersListWidget />
+      <TagCreationFormWidget />
     </>
   );
 }

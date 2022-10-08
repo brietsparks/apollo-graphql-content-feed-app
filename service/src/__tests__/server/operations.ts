@@ -20,4 +20,23 @@ export const getUser = gql`
   }
 `;
 
+export const createTag = gql`
+  mutation createTag($params: CreateTagParams!){
+    createTag(params: $params) {
+      id
+      creationTimestamp
+      name
+    }
+  }
+`;
+
+export const getTag = gql`
+  query getTag($id: String!) {
+    getTag(id: $id) {
+      id
+      creationTimestamp
+      name
+    }
+  }
+`;
 
