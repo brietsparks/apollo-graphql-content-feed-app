@@ -1,5 +1,6 @@
 import {useMemo} from 'react'
-import { ApolloClient } from '@apollo/client'
+import { ApolloClient } from '@apollo/client';
+import { HttpLink } from '@apollo/client/link/http';
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
 
@@ -15,18 +16,13 @@ function isSSR() {
   return typeof window === 'undefined';
 }
 
-function createIsomorphLink() {
-  const { HttpLink } = require('@apollo/client/link/http')
-  return new HttpLink({
-    uri: API_URL,
-    credentials: 'same-origin',
-  })
-}
-
 function createApolloClient() {
   return new ApolloClient<any>({
     ssrMode: typeof window === 'undefined',
-    link: createIsomorphLink(),
+    link: new HttpLink({
+      uri: API_URL,
+      credentials: 'same-origin',
+    }),
     cache,
     // defaultOptions: {
     //   query: {
