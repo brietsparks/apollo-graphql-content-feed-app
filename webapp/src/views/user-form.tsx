@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Stack, TextField, Button } from '@mui/material';
 
 export interface UserFormProps {
   name?: string;
@@ -22,14 +23,14 @@ export function UserForm(props: UserFormProps) {
   };
 
   return (
-    <div>
-      <input
+    <Stack spacing={2}>
+      <TextField
         placeholder="Name"
         value={name}
         onChange={e => setName(e.target.value)}
       />
 
-      <button onClick={handleClickSubmit}>{props.buttonLabel}</button>
-    </div>
+      <Button onClick={handleClickSubmit}>{props.buttonLabel}</Button>
+    </Stack>
   );
 }

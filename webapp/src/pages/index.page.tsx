@@ -1,8 +1,4 @@
-import type { NextPage, GetServerSideProps } from 'next'
-import { useApolloClient } from '@apollo/client';
-import {getDataFromTree} from "@apollo/client/react/ssr";
-
-import { API_URL } from '~/config';
+import type { NextPage } from 'next'
 import { addApolloState, initializeApollo, GetUsersDocument } from '~/apollo';
 
 import { UserCreationFormWidget, UsersListWidget, TagCreationFormWidget } from '~/widgets';

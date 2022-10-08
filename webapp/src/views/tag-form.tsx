@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Stack, TextField, Button } from '@mui/material';
 
 export interface TagFormProps {
   name?: string;
@@ -25,17 +26,17 @@ export function TagForm(props: TagFormProps) {
   };
 
   return (
-    <div>
-      <input
+    <Stack spacing={2}>
+      <TextField
         placeholder="Name"
         value={name}
         onChange={e => setName(e.target.value)}
       />
 
-      <button
+      <Button
         onClick={handleClickSubmit}
         disabled={!canSubmit}
-      >{props.buttonLabel}</button>
-    </div>
+      >{props.buttonLabel}</Button>
+    </Stack>
   );
 }
