@@ -16,6 +16,7 @@ export function TagsSearchBar(props: TagsSearchBarProps) {
       getSuggestionLabel={i => i.name || i.id}
       getSuggestionKey={i => i.id}
       label="Tag"
+      clearOnChange
     />
   );
 }

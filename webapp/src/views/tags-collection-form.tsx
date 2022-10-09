@@ -7,23 +7,23 @@ export type { TagsSearchBarProps };
 
 export interface TagsCollectionFormProps {
   searchBarProps: TagsSearchBarProps;
-  items?: TagsCollectionItem[];
+  selectedItems?: TagsCollectionItem[];
   onChange?: (data: TagsCollectionItem[]) => void;
 }
 
 export type TagsCollectionItem = TagsSearchSuggestion;
 
 export function TagsCollectionForm(props: TagsCollectionFormProps) {
-  const [items, setItems] = useState<TagsCollectionItem[]>(props.items || []);
+  const [selectedItems, setSelectedItems] = useState<TagsCollectionItem[]>(props.selectedItems || []);
   useMemo(() => {
-    if (props.items) {
-      setItems(props.items);
+    if (props.selectedItems) {
+      setSelectedItems(props.selectedItems);
     }
-  }, [props.items]);
+  }, [props.selectedItems]);
 
   const handleChange = (item?: TagsSearchSuggestion) => {
     if (item) {
-      setItems(prev => {
+      setSelectedItems(prev => {
         const newItems = [...prev, item];
         props.onChange?.(newItems);
         return newItems;
@@ -31,21 +31,30 @@ export function TagsCollectionForm(props: TagsCollectionFormProps) {
     }
   };
 
-  const removeItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
+  const unselectItem = (id: string) => {
+    setSelectedItems(prev => prev.filter(item => item.id !== id));
   };
+
+  // fixme: performance
+  const suggestions = props.searchBarProps.suggestions.filter(
+    suggestion => !selectedItems.map(item => item.id).includes(suggestion.id)
+  );
 
   return (
     <Stack spacing={2}>
-      <TagsSearchBar {...props.searchBarProps} onChange={handleChange} />
+      <TagsSearchBar
+        {...props.searchBarProps}
+        suggestions={suggestions}
+        onChange={handleChange}
+      />
 
       <div>
-        {items.map(item => (
+        {selectedItems.map(item => (
           <Chip
             key={item.id}
             id={item.id}
             label={item.name}
-            onDelete={() => removeItem(item.id)}
+            onDelete={() => unselectItem(item.id)}
           />
         ))}
       </div>
