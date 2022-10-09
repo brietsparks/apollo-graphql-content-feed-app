@@ -11,17 +11,19 @@ export function TagsCollectionFormWidget(props: TagsCollectionFormWidgetProps) {
   const [searchTags, query] = useSearchTagsLazyQuery();
 
   const handleInputChange = (term: string) => {
-    void searchTags({
-      variables: {
-        params: {
-          term,
-          pagination: {
-            limit: 3
+    if (term) {
+      void searchTags({
+        variables: {
+          params: {
+            term,
+            pagination: {
+              limit: 3
+            }
           }
-        }
-      },
-      fetchPolicy: 'no-cache'
-    });
+        },
+        fetchPolicy: 'no-cache'
+      });
+    }
   };
 
   const suggestions: TagsSearchSuggestion[] = query.data?.searchTags.items.map(tag => ({

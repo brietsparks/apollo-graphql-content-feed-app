@@ -17,11 +17,11 @@ export interface SearchBarProps<T> {
   onChange?: (value?: T) => void;
   clearOnChange?: boolean;
   onInputChange: (term: string) => void;
-  debounceMs: number;
+  debounceMs?: number;
 }
 
 export function SearchBar<T>(props: SearchBarProps<T>) {
-  const { onInputChange, debounceMs } = props;
+  const { onInputChange, debounceMs = 500 } = props;
 
   const [value, setValue] = useState<T | null>(null);
   const [inputValue, setInputValue] = useState('');
@@ -42,17 +42,21 @@ export function SearchBar<T>(props: SearchBarProps<T>) {
     }, debounceMs)
   }, [onInputChange, debounceMs]);
 
-  const handleInputChange = useCallback((e: SyntheticEvent, term: string) => {
-    if (e.type === 'change') {
+  const handleInputChange = useCallback((e: SyntheticEvent|null, term: string) => {
+    if (e?.type === 'change') {
       setInputValue(term);
       debouncedOnInputChange(e, term.trim());
     }
   }, [debouncedOnInputChange]);
 
-  const options = props.suggestions.map((suggestion) => ({
-    key: props.getSuggestionKey(suggestion),
-    ...suggestion
-  }));
+  // use-case assumption: empty input should yield no results
+  let options: T[] = [];
+  if (inputValue) {
+    options = props.suggestions.map((suggestion) => ({
+      key: props.getSuggestionKey(suggestion),
+      ...suggestion
+    }));
+  }
 
   return (
     <Autocomplete
