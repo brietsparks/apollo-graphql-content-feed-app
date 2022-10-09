@@ -17,5 +17,5 @@ export function TagsSearchBar(props: TagsSearchBarProps) {
       getSuggestionKey={i => i.id}
       label="Tag"
     />
-  )
+  );
 }
