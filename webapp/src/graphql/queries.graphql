@@ -35,3 +35,24 @@ query searchTags($params: SearchTagsParams!) {
     }
   }
 }
+
+query getPosts($params: GetPostsParams!) {
+  getPosts(params: $params) {
+    items {
+      id
+      creationTimestamp
+      ownerId
+      title
+      body
+      tags {
+        id
+        name
+      }
+    }
+    cursors {
+      start
+      end
+      next
+    }
+  }
+}

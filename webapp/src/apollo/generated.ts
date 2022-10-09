@@ -300,6 +300,13 @@ export type SearchTagsQueryVariables = Exact<{
 
 export type SearchTagsQuery = { __typename?: 'Query', searchTags: { __typename?: 'CursorPaginatedTags', cursors: { __typename?: 'Cursors', start?: string | null, next?: string | null, end?: string | null }, items: Array<{ __typename?: 'Tag', id: string, creationTimestamp: string, name: string }> } };
 
+export type GetPostsQueryVariables = Exact<{
+  params: GetPostsParams;
+}>;
+
+
+export type GetPostsQuery = { __typename?: 'Query', getPosts: { __typename?: 'CursorPaginatedPosts', items: Array<{ __typename?: 'Post', id: string, creationTimestamp: string, ownerId: string, title: string, body?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }>, cursors: { __typename?: 'Cursors', start?: string | null, end?: string | null, next?: string | null } } };
+
 
 export const CreateUserDocument = gql`
     mutation createUser($params: CreateUserParams!) {
@@ -532,3 +539,53 @@ export function useSearchTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type SearchTagsQueryHookResult = ReturnType<typeof useSearchTagsQuery>;
 export type SearchTagsLazyQueryHookResult = ReturnType<typeof useSearchTagsLazyQuery>;
 export type SearchTagsQueryResult = Apollo.QueryResult<SearchTagsQuery, SearchTagsQueryVariables>;
+export const GetPostsDocument = gql`
+    query getPosts($params: GetPostsParams!) {
+  getPosts(params: $params) {
+    items {
+      id
+      creationTimestamp
+      ownerId
+      title
+      body
+      tags {
+        id
+        name
+      }
+    }
+    cursors {
+      start
+      end
+      next
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetPostsQuery__
+ *
+ * To run a query within a React component, call `useGetPostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPostsQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useGetPostsQuery(baseOptions: Apollo.QueryHookOptions<GetPostsQuery, GetPostsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, options);
+      }
+export function useGetPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPostsQuery, GetPostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, options);
+        }
+export type GetPostsQueryHookResult = ReturnType<typeof useGetPostsQuery>;
+export type GetPostsLazyQueryHookResult = ReturnType<typeof useGetPostsLazyQuery>;
+export type GetPostsQueryResult = Apollo.QueryResult<GetPostsQuery, GetPostsQueryVariables>;

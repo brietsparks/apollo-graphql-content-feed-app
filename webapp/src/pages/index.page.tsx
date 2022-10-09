@@ -1,28 +1,42 @@
 import type { NextPage } from 'next'
-import { addApolloState, initializeApollo, GetUsersDocument } from '~/apollo';
+import { addApolloState, initializeApollo, GetUsersDocument, GetPostsDocument } from '~/apollo';
 
-import { UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsSearchBarWidget } from '~/widgets';
+import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget } from '~/widgets';
 import { HomePageLayout } from '~/views';
 
 const Home: NextPage = () => {
   return (
-    <HomePageLayout
-      userCreationForm={<UserCreationFormWidget />}
-      usersList={<UsersListWidget />}
-      tagCreationForm={<TagCreationFormWidget />}
-      tagSearchBar={<TagsSearchBarWidget />}
-    />
+    <CurrentUserContextProviderWidget>
+      <HomePageLayout
+        userCreationForm={<UserCreationFormWidget />}
+        usersList={<UsersListWidget />}
+        tagCreationForm={<TagCreationFormWidget />}
+        tagSearchBar={<TagsCollectionFormWidget />}
+        postCreationForm={<PostCreationFormWidget />}
+        postsList={<PostsListWidget />}
+      />
+    </CurrentUserContextProviderWidget>
   );
 }
 
 export async function getServerSideProps(context: any) {
   const client = initializeApollo()
-  await client.query({
-    query: GetUsersDocument,
-    variables: {
-      params: {}
-    },
-  });
+  await Promise.all([
+    client.query({
+      query: GetUsersDocument,
+      variables: {
+        params: {}
+      },
+    }),
+    client.query({
+      query: GetPostsDocument,
+      variables: {
+        params: {
+          pagination: {}
+        }
+      },
+    })
+  ]);
 
   const documentProps = addApolloState(
     client,

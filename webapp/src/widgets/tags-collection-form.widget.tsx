@@ -1,13 +1,13 @@
 import React from 'react';
 
 import { useSearchTagsLazyQuery } from '~/apollo';
-import { TagsSearchBar, TagsSearchBarProps, TagsSearchSuggestion } from '~/views';
+import { TagsCollectionForm, TagsCollectionFormProps, TagsSearchSuggestion } from '~/views';
 
-export interface TagsSearchBarWidgetProps {
-  onChange?: TagsSearchBarProps['onChange'];
+export interface TagsCollectionFormWidgetProps {
+  onChange?: TagsCollectionFormProps['onChange'];
 }
 
-export function TagsSearchBarWidget(props: TagsSearchBarWidgetProps) {
+export function TagsCollectionFormWidget(props: TagsCollectionFormWidgetProps) {
   const [searchTags, query] = useSearchTagsLazyQuery();
 
   const handleInputChange = (term: string) => {
@@ -30,11 +30,13 @@ export function TagsSearchBarWidget(props: TagsSearchBarWidgetProps) {
   })) || [];
 
   return (
-    <TagsSearchBar
-      onInputChange={handleInputChange}
+    <TagsCollectionForm
       onChange={props.onChange}
-      loading={query.loading}
-      suggestions={suggestions}
+      searchBarProps={{
+        onInputChange: handleInputChange,
+        loading: query.loading,
+        suggestions: suggestions,
+      }}
     />
   )
 }
