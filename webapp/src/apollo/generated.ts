@@ -293,6 +293,13 @@ export type GetUsersQueryVariables = Exact<{
 
 export type GetUsersQuery = { __typename?: 'Query', getUsers: { __typename?: 'CursorPaginatedUsers', items: Array<{ __typename?: 'User', id: string, name: string, creationTimestamp: string }>, cursors: { __typename?: 'Cursors', start?: string | null, end?: string | null, next?: string | null } } };
 
+export type SearchTagsQueryVariables = Exact<{
+  params: SearchTagsParams;
+}>;
+
+
+export type SearchTagsQuery = { __typename?: 'Query', searchTags: { __typename?: 'CursorPaginatedTags', cursors: { __typename?: 'Cursors', start?: string | null, next?: string | null, end?: string | null }, items: Array<{ __typename?: 'Tag', id: string, creationTimestamp: string, name: string }> } };
+
 
 export const CreateUserDocument = gql`
     mutation createUser($params: CreateUserParams!) {
@@ -481,3 +488,47 @@ export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
 export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export const SearchTagsDocument = gql`
+    query searchTags($params: SearchTagsParams!) {
+  searchTags(params: $params) {
+    cursors {
+      start
+      next
+      end
+    }
+    items {
+      id
+      creationTimestamp
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useSearchTagsQuery__
+ *
+ * To run a query within a React component, call `useSearchTagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSearchTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSearchTagsQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useSearchTagsQuery(baseOptions: Apollo.QueryHookOptions<SearchTagsQuery, SearchTagsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SearchTagsQuery, SearchTagsQueryVariables>(SearchTagsDocument, options);
+      }
+export function useSearchTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SearchTagsQuery, SearchTagsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SearchTagsQuery, SearchTagsQueryVariables>(SearchTagsDocument, options);
+        }
+export type SearchTagsQueryHookResult = ReturnType<typeof useSearchTagsQuery>;
+export type SearchTagsLazyQueryHookResult = ReturnType<typeof useSearchTagsLazyQuery>;
+export type SearchTagsQueryResult = Apollo.QueryResult<SearchTagsQuery, SearchTagsQueryVariables>;

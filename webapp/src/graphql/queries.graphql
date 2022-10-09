@@ -20,3 +20,18 @@ query getUsers($params: CursorPaginationInput!) {
     }
   }
 }
+
+query searchTags($params: SearchTagsParams!) {
+  searchTags(params: $params) {
+    cursors {
+      start
+      next
+      end
+    }
+    items {
+      id
+      creationTimestamp
+      name
+    }
+  }
+}
