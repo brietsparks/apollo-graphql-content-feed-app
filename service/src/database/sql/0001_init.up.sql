@@ -5,6 +5,8 @@ create table users
     name               varchar(255) not null
 );
 
+insert into users(id, name) values ('00000000-0000-0000-0000-000000000000', 'Default User');
+
 create table posts
 (
     id                 uuid primary key,

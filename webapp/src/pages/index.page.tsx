@@ -1,17 +1,20 @@
 import type { NextPage } from 'next'
 import { addApolloState, initializeApollo, GetUsersDocument } from '~/apollo';
 
-import { UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsCollectionFormWidget } from '~/widgets';
+import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsCollectionFormWidget, PostCreationFormWidget } from '~/widgets';
 import { HomePageLayout } from '~/views';
 
 const Home: NextPage = () => {
   return (
-    <HomePageLayout
-      userCreationForm={<UserCreationFormWidget />}
-      usersList={<UsersListWidget />}
-      tagCreationForm={<TagCreationFormWidget />}
-      tagSearchBar={<TagsCollectionFormWidget />}
-    />
+    <CurrentUserContextProviderWidget>
+      <HomePageLayout
+        userCreationForm={<UserCreationFormWidget />}
+        usersList={<UsersListWidget />}
+        tagCreationForm={<TagCreationFormWidget />}
+        tagSearchBar={<TagsCollectionFormWidget />}
+        postCreationForm={<PostCreationFormWidget />}
+      />
+    </CurrentUserContextProviderWidget>
   );
 }
 

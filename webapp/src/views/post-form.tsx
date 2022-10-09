@@ -1,45 +1,50 @@
 import React, { ComponentType } from 'react';
-import { TextField, Button, Stack, FormControl, InputLabel, Select } from '@mui/material';
+import { TextField, Button, Stack } from '@mui/material';
 import { useForm } from 'react-hook-form';
 
-export interface PostCreationFormProps {
+export interface PostFormProps {
   tagsFormComponent: ComponentType<{ onChange: TagsChangeHandler }>;
-  onSubmit: (data: PostCreationFormData) => void;
+  submit: (data: PostFormData) => void;
+  buttonLabel: string;
   pending: boolean;
 }
 
 export type TagsChangeHandler = (tags?: ({ id: string })[]) => void;
 
-export interface PostCreationFormData {
+export interface PostFormData {
   tagIds?: string[];
-  name?: string
+  title: string
+  body?: string;
 }
 
-export type Electrode = 'anode' | 'cathode';
-
-export function PostCreationForm(props: PostCreationFormProps) {
+export function PostForm(props: PostFormProps) {
   const { tagsFormComponent: TagsForm } = props;
 
-  const form = useForm<PostCreationFormData>();
+  const form = useForm<PostFormData>();
 
   const handleTagChange: TagsChangeHandler = (tags) => {
     form.setValue('tagIds', tags?.map(tag => tag.id));
   };
 
   const handleSubmit = form.handleSubmit((data) => {
-    props.onSubmit(data);
+    props.submit(data);
   });
 
   return (
     <Stack spacing={2}>
       <TextField
-        label="Name"
-        {...form.register('name')}
+        label="Title"
+        {...form.register('title')}
       />
 
       <TagsForm onChange={handleTagChange} />
 
-      <Button onClick={handleSubmit}>Create Post</Button>
+      <TextField
+        label="Body"
+        {...form.register('body')}
+      />
+
+      <Button onClick={handleSubmit}>{props.buttonLabel}</Button>
     </Stack>
   );
 }

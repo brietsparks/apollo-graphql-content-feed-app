@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, SyntheticEvent } from 'react';
 import { Autocomplete, CircularProgress, TextField, TextFieldProps } from '@mui/material';
 import debounce from 'lodash/debounce';
 
@@ -17,10 +17,11 @@ export interface SearchBarProps<T> {
   onChange?: (value?: T) => void;
   clearOnChange?: boolean;
   onInputChange: (term: string) => void;
+  debounceMs: number;
 }
 
 export function SearchBar<T>(props: SearchBarProps<T>) {
-  const { onInputChange } = props;
+  const { onInputChange, debounceMs } = props;
 
   const [value, setValue] = useState<T | null>(null);
   const [inputValue, setInputValue] = useState('');
@@ -30,18 +31,22 @@ export function SearchBar<T>(props: SearchBarProps<T>) {
     if (props.clearOnChange) {
       setInputValue('');
     }
-    props.onChange?.(value || undefined);
+    if (value) {
+      props.onChange?.(value);
+    }
   };
 
   const debouncedOnInputChange = useMemo(() => {
     return debounce((e: unknown, term: string) => {
       onInputChange(term.trim());
-    }, 500)
-  }, [onInputChange]);
+    }, debounceMs)
+  }, [onInputChange, debounceMs]);
 
-  const handleInputChange = useCallback((e: unknown, term: string) => {
-    setInputValue(term);
-    debouncedOnInputChange(e, term.trim());
+  const handleInputChange = useCallback((e: SyntheticEvent, term: string) => {
+    if (e.type === 'change') {
+      setInputValue(term);
+      debouncedOnInputChange(e, term.trim());
+    }
   }, [debouncedOnInputChange]);
 
   const options = props.suggestions.map((suggestion) => ({

@@ -6,6 +6,7 @@ export interface HomePageLayoutProps {
   usersList: ReactNode;
   tagCreationForm: ReactNode;
   tagSearchBar: ReactNode;
+  postCreationForm: ReactNode;
 }
 
 export function HomePageLayout(props: HomePageLayoutProps) {
@@ -21,6 +22,11 @@ export function HomePageLayout(props: HomePageLayoutProps) {
         <Stack>
           {props.tagCreationForm}
           {props.tagSearchBar}
+        </Stack>
+      </Grid>
+      <Grid item>
+        <Stack>
+          {props.postCreationForm}
         </Stack>
       </Grid>
     </Grid>

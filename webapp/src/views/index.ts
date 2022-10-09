@@ -3,3 +3,4 @@ export * from './tag-form';
 export * from './tags-search-bar';
 export * from './home-page-layout';
 export * from './tags-collection-form';
+export * from './post-form';

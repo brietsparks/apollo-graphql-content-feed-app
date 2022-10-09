@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Stack, Chip } from '@mui/material';
 
 import { TagsSearchBar, TagsSearchSuggestion, TagsSearchBarProps } from './tags-search-bar';
@@ -14,6 +14,8 @@ export interface TagsCollectionFormProps {
 export type TagsCollectionItem = TagsSearchSuggestion;
 
 export function TagsCollectionForm(props: TagsCollectionFormProps) {
+  const { onChange } = props;
+
   const [selectedItems, setSelectedItems] = useState<TagsCollectionItem[]>(props.selectedItems || []);
   useMemo(() => {
     if (props.selectedItems) {
@@ -21,15 +23,15 @@ export function TagsCollectionForm(props: TagsCollectionFormProps) {
     }
   }, [props.selectedItems]);
 
-  const handleChange = (item?: TagsSearchSuggestion) => {
+  const handleChange = useCallback((item?: TagsSearchSuggestion) => {
     if (item) {
       setSelectedItems(prev => {
         const newItems = [...prev, item];
-        props.onChange?.(newItems);
+        onChange?.(newItems);
         return newItems;
       });
     }
-  };
+  }, [onChange]);
 
   const unselectItem = (id: string) => {
     setSelectedItems(prev => prev.filter(item => item.id !== id));
