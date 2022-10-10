@@ -57,7 +57,7 @@ export class PostsRepository {
           body: params.body,
         }));
 
-      if (params.tagIds) {
+      if (params.tagIds.length) {
         await this.attachTagsToPost({
           postId: id,
           tagIds: params.tagIds
