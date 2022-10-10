@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useGetPostsQuery } from '~/apollo';
+import { useGetPostsQuery, GetPostsQueryItem } from '~/apollo';
 import { PaginatedList, DataDump } from '~/views';
 
 export interface PostsListWidgetProps {
@@ -30,8 +30,12 @@ export function PostsListWidget(props: PostsListWidgetProps) {
     });
   };
 
+  // return (
+  //   <DataDump {...query.data?.getPosts.items} />
+  // )
+
   return (
-    <PaginatedList
+    <PaginatedList<GetPostsQueryItem>
       itemsData={query.data?.getPosts.items}
       getItemKey={data => data.id}
       mapItemDataToProps={data => data}

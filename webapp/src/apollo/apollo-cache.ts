@@ -16,9 +16,13 @@ function cursorPaginatedField(): FieldPolicy {
   return {
     keyArgs: false,
     merge(existing, incoming) {
+      if (existing?.mutated) {
+        return existing;
+      }
+
       return {
+        ...incoming,
         items: mergeUnique([...(existing?.items || []), ...(incoming?.items || [])], '__ref'),
-        cursors: incoming.cursors
       };
     }
   };

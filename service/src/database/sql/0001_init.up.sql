@@ -16,6 +16,11 @@ create table posts
     body               varchar(1000)
 );
 
+insert into posts(id, owner_id, title) values ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000000', 'post 1');
+insert into posts(id, owner_id, title) values ('00000000-0000-0000-0000-000000000002', '00000000-0000-0000-0000-000000000000', 'post 2');
+insert into posts(id, owner_id, title) values ('00000000-0000-0000-0000-000000000003', '00000000-0000-0000-0000-000000000000', 'post 3');
+
+
 create table images
 (
     id                 uuid primary key,

@@ -18,6 +18,7 @@ function isSSR() {
 
 function createApolloClient() {
   return new ApolloClient<any>({
+    connectToDevTools: true,
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
       uri: API_URL,

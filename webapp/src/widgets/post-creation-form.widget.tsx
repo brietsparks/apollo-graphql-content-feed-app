@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useCreatePostMutation, createPostMutationUpdate } from '~/apollo';
+import { useCreatePostMutation, createPostMutationUpdate, GetPostsDocument } from '~/apollo';
 import { PostForm, PostFormData, PostFormProps } from '~/views';
 
 import { useCurrentUser } from './current-user-context.widget';
@@ -12,11 +12,10 @@ export interface PostCreationFormWidgetProps {
 export function PostCreationFormWidget(props: PostCreationFormWidgetProps) {
   const currentUserId = useCurrentUser();
   const [createPost, postCreation] = useCreatePostMutation({
-    update: createPostMutationUpdate
+    update: createPostMutationUpdate,
   });
 
   const submitForm = async (data: PostFormData) => {
-    console.log({data})
     if (!currentUserId) {
       return;
     }
