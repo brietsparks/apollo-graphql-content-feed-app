@@ -4,6 +4,7 @@ import { useSearchTagsLazyQuery } from '~/apollo';
 import { TagsCollectionForm, TagsCollectionFormProps, TagsSearchSuggestion } from '~/views';
 
 export interface TagsCollectionFormWidgetProps {
+  value?: TagsCollectionFormProps['value'];
   onChange?: TagsCollectionFormProps['onChange'];
 }
 
@@ -33,6 +34,7 @@ export function TagsCollectionFormWidget(props: TagsCollectionFormWidgetProps) {
 
   return (
     <TagsCollectionForm
+      value={props.value}
       onChange={props.onChange}
       searchBarProps={{
         onInputChange: handleInputChange,

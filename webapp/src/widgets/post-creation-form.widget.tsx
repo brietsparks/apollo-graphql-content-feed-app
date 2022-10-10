@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useCreatePostMutation, createPostMutationUpdate } from '~/apollo';
-import { PostForm, PostFormData } from '~/views';
+import { PostForm, PostFormData, PostFormProps } from '~/views';
 
 import { useCurrentUser } from './current-user-context.widget';
 import { TagsCollectionFormWidget } from './tags-collection-form.widget';
@@ -35,7 +35,7 @@ export function PostCreationFormWidget(props: PostCreationFormWidgetProps) {
       submit={submitForm}
       buttonLabel="Create Post"
       pending={postCreation.loading}
-      tagsFormComponent={TagsCollectionFormWidget}
+      tagsFormComponent={TagsCollectionFormWidget as PostFormProps['tagsFormComponent']}
     />
   );
 }

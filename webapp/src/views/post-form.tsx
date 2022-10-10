@@ -1,12 +1,17 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, useState } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 
 export interface PostFormProps {
-  tagsFormComponent: ComponentType<{ onChange: TagsChangeHandler }>;
+  tagsFormComponent: ComponentType<TagsFormComponentProps>;
   submit: (data: PostFormData) => void | Promise<unknown>;
   buttonLabel: string;
   pending: boolean;
+}
+
+export interface TagsFormComponentProps {
+  value?: string[];
+  onChange?: TagsChangeHandler;
 }
 
 export type TagsChangeHandler = (tags?: ({ id: string })[]) => void;
@@ -26,11 +31,16 @@ export function PostForm(props: PostFormProps) {
     form.setValue('tagIds', tags?.map(tag => tag.id));
   };
 
+  const reset = () => {
+    form.reset();
+    form.setValue('tagIds', []);
+  };
+
   const handleSubmit = form.handleSubmit((data, e) => {
     e?.preventDefault();
     const promise = props.submit(data);
     if (promise) {
-      promise.then(() => form.reset());
+      promise.then(reset);
     }
   });
 
@@ -42,7 +52,10 @@ export function PostForm(props: PostFormProps) {
           {...form.register('title')}
         />
 
-        <TagsForm onChange={handleTagChange}/>
+        <TagsForm
+          value={form.getValues('tagIds')!}
+          onChange={handleTagChange}
+        />
 
         <TextField
           label="Body"

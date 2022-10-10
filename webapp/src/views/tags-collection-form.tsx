@@ -7,7 +7,7 @@ export type { TagsSearchBarProps };
 
 export interface TagsCollectionFormProps {
   searchBarProps: TagsSearchBarProps;
-  selectedItems?: TagsCollectionItem[];
+  value?: TagsCollectionItem[];
   onChange?: (data: TagsCollectionItem[]) => void;
 }
 
@@ -16,16 +16,16 @@ export type TagsCollectionItem = TagsSearchSuggestion;
 export function TagsCollectionForm(props: TagsCollectionFormProps) {
   const { onChange } = props;
 
-  const [selectedItems, setSelectedItems] = useState<TagsCollectionItem[]>(props.selectedItems || []);
+  const [value, setValue] = useState<TagsCollectionItem[]>(props.value || []);
   useMemo(() => {
-    if (props.selectedItems) {
-      setSelectedItems(props.selectedItems);
+    if (props.value) {
+      setValue(props.value);
     }
-  }, [props.selectedItems]);
+  }, [props.value]);
 
   const handleChange = useCallback((item?: TagsSearchSuggestion) => {
     if (item) {
-      setSelectedItems(prev => {
+      setValue(prev => {
         const newItems = [...prev, item];
         onChange?.(newItems);
         return newItems;
@@ -34,12 +34,12 @@ export function TagsCollectionForm(props: TagsCollectionFormProps) {
   }, [onChange]);
 
   const unselectItem = (id: string) => {
-    setSelectedItems(prev => prev.filter(item => item.id !== id));
+    setValue(prev => prev.filter(item => item.id !== id));
   };
 
   // fixme: performance
   const suggestions = props.searchBarProps.suggestions.filter(
-    suggestion => !selectedItems.map(item => item.id).includes(suggestion.id)
+    suggestion => !value.map(item => item.id).includes(suggestion.id)
   );
 
   return (
@@ -51,12 +51,12 @@ export function TagsCollectionForm(props: TagsCollectionFormProps) {
       />
 
       <div>
-        {selectedItems.map(item => (
+        {value.map(tag => (
           <Chip
-            key={item.id}
-            id={item.id}
-            label={item.name}
-            onDelete={() => unselectItem(item.id)}
+            key={tag.id}
+            id={tag.id}
+            label={tag.name}
+            onDelete={() => unselectItem(tag.id)}
           />
         ))}
       </div>
