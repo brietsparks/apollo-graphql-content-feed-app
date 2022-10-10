@@ -17,7 +17,8 @@ function cursorPaginatedField(): FieldPolicy {
     keyArgs: false,
     merge(existing, incoming) {
       if (existing?.mutated) {
-        return existing;
+        const { mutated, ...e } = existing;
+        return e;
       }
 
       return {

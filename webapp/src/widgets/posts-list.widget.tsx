@@ -6,7 +6,7 @@ import { PaginatedList, DataDump } from '~/views';
 export interface PostsListWidgetProps {
 }
 
-const limit = 3;
+const limit = 4;
 
 export function PostsListWidget(props: PostsListWidgetProps) {
   const query = useGetPostsQuery({
@@ -29,10 +29,6 @@ export function PostsListWidget(props: PostsListWidgetProps) {
       }
     });
   };
-
-  // return (
-  //   <DataDump {...query.data?.getPosts.items} />
-  // )
 
   return (
     <PaginatedList<GetPostsQueryItem>
