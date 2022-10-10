@@ -1,7 +1,6 @@
 {
-  "name": "node-typescript-boilerplate",
+  "name": "blog-apollo-service",
   "version": "0.0.0",
-  "description": "Minimalistic boilerplate to quick-start Node.js development in TypeScript.",
   "devDependencies": {
     "@faker-js/faker": "^7.3.0",
     "@graphql-codegen/cli": "2.2.2",
