@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Stack, Chip } from '@mui/material';
 
 import { TagsSearchBar, TagsSearchSuggestion, TagsSearchBarProps } from './tags-search-bar';
@@ -17,7 +17,7 @@ export function TagsCollectionForm(props: TagsCollectionFormProps) {
   const { onChange } = props;
 
   const [value, setValue] = useState<TagsCollectionItem[]>(props.value || []);
-  useMemo(() => {
+  useEffect(() => {
     if (props.value) {
       setValue(props.value);
     }
@@ -34,15 +34,17 @@ export function TagsCollectionForm(props: TagsCollectionFormProps) {
   }, [onChange]);
 
   const unselectItem = (id: string) => {
-    setValue(prev => prev.filter(item => item.id !== id));
+    setValue(prev => {
+      const newItems = prev.filter(item => item.id !== id);
+      onChange?.(newItems);
+      return newItems;
+    });
   };
 
   // fixme: performance
   const suggestions = props.searchBarProps.suggestions.filter(
     suggestion => !value.map(item => item.id).includes(suggestion.id)
   );
-
-  console.log({ value });
 
   return (
     <Stack spacing={2}>

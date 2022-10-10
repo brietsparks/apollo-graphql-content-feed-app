@@ -15,12 +15,13 @@ export function PostCreationFormWidget(props: PostCreationFormWidgetProps) {
     update: createPostMutationUpdate
   });
 
-  const submitForm = (data: PostFormData) => {
+  const submitForm = async (data: PostFormData) => {
+    console.log({data})
     if (!currentUserId) {
       return;
     }
 
-    return createPost({
+    return await createPost({
       variables: {
         params: {
           ownerId: currentUserId,
