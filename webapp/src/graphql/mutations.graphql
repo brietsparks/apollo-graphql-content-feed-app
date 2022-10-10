@@ -18,7 +18,12 @@ mutation createPost($params: CreatePostParams!) {
   createPost(params: $params) {
     id
     creationTimestamp
+    ownerId
     title
     body
+    tags {
+      id
+      name
+    }
   }
 }

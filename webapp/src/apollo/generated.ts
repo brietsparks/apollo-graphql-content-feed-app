@@ -277,7 +277,7 @@ export type CreatePostMutationVariables = Exact<{
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: string, creationTimestamp: string, title: string, body?: string | null } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: string, creationTimestamp: string, ownerId: string, title: string, body?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } };
 
 export type GetUserQueryVariables = Exact<{
   params: Scalars['String'];
@@ -383,8 +383,13 @@ export const CreatePostDocument = gql`
   createPost(params: $params) {
     id
     creationTimestamp
+    ownerId
     title
     body
+    tags {
+      id
+      name
+    }
   }
 }
     `;

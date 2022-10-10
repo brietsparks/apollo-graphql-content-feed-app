@@ -6,7 +6,7 @@ import { apolloCache } from './apollo-cache';
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 
-export type GetUsersQueryItem = ArrayElement<generated.GetUsersQuery['getUsers']['items']>;
+export type GetPostsQueryItem = ArrayElement<generated.GetPostsQuery['getPosts']['items']>;
 
 type MutationUpdaterFunction<TData, TVariables> = BaseMutationUpdaterFunction<TData, TVariables, DefaultContext, ApolloCache<typeof apolloCache>>;
 
@@ -41,8 +41,8 @@ export const createPostMutationUpdate: MutationUpdaterFunction<generated.CreateP
           });
 
           return {
+            cursors: existing.cursors,
             items: [newPost, ...existing.items],
-            cursors: existing.cursors
           };
         }
       }

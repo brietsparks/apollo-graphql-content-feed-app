@@ -1,5 +1,5 @@
 import {useMemo} from 'react'
-import { ApolloClient } from '@apollo/client';
+import { ApolloClient, QueryOptions } from '@apollo/client';
 import { HttpLink } from '@apollo/client/link/http';
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
@@ -18,18 +18,19 @@ function isSSR() {
 
 function createApolloClient() {
   return new ApolloClient<any>({
+    connectToDevTools: true,
     ssrMode: typeof window === 'undefined',
     link: new HttpLink({
       uri: API_URL,
-      credentials: 'same-origin',
+      // credentials: 'same-origin',
     }),
     cache,
-    // defaultOptions: {
-    //   query: {
-    //     fetchPolicy: isSSR() ? 'no-cache' : ('cache-and-network' as any),
-    //     errorPolicy: 'all'
-    //   }
-    // }
+    defaultOptions: {
+      query: {
+        errorPolicy: 'all',
+        fetchPolicy: isSSR() ? 'no-cache' : 'cache-first'
+      }
+    }
   })
 }
 
