@@ -41,9 +41,8 @@ export const createPostMutationUpdate: MutationUpdaterFunction<generated.CreateP
           });
 
           return {
-            mutated: true,
+            cursors: existing.cursors,
             items: [newPost, ...existing.items],
-            cursors: existing.cursors
           };
         }
       }

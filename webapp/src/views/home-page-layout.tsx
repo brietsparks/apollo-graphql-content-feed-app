@@ -28,10 +28,8 @@ export function HomePageLayout(props: HomePageLayoutProps) {
       <Grid item>
         <Stack>
           {props.postCreationForm}
+          {props.postsList}
         </Stack>
-      </Grid>
-      <Grid item>
-        {props.postsList}
       </Grid>
     </Grid>
   )
