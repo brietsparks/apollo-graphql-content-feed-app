@@ -4,4 +4,4 @@ export * from './users-list.widget';
 export * from './tag-creation-form.widget';
 export * from './tags-collection-form.widget';
 export * from './post-creation-form.widget';
-export * from './posts-lists.widget';
+export * from './posts-list.widget';

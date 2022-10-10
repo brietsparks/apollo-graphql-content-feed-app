@@ -6,6 +6,7 @@ export const apolloCache = new InMemoryCache({
   typePolicies: {
     Query: {
       fields: {
+        getPosts: cursorPaginatedField()
       },
     },
   }
@@ -17,7 +18,7 @@ function cursorPaginatedField(): FieldPolicy {
     merge(existing, incoming) {
       return {
         items: mergeUnique([...(existing?.items || []), ...(incoming?.items || [])], '__ref'),
-        page: incoming.page
+        cursors: incoming.cursors
       };
     }
   };

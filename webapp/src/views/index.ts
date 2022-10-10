@@ -1,3 +1,5 @@
+export * from './paginated-list';
+export * from './data-dump';
 export * from './user-form';
 export * from './tag-form';
 export * from './tags-search-bar';

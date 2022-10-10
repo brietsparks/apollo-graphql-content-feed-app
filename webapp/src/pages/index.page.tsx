@@ -19,33 +19,33 @@ const Home: NextPage = () => {
   );
 }
 
-export async function getServerSideProps(context: any) {
-  const client = initializeApollo()
-  await Promise.all([
-    client.query({
-      query: GetUsersDocument,
-      variables: {
-        params: {}
-      },
-    }),
-    client.query({
-      query: GetPostsDocument,
-      variables: {
-        params: {
-          pagination: {}
-        }
-      },
-    })
-  ]);
-
-  const documentProps = addApolloState(
-    client,
-    { props: {} }, // { props: {...(await serverSideTranslations(locale, ['header', 'complaintList', 'footer']))}, }
-  );
-
-  // Will be passed to the page component as props
-  return { props: documentProps.props }
-}
+// export async function getServerSideProps(context: any) {
+//   const client = initializeApollo()
+//   await Promise.all([
+//     client.query({
+//       query: GetUsersDocument,
+//       variables: {
+//         params: {}
+//       },
+//     }),
+//     client.query({
+//       query: GetPostsDocument,
+//       variables: {
+//         params: {
+//           pagination: {}
+//         }
+//       },
+//     })
+//   ]);
+//
+//   const documentProps = addApolloState(
+//     client,
+//     { props: {} }, // { props: {...(await serverSideTranslations(locale, ['header', 'complaintList', 'footer']))}, }
+//   );
+//
+//   // Will be passed to the page component as props
+//   return { props: documentProps.props }
+// }
 
 
 export default Home;
