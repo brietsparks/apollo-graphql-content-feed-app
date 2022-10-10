@@ -42,6 +42,8 @@ export function TagsCollectionForm(props: TagsCollectionFormProps) {
     suggestion => !value.map(item => item.id).includes(suggestion.id)
   );
 
+  console.log({ value });
+
   return (
     <Stack spacing={2}>
       <TagsSearchBar

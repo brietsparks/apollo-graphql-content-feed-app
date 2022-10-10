@@ -10,11 +10,11 @@ export interface PostFormProps {
 }
 
 export interface TagsFormComponentProps {
-  value?: string[];
-  onChange?: TagsChangeHandler;
+  value?: PostFormTag[];
+  onChange?: PostFormTagsChangeHandler;
 }
-
-export type TagsChangeHandler = (tags?: ({ id: string })[]) => void;
+export type PostFormTagsChangeHandler = (tags: PostFormTag[]) => void;
+export type PostFormTag = { id: string };
 
 export interface PostFormData {
   tagIds?: string[];
@@ -26,19 +26,19 @@ export function PostForm(props: PostFormProps) {
   const { tagsFormComponent: TagsForm } = props;
 
   const form = useForm<PostFormData>();
-
-  const handleTagChange: TagsChangeHandler = (tags) => {
-    form.setValue('tagIds', tags?.map(tag => tag.id));
-  };
+  const [tags, setTags] = useState<PostFormTag[]>([]);
 
   const reset = () => {
     form.reset();
-    form.setValue('tagIds', []);
+    setTags([]);
   };
 
   const handleSubmit = form.handleSubmit((data, e) => {
     e?.preventDefault();
-    const promise = props.submit(data);
+    const promise = props.submit({
+      ...data,
+      tagIds: tags.map(tag => tag.id)
+    });
     if (promise) {
       promise.then(reset);
     }
@@ -53,8 +53,8 @@ export function PostForm(props: PostFormProps) {
         />
 
         <TagsForm
-          value={form.getValues('tagIds')!}
-          onChange={handleTagChange}
+          value={tags}
+          onChange={setTags}
         />
 
         <TextField
