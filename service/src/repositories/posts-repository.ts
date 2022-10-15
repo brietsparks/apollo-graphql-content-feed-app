@@ -39,7 +39,6 @@ export interface AttachTagsToPostParams {
 
 export interface GetRecentPostsByTagsIdsParams {
   tagIds: string[];
-  limit?: number;
 }
 
 export class PostsRepository {

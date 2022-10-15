@@ -256,6 +256,7 @@ export type Tag = {
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+  recentImages: Array<Image>;
   recentPosts: Array<Post>;
 };
 
@@ -497,6 +498,7 @@ export type TagResolvers<ContextType = any, ParentType extends ResolversParentTy
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  recentImages?: Resolver<Array<ResolversTypes['Image']>, ParentType, ContextType>;
   recentPosts?: Resolver<Array<ResolversTypes['Post']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

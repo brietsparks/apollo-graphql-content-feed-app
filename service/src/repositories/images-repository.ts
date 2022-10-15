@@ -36,6 +36,10 @@ export interface AttachTagsToImageParams {
   imageId: string;
 }
 
+export interface GetRecentImagesOfTagsParams {
+  tagIds: string[];
+}
+
 export class ImagesRepository {
   private trx: TransactionsHelper;
 
@@ -120,6 +124,38 @@ export class ImagesRepository {
 
       return insert.map(row => row.id);
     });
+  };
+
+  getRecentImagesOfTags = async (params: GetRecentImagesOfTagsParams): Promise<Record<string, Image[]>> => {
+    const rows = await this.db.unionAll(params.tagIds.map(
+      (tagId) => this.db
+        .from(imagesTable.name)
+        .innerJoin(
+          imageTagsTable.name,
+          imageTagsTable.prefixedColumn('imageId'),
+          imagesTable.prefixedColumn('id')
+        )
+        .select(
+          imagesTable.prefixedColumns(),
+          { ...imageTagsTable.prefixedColumns('tagId') }
+        )
+        .where(imageTagsTable.prefixedColumn('tagId'), tagId)
+        .orderBy(imagesTable.prefixedColumn('creationTimestamp'), 'desc')
+        .limit(3)
+    ), true);
+
+    const imagesOfTags: Record<string, Image[]> = {};
+
+    for (const row of rows) {
+      const image = imagesTable.toAttributeCase<Image>(row);
+      const tagId = imageTagsTable.toAttributeCase<{ tagId: string }>(row).tagId;
+      if (!imagesOfTags[tagId]) {
+        imagesOfTags[tagId] = [];
+      }
+      imagesOfTags[tagId].push(image)
+    }
+
+    return imagesOfTags;
   };
 }
 

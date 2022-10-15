@@ -173,6 +173,7 @@ type Tag {
   creationTimestamp: String!
   name: String!
   recentPosts: [Post!]!
+  recentImages: [Image!]!
 }
 
 type CursorPaginatedTags {

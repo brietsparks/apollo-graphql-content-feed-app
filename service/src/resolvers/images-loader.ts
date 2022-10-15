@@ -4,6 +4,7 @@ import { ImagesRepository, Image } from '../repositories';
 
 export interface ImagesLoader {
   getImagesByOwnerIds: Dataloader<string, Image[]>;
+  getRecentImagesOfTags: Dataloader<string, Image[]>;
 }
 
 export function makeImagesLoader(imagesRepository: ImagesRepository): ImagesLoader {
@@ -23,7 +24,13 @@ export function makeImagesLoader(imagesRepository: ImagesRepository): ImagesLoad
     return ownerIds.map(ownerId => lookup[ownerId]);
   };
 
+  const getRecentImagesOfTags = async (tagIds: string[]) => {
+    const imagesOfTags = await imagesRepository.getRecentImagesOfTags({ tagIds });
+    return tagIds.map(tagId => imagesOfTags[tagId] || []);
+  };
+
   return {
-    getImagesByOwnerIds: new Dataloader(getImagesByOwnerIds)
+    getImagesByOwnerIds: new Dataloader(getImagesByOwnerIds),
+    getRecentImagesOfTags: new Dataloader(getRecentImagesOfTags),
   };
 }

@@ -33,6 +33,10 @@ export function makeTagsResolver(repositories: Repositories) {
     return ctx.loaders.postsLoader.getRecentPostsOfTags.load(tag.id);
   }
 
+  const getRecentImages: IFieldResolver<Tag, RequestContext> = (tag, _, ctx) => {
+    return ctx.loaders.imagesLoader.getRecentImagesOfTags.load(tag.id);
+  }
+
   return {
     Query: {
       getTag,
@@ -47,6 +51,7 @@ export function makeTagsResolver(repositories: Repositories) {
       creationTimestamp: (t) => t.creationTimestamp,
       name: (t) => t.name,
       recentPosts: getRecentPosts,
+      recentImages: getRecentImages,
     }
   }
 }

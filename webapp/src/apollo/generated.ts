@@ -256,6 +256,7 @@ export type Tag = {
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
   name: Scalars['String'];
+  recentImages: Array<Image>;
   recentPosts: Array<Post>;
 };
 
@@ -316,7 +317,7 @@ export type GetTagsQueryVariables = Exact<{
 }>;
 
 
-export type GetTagsQuery = { __typename?: 'Query', getTags: { __typename?: 'CursorPaginatedTags', cursors: { __typename?: 'Cursors', start?: string | null, next?: string | null, end?: string | null }, items: Array<{ __typename?: 'Tag', id: string, creationTimestamp: string, name: string, recentPosts: Array<{ __typename?: 'Post', id: string, creationTimestamp: string, title: string }> }> } };
+export type GetTagsQuery = { __typename?: 'Query', getTags: { __typename?: 'CursorPaginatedTags', cursors: { __typename?: 'Cursors', start?: string | null, next?: string | null, end?: string | null }, items: Array<{ __typename?: 'Tag', id: string, creationTimestamp: string, name: string, recentPosts: Array<{ __typename?: 'Post', id: string, creationTimestamp: string, title: string }>, recentImages: Array<{ __typename?: 'Image', id: string, creationTimestamp: string, url: string }> }> } };
 
 export type SearchTagsQueryVariables = Exact<{
   params: SearchTagsParams;
@@ -594,6 +595,11 @@ export const GetTagsDocument = gql`
         id
         creationTimestamp
         title
+      }
+      recentImages {
+        id
+        creationTimestamp
+        url
       }
     }
   }

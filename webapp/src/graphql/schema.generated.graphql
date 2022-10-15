@@ -157,6 +157,7 @@ type Tag {
   creationTimestamp: String!
   id: String!
   name: String!
+  recentImages: [Image!]!
   recentPosts: [Post!]!
 }
 

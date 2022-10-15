@@ -37,6 +37,11 @@ query getTags($params: GetTagsParams!) {
         creationTimestamp
         title
       }
+      recentImages {
+        id
+        creationTimestamp
+        url
+      }
     }
   }
 }
