@@ -32,6 +32,11 @@ query getTags($params: GetTagsParams!) {
       id
       creationTimestamp
       name
+      recentPosts {
+        id
+        creationTimestamp
+        title
+      }
     }
   }
 }

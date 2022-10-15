@@ -4,10 +4,11 @@ import { PostsRepository, Post } from '../repositories';
 
 export interface PostsLoader {
   getPostsByOwnerIds: Dataloader<string, Post[]>;
+  getRecentPostsOfTags: Dataloader<string, Post[]>;
 }
 
 export function makePostsLoader(postsRepository: PostsRepository): PostsLoader {
-  const getPostsByOwnerIds = async (ownerIds: ReadonlyArray<string>) => {
+  const getPostsByOwnerIds = async (ownerIds: string[]) => {
     const posts = await postsRepository.getRecentPostsByOwnerIds({
       ownerIds: ownerIds as string[]
     });
@@ -23,7 +24,13 @@ export function makePostsLoader(postsRepository: PostsRepository): PostsLoader {
     return ownerIds.map(ownerId => lookup[ownerId]);
   };
 
+  const getRecentPostsOfTags = async (tagIds: string[]) => {
+    const postsOfTags = await postsRepository.getRecentPostsOfTags({ tagIds });
+    return tagIds.map(tagId => postsOfTags[tagId] || []);
+  };
+
   return {
-    getPostsByOwnerIds: new Dataloader(getPostsByOwnerIds)
+    getPostsByOwnerIds: new Dataloader(getPostsByOwnerIds),
+    getRecentPostsOfTags: new Dataloader(getRecentPostsOfTags),
   };
 }

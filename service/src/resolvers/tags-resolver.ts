@@ -29,6 +29,10 @@ export function makeTagsResolver(repositories: Repositories) {
     });
   };
 
+  const getRecentPosts: IFieldResolver<Tag, RequestContext> = (tag, _, ctx) => {
+    return ctx.loaders.postsLoader.getRecentPostsOfTags.load(tag.id);
+  }
+
   return {
     Query: {
       getTag,
@@ -42,6 +46,7 @@ export function makeTagsResolver(repositories: Repositories) {
       id: (t) => t.id,
       creationTimestamp: (t) => t.creationTimestamp,
       name: (t) => t.name,
+      recentPosts: getRecentPosts,
     }
   }
 }

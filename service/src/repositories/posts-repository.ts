@@ -37,6 +37,11 @@ export interface AttachTagsToPostParams {
   postId: string;
 }
 
+export interface GetRecentPostsByTagsIdsParams {
+  tagIds: string[];
+  limit?: number;
+}
+
 export class PostsRepository {
   private trx: TransactionsHelper;
 
@@ -57,7 +62,7 @@ export class PostsRepository {
           body: params.body,
         }));
 
-      if (params.tagIds.length) {
+      if (params.tagIds?.length) {
         await this.attachTagsToPost({
           postId: id,
           tagIds: params.tagIds
@@ -133,6 +138,38 @@ export class PostsRepository {
 
       return insert.map(row => row.id);
     });
+  };
+
+  getRecentPostsOfTags = async (params: GetRecentPostsByTagsIdsParams): Promise<Record<string, Post[]>> => {
+    const rows = await this.db.unionAll(params.tagIds.map(
+      (tagId) => this.db
+        .from(postsTable.name)
+        .innerJoin(
+          postTagsTable.name,
+          postTagsTable.prefixedColumn('postId'),
+          postsTable.prefixedColumn('id')
+        )
+        .select(
+          postsTable.prefixedColumns(),
+          { ...postTagsTable.prefixedColumns('tagId') }
+        )
+        .where(postTagsTable.prefixedColumn('tagId'), tagId)
+        .orderBy(postsTable.prefixedColumn('creationTimestamp'), 'desc')
+        .limit(3)
+    ), true);
+
+    const postsOfTags: Record<string, Post[]> = {};
+
+    for (const row of rows) {
+      const post = postsTable.toAttributeCase<Post>(row);
+      const tagId = postTagsTable.toAttributeCase<{ tagId: string }>(row).tagId;
+      if (!postsOfTags[tagId]) {
+        postsOfTags[tagId] = [];
+      }
+      postsOfTags[tagId].push(post)
+    }
+
+    return postsOfTags;
   };
 }
 

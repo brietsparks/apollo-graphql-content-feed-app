@@ -9,7 +9,9 @@ export interface TagCreationFormWidgetProps {
 }
 
 export function TagCreationFormWidget(props: TagCreationFormWidgetProps) {
-  const [createTag, tagCreation] = useCreateTagMutation();
+  const [createTag, tagCreation] = useCreateTagMutation({
+    update: createTagMutationUpdate,
+  });
 
   const submitForm = (data: TagFormData) => {
     void createTag({
@@ -17,8 +19,7 @@ export function TagCreationFormWidget(props: TagCreationFormWidgetProps) {
         params: {
           name: data.name,
         }
-      },
-      update: createTagMutationUpdate,
+      }
     });
   };
 
