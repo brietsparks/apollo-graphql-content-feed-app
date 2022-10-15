@@ -1,6 +1,6 @@
 import { MutationUpdaterFunction as BaseMutationUpdaterFunction, DefaultContext, ApolloCache } from '@apollo/client';
 
-import { apolloCache, generated } from '~/apollo';
+import { apolloCache, generated, Tag } from '~/apollo';
 
 type MutationUpdaterFunction<TData, TVariables> = BaseMutationUpdaterFunction<TData, TVariables, DefaultContext, ApolloCache<typeof apolloCache>>;
 
@@ -61,6 +61,24 @@ export const createPostMutationUpdate: MutationUpdaterFunction<generated.CreateP
         }
       }
     }
+  });
+
+  data?.createPost.tags.forEach(tag => {
+    cache.modify({
+      id: cache.identify({
+        __typename: tag.__typename,
+        id: tag.id
+      }),
+      fields: {
+        recentPosts(existing: generated.Tag['recentPosts'], { toReference }) {
+          const newPost = toReference({
+            __typename: data.createPost.__typename,
+            id: data.createPost.id
+          });
+          return [newPost, ...existing];
+        }
+      }
+    })
   });
 };
 
