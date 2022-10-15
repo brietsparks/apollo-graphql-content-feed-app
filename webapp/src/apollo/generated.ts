@@ -281,7 +281,7 @@ export type CreateTagMutationVariables = Exact<{
 }>;
 
 
-export type CreateTagMutation = { __typename?: 'Mutation', createTag: { __typename?: 'Tag', id: string, creationTimestamp: string, name: string } };
+export type CreateTagMutation = { __typename?: 'Mutation', createTag: { __typename?: 'Tag', id: string, creationTimestamp: string, name: string, recentPosts: Array<{ __typename?: 'Post', id: string, creationTimestamp: string, title: string }> } };
 
 export type CreatePostMutationVariables = Exact<{
   params: CreatePostParams;
@@ -381,6 +381,11 @@ export const CreateTagDocument = gql`
     id
     creationTimestamp
     name
+    recentPosts {
+      id
+      creationTimestamp
+      title
+    }
   }
 }
     `;

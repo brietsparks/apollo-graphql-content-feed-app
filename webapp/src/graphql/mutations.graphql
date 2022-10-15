@@ -11,6 +11,11 @@ mutation createTag($params: CreateTagParams!) {
     id
     creationTimestamp
     name
+    recentPosts {
+      id
+      creationTimestamp
+      title
+    }
   }
 }
 
