@@ -12,6 +12,7 @@ export interface AppParams {
     database: string;
     port: number;
   };
+  apqCacheUrl?: string;
 }
 
 export async function createApp(params: AppParams) {
@@ -21,7 +22,9 @@ export async function createApp(params: AppParams) {
 
   const repositories = makeRepositories(db);
 
-  const server = makeServer(repositories);
+  const server = makeServer(repositories, {
+    apqCacheUrl: params.apqCacheUrl
+  });
 
   return {
     db,

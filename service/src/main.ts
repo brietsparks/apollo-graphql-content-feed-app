@@ -12,7 +12,8 @@ export async function main() {
       host: '127.0.0.1',
       database: 'example_app',
       port: 5432
-    }
+    },
+    apqCacheUrl: 'redis://localhost:6379'
   });
 
   const vars = {

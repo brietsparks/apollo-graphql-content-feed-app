@@ -16,3 +16,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ] # https://stackoverflow.com/questions/67904609/how-do-you-perform-a-healthcheck-in-the-redis-docker-image
+      interval: 5s
+      timeout: 5s
+      retries: 5
+

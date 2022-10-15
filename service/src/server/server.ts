@@ -1,16 +1,28 @@
-import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
 import { readFileSync } from 'fs';
+import express from 'express';
+import { KeyValueCache } from 'apollo-server-core';
+import { ApolloServer } from 'apollo-server-express';
+import Keyv from "keyv";
+import { KeyvAdapter } from "@apollo/utils.keyvadapter";
 
 import { Repositories } from '../repositories';
 import { makeResolvers, makeLoaders } from '../resolvers';
 
 const typeDefs = readFileSync(require.resolve('../graphql/schema.graphql')).toString('utf-8');
 
-export function makeServer(repositories: Repositories) {
+export interface MakeServerOptions {
+  apqCacheUrl?: string;
+}
+
+export function makeServer(repositories: Repositories, opts: MakeServerOptions = {}) {
   const expressServer = express();
 
   const resolvers = makeResolvers(repositories);
+
+  let cache: KeyValueCache|undefined;
+  if (opts.apqCacheUrl) {
+    cache = new KeyvAdapter(new Keyv(opts.apqCacheUrl));
+  }
 
   const apolloServer = new ApolloServer({
     typeDefs,
@@ -24,7 +36,8 @@ export function makeServer(repositories: Repositories) {
       return {
         loaders: makeLoaders(repositories)
       };
-    }
+    },
+    cache,
   });
 
   const start = async () => {
