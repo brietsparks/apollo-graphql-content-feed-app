@@ -29,18 +29,18 @@ function createApolloClient() {
       // credentials: 'same-origin',
     }),
     cache,
-    defaultOptions: {
-      query: {
-        errorPolicy: 'all',
-        fetchPolicy: isSSR() ? 'no-cache' : 'cache-first'
-      }
-    }
+    // defaultOptions: {
+    //   query: {
+    //     errorPolicy: 'all',
+    //     fetchPolicy: isSSR() ? 'no-cache' : 'cache-first'
+    //   }
+    // }
   })
 }
 
 
 export function initializeApollo(initialState: any = null) {
-  const _apolloClient = apolloClient ?? createApolloClient()
+  const _apolloClient = apolloClient ?? createApolloClient();
 
   // If your page has Next.js data fetching methods that use Apollo Client, the initial state
   // get hydrated here
