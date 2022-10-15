@@ -19,6 +19,7 @@
     "@mui/material": "^5.10.8",
     "@types/lodash": "^4.14.186",
     "apollo-link-http": "^1.5.17",
+    "crypto-hash": "^2.0.1",
     "deepmerge": "^4.2.2",
     "graphql": "^16.6.0",
     "lodash": "^4.17.21",

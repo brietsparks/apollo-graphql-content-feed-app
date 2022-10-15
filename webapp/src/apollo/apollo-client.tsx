@@ -1,8 +1,10 @@
 import {useMemo} from 'react'
 import { ApolloClient } from '@apollo/client';
 import { HttpLink } from '@apollo/client/link/http';
+import { createPersistedQueryLink } from "@apollo/client/link/persisted-queries";
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
+import { sha256 } from 'crypto-hash';
 
 import { API_URL } from '~/config';
 
@@ -24,10 +26,11 @@ function createApolloClient() {
   return new ApolloClient<any>({
     connectToDevTools: true,
     ssrMode: typeof window === 'undefined',
-    link: new HttpLink({
-      uri: API_URL,
-      // credentials: 'same-origin',
-    }),
+    link: createPersistedQueryLink({
+      sha256,
+      useGETForHashedQueries: true
+    })
+      .concat(new HttpLink({ uri: API_URL })),
     cache,
     // defaultOptions: {
     //   query: {
