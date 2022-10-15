@@ -27,6 +27,10 @@ export function makeImagesResolver(repositories: Repositories) {
     return ctx.loaders.usersLoader.getUsersByIds.load(image.ownerId);
   };
 
+  const getImageTags: IFieldResolver<Image, RequestContext> = (image, _, ctx) => {
+    return ctx.loaders.tagsLoader.getTagsOfImages.load(image.id);
+  };
+
   return {
     Query: {
       getImage,
@@ -40,6 +44,7 @@ export function makeImagesResolver(repositories: Repositories) {
       creationTimestamp: (p) => p.creationTimestamp,
       ownerId: (p) => p.ownerId,
       owner: getImageOwner,
+      tags: getImageTags,
       url: (p) => p.url,
       caption: (p) => p.caption
     }

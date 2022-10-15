@@ -5,3 +5,4 @@ export * from './tag-creation-form.widget';
 export * from './tags-collection-form.widget';
 export * from './post-creation-form.widget';
 export * from './posts-list.widget';
+export * from './image-creation-form.widget';

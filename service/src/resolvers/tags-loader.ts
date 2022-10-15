@@ -4,6 +4,7 @@ import { TagsRepository, Tag } from '../repositories';
 
 export interface TagsLoader {
   getTagsOfPosts: Dataloader<string, Tag[]>;
+  getTagsOfImages: Dataloader<string, Tag[]>;
 }
 
 export function makeTagsLoader(tagsRepository: TagsRepository): TagsLoader {
@@ -21,7 +22,22 @@ export function makeTagsLoader(tagsRepository: TagsRepository): TagsLoader {
     return postIds.map(postId => lookup[postId]);
   };
 
+  const getTagsOfImages = async (imageIds: ReadonlyArray<string>) => {
+    const tags = await tagsRepository.getTagsOfImages(imageIds as string[]);
+
+    const lookup: Record<string, Tag[]> = {};
+    for (const imageId of imageIds) {
+      lookup[imageId] = [];
+    }
+    for (const tag of tags) {
+      lookup[tag.imageId].push(tag);
+    }
+
+    return imageIds.map(imageId => lookup[imageId]);
+  };
+
   return {
-    getTagsOfPosts: new Dataloader(getTagsOfPosts)
+    getTagsOfPosts: new Dataloader(getTagsOfPosts),
+    getTagsOfImages: new Dataloader(getTagsOfImages),
   };
 }

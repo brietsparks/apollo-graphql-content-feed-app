@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { v4 as uuid } from 'uuid';
 
-import { imagesTable } from '../database';
+import { imagesTable, imageTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
 import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
@@ -16,6 +16,7 @@ export type Image = {
 
 export interface CreateImageParams {
   ownerId: string;
+  tagIds?: string[];
   url: string;
   caption?: string | null;
 }
@@ -28,6 +29,11 @@ export interface GetImagesParams {
 export interface GetRecentImagesByOwnerIdsParams {
   ownerIds: string[];
   limit?: number;
+}
+
+export interface AttachTagsToImageParams {
+  tagIds: string[];
+  imageId: string;
 }
 
 export class ImagesRepository {
@@ -49,6 +55,13 @@ export class ImagesRepository {
           id,
           ...params,
         }));
+
+      if (params.tagIds.length) {
+        await this.attachTagsToImage({
+          imageId: id,
+          tagIds: params.tagIds
+        }, { ...opts, trx });
+      }
 
       return { id };
     }));
@@ -92,6 +105,22 @@ export class ImagesRepository {
         .orderBy(imagesTable.rawColumn('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
+  };
+
+  attachTagsToImage = async (params: AttachTagsToImageParams, opts: TransactionOptions) => {
+    return this.trx.query(opts,async (trx) => {
+      const insert = params.tagIds.map(tagId => imageTagsTable.toColumnCase({
+        id: uuid(),
+        tagId,
+        imageId: params.imageId,
+      }));
+
+      await trx
+        .into(imageTagsTable.name)
+        .insert(insert);
+
+      return insert.map(row => row.id);
+    });
   };
 }
 

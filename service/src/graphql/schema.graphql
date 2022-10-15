@@ -132,6 +132,7 @@ type Image {
 
 input CreateImageParams {
   ownerId: String!
+  tagIds: [String]
   url: String!
   caption: String
 }

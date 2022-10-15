@@ -27,3 +27,16 @@ mutation createPost($params: CreatePostParams!) {
     }
   }
 }
+
+mutation createImage($params: CreateImageParams!) {
+  createImage(params: $params) {
+    id
+    creationTimestamp
+    ownerId
+    url
+    tags {
+      id
+      name
+    }
+  }
+}

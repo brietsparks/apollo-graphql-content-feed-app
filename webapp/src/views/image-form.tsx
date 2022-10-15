@@ -2,31 +2,30 @@ import React, { ComponentType, useState } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
 
-export interface PostFormProps {
-  tagsComponent: ComponentType<PostFormTagsComponentProps>;
-  submit: (data: PostFormData) => void | Promise<unknown>;
+export interface ImageFormProps {
+  tagsComponent: ComponentType<ImageFormTagsComponentProps>;
+  submit: (data: ImageFormData) => void | Promise<unknown>;
   buttonLabel: string;
   pending: boolean;
 }
 
-export interface PostFormTagsComponentProps {
-  value?: PostFormTag[];
-  onChange?: PostFormTagsChangeHandler;
+export interface ImageFormTagsComponentProps {
+  value?: ImageFormTag[];
+  onChange?: ImageFormTagsChangeHandler;
 }
-export type PostFormTagsChangeHandler = (tags: PostFormTag[]) => void;
-export type PostFormTag = { id: string };
+export type ImageFormTagsChangeHandler = (tags: ImageFormTag[]) => void;
+export type ImageFormTag = { id: string };
 
-export interface PostFormData {
+export interface ImageFormData {
   tagIds?: string[];
-  title: string
-  body?: string;
+  url: string
 }
 
-export function PostForm(props: PostFormProps) {
+export function ImageForm(props: ImageFormProps) {
   const { tagsComponent: TagsForm } = props;
 
-  const form = useForm<PostFormData>();
-  const [tags, setTags] = useState<PostFormTag[]>([]);
+  const form = useForm<ImageFormData>();
+  const [tags, setTags] = useState<ImageFormTag[]>([]);
 
   const reset = () => {
     form.reset();
@@ -48,18 +47,13 @@ export function PostForm(props: PostFormProps) {
     <form onSubmit={handleSubmit}>
       <Stack spacing={2}>
         <TextField
-          label="Title"
-          {...form.register('title')}
+          label="url"
+          {...form.register('url')}
         />
 
         <TagsForm
           value={tags}
           onChange={setTags}
-        />
-
-        <TextField
-          label="Body"
-          {...form.register('body')}
         />
 
         <Button type="submit">{props.buttonLabel}</Button>

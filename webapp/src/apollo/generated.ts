@@ -279,6 +279,13 @@ export type CreatePostMutationVariables = Exact<{
 
 export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: string, creationTimestamp: string, ownerId: string, title: string, body?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } };
 
+export type CreateImageMutationVariables = Exact<{
+  params: CreateImageParams;
+}>;
+
+
+export type CreateImageMutation = { __typename?: 'Mutation', createImage: { __typename?: 'Image', id: string, creationTimestamp: string, ownerId: string, url: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } };
+
 export type GetUserQueryVariables = Exact<{
   params: Scalars['String'];
 }>;
@@ -419,6 +426,46 @@ export function useCreatePostMutation(baseOptions?: Apollo.MutationHookOptions<C
 export type CreatePostMutationHookResult = ReturnType<typeof useCreatePostMutation>;
 export type CreatePostMutationResult = Apollo.MutationResult<CreatePostMutation>;
 export type CreatePostMutationOptions = Apollo.BaseMutationOptions<CreatePostMutation, CreatePostMutationVariables>;
+export const CreateImageDocument = gql`
+    mutation createImage($params: CreateImageParams!) {
+  createImage(params: $params) {
+    id
+    creationTimestamp
+    ownerId
+    url
+    tags {
+      id
+      name
+    }
+  }
+}
+    `;
+export type CreateImageMutationFn = Apollo.MutationFunction<CreateImageMutation, CreateImageMutationVariables>;
+
+/**
+ * __useCreateImageMutation__
+ *
+ * To run a mutation, you first call `useCreateImageMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateImageMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createImageMutation, { data, loading, error }] = useCreateImageMutation({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useCreateImageMutation(baseOptions?: Apollo.MutationHookOptions<CreateImageMutation, CreateImageMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<CreateImageMutation, CreateImageMutationVariables>(CreateImageDocument, options);
+      }
+export type CreateImageMutationHookResult = ReturnType<typeof useCreateImageMutation>;
+export type CreateImageMutationResult = Apollo.MutationResult<CreateImageMutation>;
+export type CreateImageMutationOptions = Apollo.BaseMutationOptions<CreateImageMutation, CreateImageMutationVariables>;
 export const GetUserDocument = gql`
     query getUser($params: String!) {
   getUser(id: $params) {

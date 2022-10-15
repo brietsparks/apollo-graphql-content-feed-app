@@ -1,7 +1,7 @@
 import { Knex } from 'knex';
 import { v4 as uuid } from 'uuid';
 
-import { tagsTable, postTagsTable } from '../database';
+import { tagsTable, postTagsTable, imageTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
 import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
@@ -15,6 +15,11 @@ export type Tag = {
 export type PostTag =
   Tag & {
   postId: string;
+}
+
+export type ImageTag =
+  Tag & {
+  imageId: string;
 }
 
 export interface CreateTagParams {
@@ -108,6 +113,26 @@ export class TagsRepository {
       const tag = tagsTable.toAttributeCase(row);
       const { postId } = postTagsTable.toAttributeCase(row);
       return { ...tag, postId } as PostTag;
+    });
+  };
+
+  getTagsOfImages = async (imageIds: string[]): Promise<ImageTag[]> => {
+    const rows = await this.db
+      .from(tagsTable.name)
+      .innerJoin(
+        imageTagsTable.name,
+        imageTagsTable.prefixedColumn('tagId'),
+        tagsTable.prefixedColumn('id')
+      )
+      .select(tagsTable.prefixedColumns())
+      .select(imageTagsTable.prefixedColumns())
+      .whereIn(imageTagsTable.prefixedColumn('imageId'), imageIds)
+      .orderBy(imageTagsTable.prefixedColumn('creationTimestamp'));
+
+    return rows.map(row => {
+      const tag = tagsTable.toAttributeCase(row);
+      const { imageId } = imageTagsTable.toAttributeCase(row);
+      return { ...tag, imageId } as ImageTag;
     });
   };
 }

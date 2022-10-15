@@ -35,7 +35,7 @@ export function PostCreationFormWidget(props: PostCreationFormWidgetProps) {
       submit={submitForm}
       buttonLabel="Create Post"
       pending={postCreation.loading}
-      tagsFormComponent={TagsCollectionFormWidget as PostFormProps['tagsFormComponent']}
+      tagsComponent={TagsCollectionFormWidget as PostFormProps['tagsComponent']}
     />
   );
 }
