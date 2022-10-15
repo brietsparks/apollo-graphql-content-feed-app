@@ -3,6 +3,7 @@ import React from 'react';
 import { useCreateImageMutation } from '~/apollo';
 import { ImageForm, ImageFormData, ImageFormProps } from '~/views';
 
+import { createImageMutationUpdate } from './apollo';
 import { useCurrentUser } from './current-user-context.widget';
 import { TagsCollectionFormWidget } from './tags-collection-form.widget';
 
@@ -12,7 +13,7 @@ export interface ImageCreationFormWidgetProps {
 export function ImageCreationFormWidget(props: ImageCreationFormWidgetProps) {
   const currentUserId = useCurrentUser();
   const [createImage, imageCreation] = useCreateImageMutation({
-    // update: createImageMutationUpdate,
+    update: createImageMutationUpdate,
   });
 
   const submitForm = async (data: ImageFormData) => {

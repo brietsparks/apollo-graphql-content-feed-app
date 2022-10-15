@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import { addApolloState, initializeApollo, GetUsersDocument, GetPostsDocument } from '~/apollo';
 
-import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget } from '~/widgets';
+import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget, ImagesListWidget } from '~/widgets';
 import { HomePageLayout } from '~/views';
 
 const Home: NextPage = () => {
@@ -15,6 +15,7 @@ const Home: NextPage = () => {
         postCreationForm={<PostCreationFormWidget />}
         postsList={<PostsListWidget />}
         imageCreationForm={<ImageCreationFormWidget />}
+        imagesList={<ImagesListWidget />}
       />
     </CurrentUserContextProviderWidget>
   );
@@ -22,22 +23,23 @@ const Home: NextPage = () => {
 
 export async function getServerSideProps(context: any) {
   const client = initializeApollo()
-  await Promise.all([
-    client.query({
-      query: GetUsersDocument,
-      variables: {
-        params: {}
-      },
-    }),
-    client.query({
-      query: GetPostsDocument,
-      variables: {
-        params: {
-          pagination: {}
-        }
-      },
-    })
-  ]);
+  // await Promise.all([
+  //   client.query({
+  //     query: GetUsersDocument,
+  //     variables: {
+  //       params: {}
+  //     },
+  //   }),
+  //   client.query({
+  //     query: GetPostsDocument,
+  //     variables: {
+  //       params: {
+  //         pagination: {}
+  //       }
+  //     },
+  //   }),
+  //   // todo images
+  // ]);
 
   const documentProps = addApolloState(
     client,

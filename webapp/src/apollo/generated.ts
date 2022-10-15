@@ -20,6 +20,7 @@ export type ContentItem = Image | Post;
 export type CreateImageParams = {
   caption?: InputMaybe<Scalars['String']>;
   ownerId: Scalars['String'];
+  tagIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   url: Scalars['String'];
 };
 
@@ -284,7 +285,7 @@ export type CreateImageMutationVariables = Exact<{
 }>;
 
 
-export type CreateImageMutation = { __typename?: 'Mutation', createImage: { __typename?: 'Image', id: string, creationTimestamp: string, ownerId: string, url: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } };
+export type CreateImageMutation = { __typename?: 'Mutation', createImage: { __typename?: 'Image', id: string, creationTimestamp: string, ownerId: string, url: string, caption?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } };
 
 export type GetUserQueryVariables = Exact<{
   params: Scalars['String'];
@@ -313,6 +314,13 @@ export type GetPostsQueryVariables = Exact<{
 
 
 export type GetPostsQuery = { __typename?: 'Query', getPosts: { __typename?: 'CursorPaginatedPosts', items: Array<{ __typename?: 'Post', id: string, creationTimestamp: string, ownerId: string, title: string, body?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }>, cursors: { __typename?: 'Cursors', start?: string | null, end?: string | null, next?: string | null } } };
+
+export type GetImagesQueryVariables = Exact<{
+  params: GetImagesParams;
+}>;
+
+
+export type GetImagesQuery = { __typename?: 'Query', getImages: { __typename?: 'CursorPaginatedImages', items: Array<{ __typename?: 'Image', id: string, creationTimestamp: string, ownerId: string, url: string, caption?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }>, cursors: { __typename?: 'Cursors', start?: string | null, end?: string | null, next?: string | null } } };
 
 
 export const CreateUserDocument = gql`
@@ -433,6 +441,7 @@ export const CreateImageDocument = gql`
     creationTimestamp
     ownerId
     url
+    caption
     tags {
       id
       name
@@ -641,3 +650,53 @@ export function useGetPostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetPostsQueryHookResult = ReturnType<typeof useGetPostsQuery>;
 export type GetPostsLazyQueryHookResult = ReturnType<typeof useGetPostsLazyQuery>;
 export type GetPostsQueryResult = Apollo.QueryResult<GetPostsQuery, GetPostsQueryVariables>;
+export const GetImagesDocument = gql`
+    query getImages($params: GetImagesParams!) {
+  getImages(params: $params) {
+    items {
+      id
+      creationTimestamp
+      ownerId
+      url
+      caption
+      tags {
+        id
+        name
+      }
+    }
+    cursors {
+      start
+      end
+      next
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetImagesQuery__
+ *
+ * To run a query within a React component, call `useGetImagesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetImagesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetImagesQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useGetImagesQuery(baseOptions: Apollo.QueryHookOptions<GetImagesQuery, GetImagesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetImagesQuery, GetImagesQueryVariables>(GetImagesDocument, options);
+      }
+export function useGetImagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetImagesQuery, GetImagesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetImagesQuery, GetImagesQueryVariables>(GetImagesDocument, options);
+        }
+export type GetImagesQueryHookResult = ReturnType<typeof useGetImagesQuery>;
+export type GetImagesLazyQueryHookResult = ReturnType<typeof useGetImagesLazyQuery>;
+export type GetImagesQueryResult = Apollo.QueryResult<GetImagesQuery, GetImagesQueryVariables>;

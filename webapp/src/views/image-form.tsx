@@ -18,7 +18,8 @@ export type ImageFormTag = { id: string };
 
 export interface ImageFormData {
   tagIds?: string[];
-  url: string
+  url: string;
+  caption?: string;
 }
 
 export function ImageForm(props: ImageFormProps) {
@@ -47,13 +48,18 @@ export function ImageForm(props: ImageFormProps) {
     <form onSubmit={handleSubmit}>
       <Stack spacing={2}>
         <TextField
-          label="url"
+          label="URL"
           {...form.register('url')}
         />
 
         <TagsForm
           value={tags}
           onChange={setTags}
+        />
+
+        <TextField
+          label="Caption"
+          {...form.register('caption')}
         />
 
         <Button type="submit">{props.buttonLabel}</Button>

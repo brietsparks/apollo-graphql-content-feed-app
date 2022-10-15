@@ -1,12 +1,16 @@
 import {useMemo} from 'react'
-import { ApolloClient, QueryOptions } from '@apollo/client';
+import { ApolloClient } from '@apollo/client';
 import { HttpLink } from '@apollo/client/link/http';
 import merge from 'deepmerge'
 import isEqual from 'lodash/isEqual'
 
 import { API_URL } from '~/config';
 
-import { apolloCache as cache } from './apollo-cache';
+import { apolloCache } from './apollo-cache';
+
+export { apolloCache };
+
+const cache = apolloCache;
 
 export const APOLLO_STATE_PROP_NAME = '__APOLLO_STATE__'
 

@@ -56,3 +56,24 @@ query getPosts($params: GetPostsParams!) {
     }
   }
 }
+
+query getImages($params: GetImagesParams!) {
+  getImages(params: $params) {
+    items {
+      id
+      creationTimestamp
+      ownerId
+      url
+      caption
+      tags {
+        id
+        name
+      }
+    }
+    cursors {
+      start
+      end
+      next
+    }
+  }
+}

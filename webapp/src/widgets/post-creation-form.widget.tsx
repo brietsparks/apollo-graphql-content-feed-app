@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { useCreatePostMutation, createPostMutationUpdate, GetPostsDocument } from '~/apollo';
+import { useCreatePostMutation } from '~/apollo';
 import { PostForm, PostFormData, PostFormProps } from '~/views';
 
+import { createPostMutationUpdate } from './apollo';
 import { useCurrentUser } from './current-user-context.widget';
 import { TagsCollectionFormWidget } from './tags-collection-form.widget';
 

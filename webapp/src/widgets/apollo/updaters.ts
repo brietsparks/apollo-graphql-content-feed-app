@@ -1,12 +1,6 @@
 import { MutationUpdaterFunction as BaseMutationUpdaterFunction, DefaultContext, ApolloCache } from '@apollo/client';
 
-import * as generated from './generated';
-import { apolloCache } from './apollo-cache';
-
-type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
-
-export type GetPostsQueryItem = ArrayElement<generated.GetPostsQuery['getPosts']['items']>;
+import { apolloCache, generated } from '~/apollo';
 
 type MutationUpdaterFunction<TData, TVariables> = BaseMutationUpdaterFunction<TData, TVariables, DefaultContext, ApolloCache<typeof apolloCache>>;
 
@@ -43,6 +37,26 @@ export const createPostMutationUpdate: MutationUpdaterFunction<generated.CreateP
           return {
             cursors: existing.cursors,
             items: [newPost, ...existing.items],
+          };
+        }
+      }
+    }
+  });
+};
+
+export const createImageMutationUpdate: MutationUpdaterFunction<generated.CreateImageMutation, generated.CreateImageMutationVariables> = (cache, { data }) => {
+  cache.modify({
+    fields: {
+      getImages(existing: generated.GetImagesQuery['getImages'], { toReference }) {
+        if (data) {
+          const newImage = toReference({
+            __typename: data.createImage.__typename,
+            id: data.createImage.id
+          });
+
+          return {
+            cursors: existing.cursors,
+            items: [newImage, ...existing.items],
           };
         }
       }

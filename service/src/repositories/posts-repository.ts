@@ -105,12 +105,7 @@ export class PostsRepository {
     }
 
     const rows = await query;
-    const paginationResult = pagination.getResult(rows);
-    const posts = paginationResult.items.map(paginatedRow => postsTable.toAttributeCase<Post>(paginatedRow));
-    return {
-      items: posts,
-      cursors: paginationResult.cursors
-    };
+    return pagination.getResult(rows, postsTable.toAttributeCase<Post>);
   };
 
   getRecentPostsByOwnerIds = async (params: GetRecentPostsByOwnerIdsParams): Promise<Post[]> => {

@@ -1,7 +1,9 @@
 import React from 'react';
 
-import { useCreateUserMutation, createUserMutationUpdate } from '~/apollo';
+import { useCreateUserMutation } from '~/apollo';
 import { UserForm, UserFormData } from '~/views';
+
+import { createUserMutationUpdate } from './apollo';
 
 export interface UserCreationFormWidgetProps {
 }

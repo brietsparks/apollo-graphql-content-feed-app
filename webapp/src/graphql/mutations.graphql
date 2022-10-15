@@ -34,6 +34,7 @@ mutation createImage($params: CreateImageParams!) {
     creationTimestamp
     ownerId
     url
+    caption
     tags {
       id
       name

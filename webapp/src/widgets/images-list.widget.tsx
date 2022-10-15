@@ -1,17 +1,17 @@
 import React from 'react';
 
-import { useGetPostsQuery } from '~/apollo';
+import { useGetImagesQuery } from '~/apollo';
 import { PaginatedList, DataDump } from '~/views';
 
-import { GetPostsQueryItem } from './apollo';
+import { GetImagesQueryItem } from './apollo';
 
-export interface PostsListWidgetProps {
+export interface ImagesListWidgetProps {
 }
 
 const limit = 4;
 
-export function PostsListWidget(props: PostsListWidgetProps) {
-  const query = useGetPostsQuery({
+export function ImagesListWidget(props: ImagesListWidgetProps) {
+  const query = useGetImagesQuery({
     variables: {
       params: {
         pagination: { limit }
@@ -24,7 +24,7 @@ export function PostsListWidget(props: PostsListWidgetProps) {
       variables: {
         params: {
           pagination: {
-            cursor: query.data?.getPosts.cursors.next,
+            cursor: query.data?.getImages.cursors.next,
             limit
           }
         }
@@ -33,13 +33,13 @@ export function PostsListWidget(props: PostsListWidgetProps) {
   };
 
   return (
-    <PaginatedList<GetPostsQueryItem>
-      itemsData={query.data?.getPosts.items}
+    <PaginatedList<GetImagesQueryItem>
+      itemsData={query.data?.getImages.items}
       getItemKey={data => data.id}
       mapItemDataToProps={data => data}
       itemComponent={DataDump}
       loadMore={loadMore}
-      hasMore={!!query.data?.getPosts.cursors.next}
+      hasMore={!!query.data?.getImages.cursors.next}
       isLoadingMore={query.loading}
     />
   );

@@ -80,20 +80,19 @@ export class ImagesRepository {
 
     const query = this.db
       .from(imagesTable.name)
-      .select(imagesTable.rawColumns())
+      .select(imagesTable.prefixedColumns())
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere({
-        [imagesTable.rawColumn('ownerId')]: params.ownerId
+        [imagesTable.prefixedColumn('ownerId')]: params.ownerId
       });
     }
 
-    const images = await query;
-
-    return pagination.getResult(images);
+    const rows = await query;
+    return pagination.getResult(rows, imagesTable.toAttributeCase<Image>);
   };
 
   getRecentImagesByOwnerIds = async (params: GetRecentImagesByOwnerIdsParams): Promise<Image[]> => {
@@ -124,9 +123,9 @@ export class ImagesRepository {
   };
 }
 
-export function makeImagesCursorPagination(params: Partial<CursorPaginationParams>) {
+export function makeImagesCursorPagination(params: Partial<CursorPaginationParams<keyof Image>>) {
   return makeCursorPagination({
-    field: params.field || imagesTable.rawColumn('creationTimestamp'),
+    field: imagesTable.prefixedColumn(params.field || 'creationTimestamp'),
     sortDirection: params.sortDirection || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor
