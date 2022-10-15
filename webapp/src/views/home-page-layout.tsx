@@ -5,6 +5,7 @@ export interface HomePageLayoutProps {
   userCreationForm: ReactNode;
   usersList: ReactNode;
   tagCreationForm: ReactNode;
+  tagsList: ReactNode;
   tagSearchBar: ReactNode;
   postCreationForm: ReactNode;
   postsList: ReactNode;
@@ -21,12 +22,12 @@ export function HomePageLayout(props: HomePageLayoutProps) {
       {/*    {props.usersList}*/}
       {/*  </Stack>*/}
       {/*</Grid>*/}
-      {/*<Grid item>*/}
-      {/*  <Stack>*/}
-      {/*    {props.tagCreationForm}*/}
-      {/*    {props.tagSearchBar}*/}
-      {/*  </Stack>*/}
-      {/*</Grid>*/}
+      <Grid item>
+        <Stack>
+          {props.tagCreationForm}
+          {props.tagsList}
+        </Stack>
+      </Grid>
 
       <Grid item>
         <Stack>

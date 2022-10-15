@@ -21,6 +21,21 @@ query getUsers($params: CursorPaginationInput!) {
   }
 }
 
+query getTags($params: GetTagsParams!) {
+  getTags(params: $params) {
+    cursors {
+      start
+      next
+      end
+    }
+    items {
+      id
+      creationTimestamp
+      name
+    }
+  }
+}
+
 query searchTags($params: SearchTagsParams!) {
   searchTags(params: $params) {
     cursors {

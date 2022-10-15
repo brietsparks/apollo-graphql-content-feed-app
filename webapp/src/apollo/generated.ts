@@ -99,6 +99,10 @@ export type GetPostsParams = {
   tagId?: InputMaybe<Scalars['String']>;
 };
 
+export type GetTagsParams = {
+  pagination: CursorPaginationInput;
+};
+
 export type Image = {
   __typename?: 'Image';
   caption?: Maybe<Scalars['String']>;
@@ -176,6 +180,7 @@ export type Query = {
   getPost?: Maybe<Post>;
   getPosts: CursorPaginatedPosts;
   getTag?: Maybe<Tag>;
+  getTags: CursorPaginatedTags;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
   searchTags: CursorPaginatedTags;
@@ -209,6 +214,11 @@ export type QueryGetPostsArgs = {
 
 export type QueryGetTagArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryGetTagsArgs = {
+  params?: InputMaybe<GetTagsParams>;
 };
 
 
@@ -300,6 +310,13 @@ export type GetUsersQueryVariables = Exact<{
 
 
 export type GetUsersQuery = { __typename?: 'Query', getUsers: { __typename?: 'CursorPaginatedUsers', items: Array<{ __typename?: 'User', id: string, name: string, creationTimestamp: string }>, cursors: { __typename?: 'Cursors', start?: string | null, end?: string | null, next?: string | null } } };
+
+export type GetTagsQueryVariables = Exact<{
+  params: GetTagsParams;
+}>;
+
+
+export type GetTagsQuery = { __typename?: 'Query', getTags: { __typename?: 'CursorPaginatedTags', cursors: { __typename?: 'Cursors', start?: string | null, next?: string | null, end?: string | null }, items: Array<{ __typename?: 'Tag', id: string, creationTimestamp: string, name: string }> } };
 
 export type SearchTagsQueryVariables = Exact<{
   params: SearchTagsParams;
@@ -556,6 +573,50 @@ export function useGetUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetUsersQueryHookResult = ReturnType<typeof useGetUsersQuery>;
 export type GetUsersLazyQueryHookResult = ReturnType<typeof useGetUsersLazyQuery>;
 export type GetUsersQueryResult = Apollo.QueryResult<GetUsersQuery, GetUsersQueryVariables>;
+export const GetTagsDocument = gql`
+    query getTags($params: GetTagsParams!) {
+  getTags(params: $params) {
+    cursors {
+      start
+      next
+      end
+    }
+    items {
+      id
+      creationTimestamp
+      name
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetTagsQuery__
+ *
+ * To run a query within a React component, call `useGetTagsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTagsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTagsQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useGetTagsQuery(baseOptions: Apollo.QueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, options);
+      }
+export function useGetTagsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTagsQuery, GetTagsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTagsQuery, GetTagsQueryVariables>(GetTagsDocument, options);
+        }
+export type GetTagsQueryHookResult = ReturnType<typeof useGetTagsQuery>;
+export type GetTagsLazyQueryHookResult = ReturnType<typeof useGetTagsLazyQuery>;
+export type GetTagsQueryResult = Apollo.QueryResult<GetTagsQuery, GetTagsQueryVariables>;
 export const SearchTagsDocument = gql`
     query searchTags($params: SearchTagsParams!) {
   searchTags(params: $params) {

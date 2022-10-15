@@ -26,6 +26,10 @@ export interface CreateTagParams {
   name: string;
 }
 
+export interface GetTagsParams {
+  pagination: Partial<CursorPaginationParams<keyof Tag>>;
+}
+
 export interface SearchTagsParams {
   term: string;
   pagination: Partial<CursorPaginationParams<keyof Tag>>;
@@ -65,25 +69,21 @@ export class TagsRepository {
       .first();
   };
 
-  getTags = async (ids: string[]) => {
-    return this.db
+  getTags = async (params: GetTagsParams) => {
+    const pagination = makeTagsCursorPagination(params.pagination);
+
+    const rows = await this.db
       .from(tagsTable.name)
-      .select(tagsTable.rawColumns())
-      .whereIn(tagsTable.rawColumn('id'), ids);
+      .where(...pagination.where)
+      .orderBy(...pagination.orderBy)
+      .limit(pagination.limit)
+      .select(tagsTable.prefixedColumns());
+
+    return pagination.getResult(rows, tagsTable.toAttributeCase<Tag>);
   }
 
-  getAllTags = async (): Promise<Tag[]> => {
-    return this.db
-      .from(tagsTable.name)
-      .select(tagsTable.rawColumns())
-  };
-
   searchTags = async (params: SearchTagsParams): Promise<SearchTagsResult> => {
-    const pagination = makeTagsCursorPagination({
-      field: 'name',
-      sortDirection: 'asc',
-      ...params.pagination
-    });
+    const pagination = makeTagsCursorPagination(params.pagination);
 
     const rows = await this.db
       .from(tagsTable.name)
@@ -141,7 +141,7 @@ export function makeTagsCursorPagination(params: Partial<CursorPaginationParams<
   return makeCursorPagination({
     field: tagsTable.prefixedColumn(params.field || 'creationTimestamp'),
     sortDirection: params.sortDirection || 'desc',
-    limit: params.limit || 4,
+    limit: params.limit || 12,
     cursor: params.cursor,
   });
 }

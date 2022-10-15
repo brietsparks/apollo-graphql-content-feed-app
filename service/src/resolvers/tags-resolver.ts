@@ -16,6 +16,12 @@ export function makeTagsResolver(repositories: Repositories) {
     return repositories.tagsRepository.getTag(id);
   };
 
+  const getTags: IFieldResolver<unknown, RequestContext, schema.QueryGetTagsArgs> = (_, { params }) => {
+    return repositories.tagsRepository.getTags({
+      pagination: adaptCursorPagination<Tag>(params.pagination)
+    });
+  };
+
   const searchTags: IFieldResolver<unknown, RequestContext, schema.QuerySearchTagsArgs> = (_, { params }) => {
     return repositories.tagsRepository.searchTags({
       term: params.term,
@@ -26,6 +32,7 @@ export function makeTagsResolver(repositories: Repositories) {
   return {
     Query: {
       getTag,
+      getTags,
       searchTags,
     },
     Mutation: {

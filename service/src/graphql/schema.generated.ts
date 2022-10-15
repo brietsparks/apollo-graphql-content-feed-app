@@ -20,6 +20,7 @@ export type ContentItem = Image | Post;
 export type CreateImageParams = {
   caption?: InputMaybe<Scalars['String']>;
   ownerId: Scalars['String'];
+  tagIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   url: Scalars['String'];
 };
 
@@ -96,6 +97,10 @@ export type GetPostsParams = {
   ownerId?: InputMaybe<Scalars['String']>;
   pagination: CursorPaginationInput;
   tagId?: InputMaybe<Scalars['String']>;
+};
+
+export type GetTagsParams = {
+  pagination: CursorPaginationInput;
 };
 
 export type Image = {
@@ -175,6 +180,7 @@ export type Query = {
   getPost?: Maybe<Post>;
   getPosts: CursorPaginatedPosts;
   getTag?: Maybe<Tag>;
+  getTags: CursorPaginatedTags;
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
   searchTags: CursorPaginatedTags;
@@ -208,6 +214,11 @@ export type QueryGetPostsArgs = {
 
 export type QueryGetTagArgs = {
   id: Scalars['String'];
+};
+
+
+export type QueryGetTagsArgs = {
+  params?: InputMaybe<GetTagsParams>;
 };
 
 
@@ -343,6 +354,7 @@ export type ResolversTypes = {
   GetContentItemsParams: GetContentItemsParams;
   GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
+  GetTagsParams: GetTagsParams;
   Image: ResolverTypeWrapper<Image>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -377,6 +389,7 @@ export type ResolversParentTypes = {
   GetContentItemsParams: GetContentItemsParams;
   GetImagesParams: GetImagesParams;
   GetPostsParams: GetPostsParams;
+  GetTagsParams: GetTagsParams;
   Image: Image;
   Int: Scalars['Int'];
   Mutation: {};
@@ -474,6 +487,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, RequireFields<QueryGetPostArgs, 'id'>>;
   getPosts?: Resolver<ResolversTypes['CursorPaginatedPosts'], ParentType, ContextType, RequireFields<QueryGetPostsArgs, 'params'>>;
   getTag?: Resolver<Maybe<ResolversTypes['Tag']>, ParentType, ContextType, RequireFields<QueryGetTagArgs, 'id'>>;
+  getTags?: Resolver<ResolversTypes['CursorPaginatedTags'], ParentType, ContextType, RequireFields<QueryGetTagsArgs, never>>;
   getUser?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryGetUserArgs, 'id'>>;
   getUsers?: Resolver<ResolversTypes['CursorPaginatedUsers'], ParentType, ContextType, RequireFields<QueryGetUsersArgs, 'pagination'>>;
   searchTags?: Resolver<ResolversTypes['CursorPaginatedTags'], ParentType, ContextType, RequireFields<QuerySearchTagsArgs, 'params'>>;

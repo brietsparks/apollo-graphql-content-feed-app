@@ -24,6 +24,26 @@ export const createUserMutationUpdate: MutationUpdaterFunction<generated.CreateU
   });
 };
 
+export const createTagMutationUpdate: MutationUpdaterFunction<generated.CreateTagMutation, generated.CreateTagMutationVariables> = (cache, { data }) => {
+  cache.modify({
+    fields: {
+      getTags(existing: generated.GetTagsQuery['getTags'], { toReference }) {
+        if (data) {
+          const newTag = toReference({
+            __typename: data.createTag.__typename,
+            id: data.createTag.id
+          });
+
+          return {
+            cursors: existing.cursors,
+            items: [newTag, ...existing.items],
+          };
+        }
+      }
+    }
+  });
+};
+
 export const createPostMutationUpdate: MutationUpdaterFunction<generated.CreatePostMutation, generated.CreatePostMutationVariables> = (cache, { data }) => {
   cache.modify({
     fields: {

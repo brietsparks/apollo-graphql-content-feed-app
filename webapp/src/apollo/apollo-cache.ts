@@ -4,6 +4,7 @@ export const apolloCache = new InMemoryCache({
   typePolicies: {
     Query: {
       fields: {
+        getTags: cursorPaginatedField(),
         getPosts: cursorPaginatedField(),
         getImages: cursorPaginatedField(),
       },

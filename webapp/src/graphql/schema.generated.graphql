@@ -3,6 +3,7 @@ union ContentItem = Image | Post
 input CreateImageParams {
   caption: String
   ownerId: String!
+  tagIds: [String]
   url: String!
 }
 
@@ -75,6 +76,10 @@ input GetPostsParams {
   tagId: String
 }
 
+input GetTagsParams {
+  pagination: CursorPaginationInput!
+}
+
 type Image {
   caption: String
   creationTimestamp: String!
@@ -127,6 +132,7 @@ type Query {
   getPost(id: String!): Post
   getPosts(params: GetPostsParams!): CursorPaginatedPosts!
   getTag(id: String!): Tag
+  getTags(params: GetTagsParams): CursorPaginatedTags!
   getUser(id: String!): User
   getUsers(pagination: CursorPaginationInput!): CursorPaginatedUsers!
   searchTags(params: SearchTagsParams!): CursorPaginatedTags!
