@@ -65,6 +65,8 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
       };
     }
 
+    console.log(rows.length, queriedLimit, rows.length <= specifiedLimit, params.cursor, rows[rows.length - 1], itemCursorField)
+
     if (rows.length === queriedLimit) {
       return {
         start: params.cursor,

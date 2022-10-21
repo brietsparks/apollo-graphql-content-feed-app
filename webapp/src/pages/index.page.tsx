@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import { addApolloState, initializeApollo, GetUsersDocument, GetTagsDocument, GetPostsDocument, GetImagesDocument } from '~/apollo';
 
-import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsListWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget, ImagesListWidget } from '~/widgets';
+import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsListWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget, ImagesListWidget, ContentItemsListWidget } from '~/widgets';
 import { HomePageLayout } from '~/views';
 
 const Home: NextPage = () => {
@@ -17,6 +17,7 @@ const Home: NextPage = () => {
         postsList={<PostsListWidget />}
         imageCreationForm={<ImageCreationFormWidget />}
         imagesList={<ImagesListWidget />}
+        contentItemsList={<ContentItemsListWidget />}
       />
     </CurrentUserContextProviderWidget>
   );
@@ -29,38 +30,38 @@ export async function getServerSideProps(context: any) {
   await client.resetStore();
   await client.clearStore();
 
-  await Promise.all([
-    client.query({
-      query: GetUsersDocument,
-      variables: {
-        params: {}
-      },
-    }),
-    client.query({
-      query: GetTagsDocument,
-      variables: {
-        params: {
-          pagination: {}
-        }
-      },
-    }),
-    client.query({
-      query: GetPostsDocument,
-      variables: {
-        params: {
-          pagination: {}
-        }
-      },
-    }),
-    client.query({
-      query: GetImagesDocument,
-      variables: {
-        params: {
-          pagination: {}
-        }
-      },
-    }),
-  ]);
+  // await Promise.all([
+  //   client.query({
+  //     query: GetUsersDocument,
+  //     variables: {
+  //       params: {}
+  //     },
+  //   }),
+  //   client.query({
+  //     query: GetTagsDocument,
+  //     variables: {
+  //       params: {
+  //         pagination: {}
+  //       }
+  //     },
+  //   }),
+  //   client.query({
+  //     query: GetPostsDocument,
+  //     variables: {
+  //       params: {
+  //         pagination: {}
+  //       }
+  //     },
+  //   }),
+  //   client.query({
+  //     query: GetImagesDocument,
+  //     variables: {
+  //       params: {
+  //         pagination: {}
+  //       }
+  //     },
+  //   }),
+  // ]);
 
   const documentProps = addApolloState(
     client,

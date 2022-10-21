@@ -1,9 +1,9 @@
-import { Knex } from 'knex';
+import { Knex, knex } from 'knex';
 
 import { postsTable, imagesTable } from '../database';
 import { XOR } from '../util/types';
 
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
 import { Post } from './posts-repository';
 import { Image } from './images-repository';
 
@@ -13,7 +13,7 @@ export type ContentItem = XOR<
 >;
 
 export interface GetContentItemsParams {
-  pagination: Partial<CursorPaginationParams<ContentItem>>;
+  pagination: Partial<CursorPaginationParams<keyof ContentItem>>;
   ownerId?: string;
 }
 
@@ -23,33 +23,49 @@ export class ContentItemsRepository {
   ) {}
 
   getContentItems = async (params: GetContentItemsParams): Promise<CursorPaginationResult<ContentItem>> => {
-    const pagination = makeCursorPagination<ContentItem>({
-      ...params,
+    const cursorField = 'creation_timestamp';
+
+    const pagination = makeCursorPagination({
+      field: cursorField,
       sortDirection: 'desc',
-      limit: params.pagination.limit || 10,
-      field: 'creationTimestamp'
+      limit: params.pagination.limit || 4,
+      cursor: params.pagination.cursor
     });
 
     const query = this.db
-      .from(postsTable.name)
-      .select(this.db.raw(
-        `coalesce(
-          ${postsTable.prefixedColumn('creationTimestamp')},
-          ${imagesTable.prefixedColumn('creationTimestamp')}
-        ) as creation_timestamp`
-      ))
-      .select(
-        postsTable.prefixedColumns(),
-        { ...imagesTable.prefixedColumns() }
-      )
-      .fullOuterJoin(
-        imagesTable.name,
-        postsTable.prefixedColumn('id'),
-        imagesTable.prefixedColumn('id')
-      )
+      .from((db: Knex) => {
+        db.from(postsTable.name)
+          .select(
+            this.db.raw(
+              `coalesce(
+                ${postsTable.prefixedColumn('creationTimestamp')},
+                ${imagesTable.prefixedColumn('creationTimestamp')}
+              ) as ${cursorField}`
+            )
+          )
+          .select({
+            ...postsTable.prefixedColumns(),
+            ...imagesTable.prefixedColumns()
+          })
+          .fullOuterJoin(
+            imagesTable.name,
+            postsTable.prefixedColumn('id'),
+            imagesTable.prefixedColumn('id')
+          )
+          .as('subquery')
+      })
+      .select(Object.values({
+        ...postsTable.prefixedColumns(),
+        ...imagesTable.prefixedColumns()
+      }))
       .where(...pagination.where)
-      .orderBy(1, params.pagination.sortDirection || 'desc')
-      .limit(pagination.limit)
+      .orderBy(cursorField, params.pagination.sortDirection || 'desc')
+      .limit(pagination.limit);
+
+    console.log('====================================')
+    console.log(query.toSQL().sql);
+    console.log('====================================')
+
 
     if (params.ownerId) {
       query.andWhere(q => q
@@ -60,24 +76,25 @@ export class ContentItemsRepository {
 
     const rows = await query;
 
-    const contentItems = rows
-      .map((item) => {
-        if (item[postsTable.prefixedColumn('id')]) {
-          return {
-            ...postsTable.toAttributeCase(item),
-            _type: 'post'
-          };
-        }
-        if (item[imagesTable.prefixedColumn('id')]) {
-          return {
-            ...imagesTable.toAttributeCase(item),
-            _type: 'image'
-          };
-        }
-        return null;
-      })
-      .filter(item => !!item);
+    const r = pagination.getResult(rows, (item) => {
+      if (item[postsTable.prefixedColumn('id')]) {
+        return {
+          ...postsTable.toAttributeCase(item),
+          _type: 'post'
+        };
+      }
+      if (item[imagesTable.prefixedColumn('id')]) {
+        return {
+          ...imagesTable.toAttributeCase(item),
+          _type: 'image'
+        };
+      }
 
-    return pagination.getResult(contentItems as ContentItem[]);
+      throw new Error();
+    });
+
+    console.log(r)
+
+    return r;
   };
 }

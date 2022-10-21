@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 
 import { createPgTestcontainer, makeKnexClient } from '../../database';
 
-import { makeCursorPagination } from '../../repositories/pagination';
+import { makeCursorPagination } from '../../repositories/lib/pagination';
 
 describe('makePagination', () => {
   let testcontainer: StartedTestContainer;

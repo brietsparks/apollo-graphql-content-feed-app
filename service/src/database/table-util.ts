@@ -41,7 +41,8 @@ export class Table<T extends Record<string, string>> {
 
     const prefixedColumns: Record<string, string> = {};
     for (const prefixedColumn of prefixedColumnsArr) {
-      prefixedColumns[prefixedColumn] = prefixedColumn;
+      const alias = prefixedColumn.replace('.', ':');
+      prefixedColumns[alias] = prefixedColumn;
     }
     return prefixedColumns;
   }

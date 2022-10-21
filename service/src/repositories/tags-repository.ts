@@ -72,12 +72,16 @@ export class TagsRepository {
   getTags = async (params: GetTagsParams) => {
     const pagination = makeTagsCursorPagination(params.pagination);
 
-    const rows = await this.db
+    const q = this.db
       .from(tagsTable.name)
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit)
       .select(tagsTable.prefixedColumns());
+
+    console.log(q.toSQL().sql);
+
+    const rows = await q;
 
     return pagination.getResult(rows, tagsTable.toAttributeCase<Tag>);
   }
