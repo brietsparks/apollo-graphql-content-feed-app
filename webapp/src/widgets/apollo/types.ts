@@ -6,4 +6,4 @@ type ArrayElement<ArrayType extends readonly unknown[]> =
 export type GetTagsQueryItem = ArrayElement<generated.GetTagsQuery['getTags']['items']>;
 export type GetPostsQueryItem = ArrayElement<generated.GetPostsQuery['getPosts']['items']>;
 export type GetImagesQueryItem = ArrayElement<generated.GetImagesQuery['getImages']['items']>;
-
+export type GetContentItemsQueryItem = ArrayElement<generated.GetContentItemsQuery['getContentItems']['items']>;

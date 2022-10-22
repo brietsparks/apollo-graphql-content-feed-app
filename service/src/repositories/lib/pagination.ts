@@ -94,10 +94,10 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
     throw new Error('invalid cursor pagination state in getItems. This is probably a bug with the library');
   }
 
-  function getResult<RowType extends Record<string, unknown>>(retrievedItems: RowType[], mapItem?: (item: RowType) => RowType): CursorPaginationResult<RowType> {
+  function getResult<RowType extends Record<string, unknown>>(retrievedItems: RowType[], mapItem?: (item: RowType) => RowType | null): CursorPaginationResult<RowType> {
     let items = getRows(retrievedItems);
     if (mapItem) {
-      items = items.map(mapItem);
+      items = items.map(mapItem).filter(row => !!row);
     }
 
     return {

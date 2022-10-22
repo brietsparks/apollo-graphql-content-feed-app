@@ -102,3 +102,37 @@ query getImages($params: GetImagesParams!) {
     }
   }
 }
+
+query getContentItems($params: GetContentItemsParams!) {
+  getContentItems(params: $params) {
+    items {
+      ... on Post {
+        id
+        creationTimestamp
+        ownerId
+        title
+        body
+        tags {
+          id
+          name
+        }
+      }
+      ... on Image {
+        id
+        creationTimestamp
+        ownerId
+        url
+        caption
+        tags {
+          id
+          name
+        }
+      }
+    }
+    cursors {
+      start
+      end
+      next
+    }
+  }
+}

@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 import { postsTable, imagesTable } from '../database';
 import { XOR } from '../util/types';
 
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './pagination';
+import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
 import { Post } from './posts-repository';
 import { Image } from './images-repository';
 
@@ -13,7 +13,7 @@ export type ContentItem = XOR<
 >;
 
 export interface GetContentItemsParams {
-  pagination: Partial<CursorPaginationParams<ContentItem>>;
+  pagination: Partial<CursorPaginationParams<keyof ContentItem>>;
   ownerId?: string;
 }
 
@@ -23,61 +23,106 @@ export class ContentItemsRepository {
   ) {}
 
   getContentItems = async (params: GetContentItemsParams): Promise<CursorPaginationResult<ContentItem>> => {
-    const pagination = makeCursorPagination<ContentItem>({
-      ...params,
+    const cursorField = '_creation_timestamp';
+
+    const pagination = makeCursorPagination({
+      field: cursorField,
       sortDirection: 'desc',
-      limit: params.pagination.limit || 10,
-      field: 'creationTimestamp'
+      limit: params.pagination.limit || 4,
+      cursor: params.pagination.cursor
     });
 
     const query = this.db
-      .from(postsTable.name)
-      .select(this.db.raw(
-        `coalesce(
-          ${postsTable.prefixedColumn('creationTimestamp')},
-          ${imagesTable.prefixedColumn('creationTimestamp')}
-        ) as creation_timestamp`
-      ))
+      .from((db: Knex) => {
+        db.from(postsTable.name)
+          .select(
+            this.db.raw(
+              `coalesce(
+                ${postsTable.prefixedColumn('creationTimestamp')},
+                ${imagesTable.prefixedColumn('creationTimestamp')}
+              ) as ${cursorField}`
+            )
+          )
+          .select({
+            // ...postsTable.prefixedColumns(),
+            // ...imagesTable.prefixedColumns()
+
+
+            // alias must cannot use a "." for separator because the outer query will parse it as table and column
+            'posts:id': 'posts.id',
+            'posts:creationTimestamp': 'posts.creation_timestamp',
+            'posts:ownerId': 'posts.owner_id',
+            'posts:title': 'posts.title',
+            'posts:body': 'posts.body',
+            'images:id': 'images.id',
+            'images:creationTimestamp': 'images.creation_timestamp',
+            'images:ownerId': 'images.owner_id',
+            'images:url': 'images.url',
+            'images:caption': 'images.caption',
+          })
+          .fullOuterJoin(
+            imagesTable.name,
+            postsTable.prefixedColumn('id'),
+            imagesTable.prefixedColumn('id')
+          )
+          .as('subquery')
+      })
       .select(
-        postsTable.prefixedColumns(),
-        { ...imagesTable.prefixedColumns() }
-      )
-      .fullOuterJoin(
-        imagesTable.name,
-        postsTable.prefixedColumn('id'),
-        imagesTable.prefixedColumn('id')
+        cursorField,
+        'posts:id',
+        'posts:creationTimestamp',
+        'posts:ownerId',
+        'posts:title',
+        'posts:body',
+        'images:id',
+        'images:creationTimestamp',
+        'images:ownerId',
+        'images:url',
+        'images:caption',
+
+        // Object.values({
+        //   ...postsTable.prefixedColumns(),
+        //   ...imagesTable.prefixedColumns()
+        // })
       )
       .where(...pagination.where)
-      .orderBy(1, params.pagination.sortDirection || 'desc')
-      .limit(pagination.limit)
+
+      // raw is needed because orderBy will wrap the identifier in quotes, which will make the subquery alias field unrecognized
+      .orderByRaw(`${cursorField} desc`) // todo: escape via bindings
+      .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere(q => q
-        .orWhere({ [postsTable.prefixedColumn('ownerId')]: params.ownerId })
-        .orWhere({ [imagesTable.prefixedColumn('ownerId')]: params.ownerId })
+        .orWhere({ 'posts:ownerId': params.ownerId })
+        .orWhere({ 'images:ownerId': params.ownerId })
       );
     }
 
     const rows = await query;
 
-    const contentItems = rows
-      .map((item) => {
-        if (item[postsTable.prefixedColumn('id')]) {
-          return {
-            ...postsTable.toAttributeCase(item),
-            _type: 'post'
-          };
-        }
-        if (item[imagesTable.prefixedColumn('id')]) {
-          return {
-            ...imagesTable.toAttributeCase(item),
-            _type: 'image'
-          };
-        }
-        return null;
-      })
-      .filter(item => !!item);
+    return pagination.getResult(rows, (item) => {
+      if (item['posts:id']) {
+        return {
+          _type: 'post',
+          'id': item['posts:id'],
+          'creationTimestamp': item[cursorField],
+          'ownerId': item['posts:ownerId'],
+          'title': item['posts:title'],
+          'body': item['posts:body'],
+        };
+      }
+      if (item['images:id']) {
+        return {
+          _type: 'image',
+          'id': item['images:id'],
+          'creationTimestamp': item[cursorField],
+          'ownerId': item['images:ownerId'],
+          'url': item['images:url'],
+          'caption': item['images:caption'],
+        };
+      }
 
-    return pagination.getResult(contentItems as ContentItem[]);
+      return null;
+    });
   };
 }
