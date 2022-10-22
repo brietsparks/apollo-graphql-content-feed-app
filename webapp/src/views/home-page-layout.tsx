@@ -31,20 +31,20 @@ export function HomePageLayout(props: HomePageLayoutProps) {
       {/*  </Stack>*/}
       {/*</Grid>*/}
 
-      {/*<Grid item>*/}
-      {/*  <Stack>*/}
-      {/*    {props.postCreationForm}*/}
-      {/*    {props.postsList}*/}
-      {/*  </Stack>*/}
-      {/*</Grid>*/}
+      <Grid item>
+        <Stack>
+          {props.postCreationForm}
+          {props.postsList}
+        </Stack>
+      </Grid>
 
 
-      {/*<Grid item>*/}
-      {/*  <Stack>*/}
-      {/*    {props.imageCreationForm}*/}
-      {/*    {props.imagesList}*/}
-      {/*  </Stack>*/}
-      {/*</Grid>*/}
+      <Grid item>
+        <Stack>
+          {props.imageCreationForm}
+          {props.imagesList}
+        </Stack>
+      </Grid>
 
       <Grid item>
         {props.contentItemsList}
