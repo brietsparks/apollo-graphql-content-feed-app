@@ -7,6 +7,7 @@ export const apolloCache = new InMemoryCache({
         getTags: cursorPaginatedField(),
         getPosts: cursorPaginatedField(),
         getImages: cursorPaginatedField(),
+        getContentItems: cursorPaginatedField(),
       },
     },
   }

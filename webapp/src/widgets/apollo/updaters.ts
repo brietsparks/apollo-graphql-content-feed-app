@@ -59,6 +59,19 @@ export const createPostMutationUpdate: MutationUpdaterFunction<generated.CreateP
             items: [newPost, ...existing.items],
           };
         }
+      },
+      getContentItems(existing: generated.GetContentItemsQuery['getContentItems'], { toReference }) {
+        if (data) {
+          const newPost = toReference({
+            __typename: data.createPost.__typename,
+            id: data.createPost.id
+          });
+
+          return {
+            cursors: existing.cursors,
+            items: [newPost, ...existing.items],
+          };
+        }
       }
     }
   });
@@ -95,6 +108,19 @@ export const createImageMutationUpdate: MutationUpdaterFunction<generated.Create
           return {
             cursors: existing.cursors,
             items: [newImage, ...existing.items],
+          };
+        }
+      },
+      getContentItems(existing: generated.GetContentItemsQuery['getContentItems'], { toReference }) {
+        if (data) {
+          const newPost = toReference({
+            __typename: data.createImage.__typename,
+            id: data.createImage.id
+          });
+
+          return {
+            cursors: existing.cursors,
+            items: [newPost, ...existing.items],
           };
         }
       }

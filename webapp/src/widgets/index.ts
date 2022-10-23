@@ -8,3 +8,4 @@ export * from './post-creation-form.widget';
 export * from './posts-list.widget';
 export * from './image-creation-form.widget';
 export * from './images-list.widget';
+export * from './content-items-list.widget';

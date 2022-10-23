@@ -26,12 +26,15 @@ function createApolloClient() {
   return new ApolloClient<any>({
     connectToDevTools: true,
     ssrMode: typeof window === 'undefined',
-    link: createPersistedQueryLink({
-      sha256,
-      useGETForHashedQueries: true
-    })
-      .concat(new HttpLink({ uri: API_URL })),
+    link:
+      new HttpLink({ uri: API_URL }),
+      // createPersistedQueryLink({
+      //   sha256,
+      //   useGETForHashedQueries: true
+      // })
+      // .concat(new HttpLink({ uri: API_URL })),
     cache,
+
     // defaultOptions: {
     //   query: {
     //     errorPolicy: 'all',

@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import { addApolloState, initializeApollo, GetUsersDocument, GetTagsDocument, GetPostsDocument, GetImagesDocument } from '~/apollo';
+import { addApolloState, initializeApollo, GetUsersDocument, GetTagsDocument, GetPostsDocument, GetImagesDocument, GetContentItemsDocument } from '~/apollo';
 
-import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsListWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget, ImagesListWidget } from '~/widgets';
+import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsListWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget, ImagesListWidget, ContentItemsListWidget } from '~/widgets';
 import { HomePageLayout } from '~/views';
 
 const Home: NextPage = () => {
@@ -17,6 +17,7 @@ const Home: NextPage = () => {
         postsList={<PostsListWidget />}
         imageCreationForm={<ImageCreationFormWidget />}
         imagesList={<ImagesListWidget />}
+        contentItemsList={<ContentItemsListWidget />}
       />
     </CurrentUserContextProviderWidget>
   );
@@ -60,6 +61,14 @@ export async function getServerSideProps(context: any) {
         }
       },
     }),
+    client.query({
+      query: GetContentItemsDocument,
+      variables: {
+        params: {
+          pagination: {}
+        }
+      }
+    })
   ]);
 
   const documentProps = addApolloState(

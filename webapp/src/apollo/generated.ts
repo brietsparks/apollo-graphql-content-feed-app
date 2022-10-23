@@ -340,6 +340,13 @@ export type GetImagesQueryVariables = Exact<{
 
 export type GetImagesQuery = { __typename?: 'Query', getImages: { __typename?: 'CursorPaginatedImages', items: Array<{ __typename?: 'Image', id: string, creationTimestamp: string, ownerId: string, url: string, caption?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }>, cursors: { __typename?: 'Cursors', start?: string | null, end?: string | null, next?: string | null } } };
 
+export type GetContentItemsQueryVariables = Exact<{
+  params: GetContentItemsParams;
+}>;
+
+
+export type GetContentItemsQuery = { __typename?: 'Query', getContentItems: { __typename?: 'CursorPaginatedContentItems', items: Array<{ __typename?: 'Image', id: string, creationTimestamp: string, ownerId: string, url: string, caption?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> } | { __typename?: 'Post', id: string, creationTimestamp: string, ownerId: string, title: string, body?: string | null, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }>, cursors: { __typename?: 'Cursors', start?: string | null, end?: string | null, next?: string | null } } };
+
 
 export const CreateUserDocument = gql`
     mutation createUser($params: CreateUserParams!) {
@@ -777,3 +784,66 @@ export function useGetImagesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<
 export type GetImagesQueryHookResult = ReturnType<typeof useGetImagesQuery>;
 export type GetImagesLazyQueryHookResult = ReturnType<typeof useGetImagesLazyQuery>;
 export type GetImagesQueryResult = Apollo.QueryResult<GetImagesQuery, GetImagesQueryVariables>;
+export const GetContentItemsDocument = gql`
+    query getContentItems($params: GetContentItemsParams!) {
+  getContentItems(params: $params) {
+    items {
+      ... on Post {
+        id
+        creationTimestamp
+        ownerId
+        title
+        body
+        tags {
+          id
+          name
+        }
+      }
+      ... on Image {
+        id
+        creationTimestamp
+        ownerId
+        url
+        caption
+        tags {
+          id
+          name
+        }
+      }
+    }
+    cursors {
+      start
+      end
+      next
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetContentItemsQuery__
+ *
+ * To run a query within a React component, call `useGetContentItemsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetContentItemsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetContentItemsQuery({
+ *   variables: {
+ *      params: // value for 'params'
+ *   },
+ * });
+ */
+export function useGetContentItemsQuery(baseOptions: Apollo.QueryHookOptions<GetContentItemsQuery, GetContentItemsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetContentItemsQuery, GetContentItemsQueryVariables>(GetContentItemsDocument, options);
+      }
+export function useGetContentItemsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetContentItemsQuery, GetContentItemsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetContentItemsQuery, GetContentItemsQueryVariables>(GetContentItemsDocument, options);
+        }
+export type GetContentItemsQueryHookResult = ReturnType<typeof useGetContentItemsQuery>;
+export type GetContentItemsLazyQueryHookResult = ReturnType<typeof useGetContentItemsLazyQuery>;
+export type GetContentItemsQueryResult = Apollo.QueryResult<GetContentItemsQuery, GetContentItemsQueryVariables>;
