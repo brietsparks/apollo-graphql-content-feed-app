@@ -198,3 +198,20 @@ input SearchTagsParams {
   pagination: CursorPaginationInput!
   term: String!
 }
+
+#
+# Comment
+#
+type Comment {
+  id: String!
+  creationTimestamp: String!
+  ownerId: User!
+  owner: User!
+  parentEntityId: String
+  parentEntity: Comment
+  childCommentIds: [String!]
+  childComments: [Comment!]
+  body: String!
+}
+
+union CommentableEntity = Comment | Post | Image
