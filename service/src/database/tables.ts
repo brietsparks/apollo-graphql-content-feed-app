@@ -49,19 +49,19 @@ export const commentsTable = new Table('comments', {
   body: 'body',
 });
 
-export const commentComments = new Table('comment_comments', {
+export const commentCommentsTable = new Table('comment_comments', {
   id: 'id',
   parentCommentId: 'parent_comment_id',
   childCommentId: 'child_comment_id',
 });
 
-export const postComments = new Table('post_comments', {
+export const postCommentsTable = new Table('post_comments', {
   id: 'id',
   postId: 'post_id',
   commentId: 'comment_id',
 });
 
-export const imageComments = new Table('image_comments', {
+export const imageCommentsTable = new Table('image_comments', {
   id: 'id',
   imageId: 'image_id',
   commentId: 'comment_id',

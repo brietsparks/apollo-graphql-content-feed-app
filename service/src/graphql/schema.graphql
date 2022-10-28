@@ -3,6 +3,7 @@ type Mutation {
   createTag(params: CreateTagParams!): Tag!
   createPost(params: CreatePostParams!): Post!
   createImage(params: CreateImageParams!): Image!
+  createPostComment(params: CreatePostCommentParams): Comment!
 }
 
 type Query {
@@ -16,6 +17,7 @@ type Query {
   getImage(id: String!): Image
   getImages(params: GetImagesParams!): CursorPaginatedImages!
   getContentItems(params: GetContentItemsParams!): CursorPaginatedContentItems!
+  getComment(id: String!): Comment
 }
 #
 
@@ -215,3 +217,8 @@ type Comment {
 }
 
 union CommentableEntity = Comment | Post | Image
+
+input CreatePostCommentParams {
+  postId: String!
+  body: String!
+}
