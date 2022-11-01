@@ -39,12 +39,36 @@ describe('CommentsRepository', () => {
     }, { commit: true });
 
     const comment = await app.repositories.commentsRepository.getComment(commentId);
-
     expect(comment).toEqual({
       id: commentId,
       creationTimestamp: expect.any(String),
       ownerId: userId,
       body
     });
+  });
+
+  test('getCommentsOfPost', async () => {
+    const { id: userId } = await app.repositories.usersRepository.createUser({
+      name: faker.name.firstName(),
+    }, { commit: true });
+
+    const [{ postId: postId1 }] = await Promise.all([
+      createPost(),
+      createPost()
+    ]);
+
+    const { id: commentId1 } = await app.repositories.commentsRepository.createPostComment({
+      postId: postId1,
+      ownerId: userId,
+      body: faker.random.alphaNumeric()
+    }, { commit: true });
+
+    
+
+    await app.repositories.commentsRepository.getCommentsOfPost({
+      postId: postId1
+    })
+
+
   });
 });

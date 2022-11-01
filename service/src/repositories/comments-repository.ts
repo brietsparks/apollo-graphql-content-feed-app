@@ -81,6 +81,12 @@ export class CommentsRepository {
         postCommentsTable.prefixedColumn('commentId'),
         commentsTable.prefixedColumn('id')
       )
+      .where({
+        [postCommentsTable.prefixedColumn('postId')]: params.postId
+      })
+      .andWhere(pagination.where)
+      .limit(pagination.limit)
+      .orderBy(...pagination.orderBy)
       .select(commentsTable.prefixedColumns())
       // todo
   };
