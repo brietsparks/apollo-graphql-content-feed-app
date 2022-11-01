@@ -57,18 +57,16 @@ describe('CommentsRepository', () => {
       createPost()
     ]);
 
-    const { id: commentId1 } = await app.repositories.commentsRepository.createPostComment({
+    await app.repositories.commentsRepository.createPostComment({
       postId: postId1,
       ownerId: userId,
       body: faker.random.alphaNumeric()
     }, { commit: true });
 
-    
-
-    await app.repositories.commentsRepository.getCommentsOfPost({
+    const result = await app.repositories.commentsRepository.getCommentsOfPost({
       postId: postId1
-    })
+    });
 
-
+    expect(result.items.length).toBe(1); // todo
   });
 });
