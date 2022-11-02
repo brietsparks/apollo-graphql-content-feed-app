@@ -6,6 +6,7 @@ import { TagsRepository } from './tags-repository';
 import { PostsRepository } from './posts-repository';
 import { ImagesRepository } from './images-repository';
 import { ContentItemsRepository } from './content-items-repository';
+import { CommentsRepository } from './comments-repository';
 
 export * from './users-repository';
 export * from './tags-repository';
@@ -23,6 +24,7 @@ export function makeRepositories(db: Knex) {
   const postsRepository = new PostsRepository(db);
   const imagesRepository = new ImagesRepository(db);
   const contentItemsRepository = new ContentItemsRepository(db);
+  const commentsRepository = new CommentsRepository(db);
 
   return {
     usersRepository,
@@ -30,6 +32,7 @@ export function makeRepositories(db: Knex) {
     postsRepository,
     imagesRepository,
     contentItemsRepository,
+    commentsRepository,
   };
 }
 

@@ -15,6 +15,21 @@ export type Scalars = {
   Float: number;
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  body: Scalars['String'];
+  childCommentIds?: Maybe<Array<Scalars['String']>>;
+  childComments?: Maybe<Array<Comment>>;
+  creationTimestamp: Scalars['String'];
+  id: Scalars['String'];
+  owner: User;
+  ownerId: User;
+  parentEntity?: Maybe<Comment>;
+  parentEntityId?: Maybe<Scalars['String']>;
+};
+
+export type CommentableEntity = Comment | Image | Post;
+
 export type ContentItem = Image | Post;
 
 export type CreateImageParams = {
@@ -22,6 +37,12 @@ export type CreateImageParams = {
   ownerId: Scalars['String'];
   tagIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>;
   url: Scalars['String'];
+};
+
+export type CreatePostCommentParams = {
+  body: Scalars['String'];
+  ownerId: Scalars['String'];
+  postId: Scalars['String'];
 };
 
 export type CreatePostParams = {
@@ -118,6 +139,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   createImage: Image;
   createPost: Post;
+  createPostComment: Comment;
   createTag: Tag;
   createUser: User;
 };
@@ -130,6 +152,11 @@ export type MutationCreateImageArgs = {
 
 export type MutationCreatePostArgs = {
   params: CreatePostParams;
+};
+
+
+export type MutationCreatePostCommentArgs = {
+  params?: InputMaybe<CreatePostCommentParams>;
 };
 
 
@@ -174,6 +201,7 @@ export type Post = {
 
 export type Query = {
   __typename?: 'Query';
+  getComment?: Maybe<Comment>;
   getContentItems: CursorPaginatedContentItems;
   getImage?: Maybe<Image>;
   getImages: CursorPaginatedImages;
@@ -184,6 +212,11 @@ export type Query = {
   getUser?: Maybe<User>;
   getUsers: CursorPaginatedUsers;
   searchTags: CursorPaginatedTags;
+};
+
+
+export type QueryGetCommentArgs = {
+  id: Scalars['String'];
 };
 
 
@@ -340,8 +373,11 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
+  Comment: ResolverTypeWrapper<Comment>;
+  CommentableEntity: ResolversTypes['Comment'] | ResolversTypes['Image'] | ResolversTypes['Post'];
   ContentItem: ResolversTypes['Image'] | ResolversTypes['Post'];
   CreateImageParams: CreateImageParams;
+  CreatePostCommentParams: CreatePostCommentParams;
   CreatePostParams: CreatePostParams;
   CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
@@ -375,8 +411,11 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
+  Comment: Comment;
+  CommentableEntity: ResolversParentTypes['Comment'] | ResolversParentTypes['Image'] | ResolversParentTypes['Post'];
   ContentItem: ResolversParentTypes['Image'] | ResolversParentTypes['Post'];
   CreateImageParams: CreateImageParams;
+  CreatePostCommentParams: CreatePostCommentParams;
   CreatePostParams: CreatePostParams;
   CreateTagParams: CreateTagParams;
   CreateUserParams: CreateUserParams;
@@ -404,6 +443,23 @@ export type ResolversParentTypes = {
   String: Scalars['String'];
   Tag: Tag;
   User: Omit<User, 'recentContentItems'> & { recentContentItems: Array<ResolversParentTypes['ContentItem']> };
+};
+
+export type CommentResolvers<ContextType = any, ParentType extends ResolversParentTypes['Comment'] = ResolversParentTypes['Comment']> = {
+  body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  childCommentIds?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  childComments?: Resolver<Maybe<Array<ResolversTypes['Comment']>>, ParentType, ContextType>;
+  creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  ownerId?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  parentEntity?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType>;
+  parentEntityId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CommentableEntityResolvers<ContextType = any, ParentType extends ResolversParentTypes['CommentableEntity'] = ResolversParentTypes['CommentableEntity']> = {
+  __resolveType: TypeResolveFn<'Comment' | 'Image' | 'Post', ParentType, ContextType>;
 };
 
 export type ContentItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['ContentItem'] = ResolversParentTypes['ContentItem']> = {
@@ -461,6 +517,7 @@ export type ImageResolvers<ContextType = any, ParentType extends ResolversParent
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createImage?: Resolver<ResolversTypes['Image'], ParentType, ContextType, RequireFields<MutationCreateImageArgs, 'params'>>;
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, RequireFields<MutationCreatePostArgs, 'params'>>;
+  createPostComment?: Resolver<ResolversTypes['Comment'], ParentType, ContextType, RequireFields<MutationCreatePostCommentArgs, never>>;
   createTag?: Resolver<ResolversTypes['Tag'], ParentType, ContextType, RequireFields<MutationCreateTagArgs, 'params'>>;
   createUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationCreateUserArgs, 'params'>>;
 };
@@ -482,6 +539,7 @@ export type PostResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getComment?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType, RequireFields<QueryGetCommentArgs, 'id'>>;
   getContentItems?: Resolver<ResolversTypes['CursorPaginatedContentItems'], ParentType, ContextType, RequireFields<QueryGetContentItemsArgs, 'params'>>;
   getImage?: Resolver<Maybe<ResolversTypes['Image']>, ParentType, ContextType, RequireFields<QueryGetImageArgs, 'id'>>;
   getImages?: Resolver<ResolversTypes['CursorPaginatedImages'], ParentType, ContextType, RequireFields<QueryGetImagesArgs, 'params'>>;
@@ -514,6 +572,8 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type Resolvers<ContextType = any> = {
+  Comment?: CommentResolvers<ContextType>;
+  CommentableEntity?: CommentableEntityResolvers<ContextType>;
   ContentItem?: ContentItemResolvers<ContextType>;
   CursorPaginatedContentItems?: CursorPaginatedContentItemsResolvers<ContextType>;
   CursorPaginatedImages?: CursorPaginatedImagesResolvers<ContextType>;

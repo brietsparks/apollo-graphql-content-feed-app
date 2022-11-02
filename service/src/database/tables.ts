@@ -41,3 +41,28 @@ export const imageTagsTable = new Table('image_tags', {
   imageId: 'image_id',
   tagId: 'tag_id',
 });
+
+export const commentsTable = new Table('comments', {
+  id: 'id',
+  creationTimestamp: 'creation_timestamp',
+  ownerId: 'owner_id',
+  body: 'body',
+});
+
+export const commentCommentsTable = new Table('comment_comments', {
+  id: 'id',
+  parentCommentId: 'parent_comment_id',
+  childCommentId: 'child_comment_id',
+});
+
+export const postCommentsTable = new Table('post_comments', {
+  id: 'id',
+  postId: 'post_id',
+  commentId: 'comment_id',
+});
+
+export const imageCommentsTable = new Table('image_comments', {
+  id: 'id',
+  imageId: 'image_id',
+  commentId: 'comment_id',
+});
