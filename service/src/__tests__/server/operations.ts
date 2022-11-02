@@ -40,3 +40,48 @@ export const getTag = gql`
   }
 `;
 
+export const createPost = gql`
+  mutation createPost($params: CreatePostParams!) {
+    createPost(params: $params) {
+      id
+      creationTimestamp
+      ownerId
+      title
+      body
+    }
+  }
+`;
+
+export const getPost = gql`
+  query getPost($id: String!) {
+    getPost(id: $id) {
+      id
+      creationTimestamp
+      ownerId
+      title
+      body
+    }
+  }
+`;
+
+export const createPostComment = gql`
+  mutation createComment($params: CreatePostCommentParams!) {
+    createPostComment(params: $params) {
+      id
+      creationTimestamp
+      ownerId
+      body
+    }
+  }
+`;
+
+export const getComment = gql`
+  query getComment($id: String!) {
+    getComment(id: $id) {
+      id
+      creationTimestamp
+      ownerId
+      body
+    }
+  }
+`;

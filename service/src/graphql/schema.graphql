@@ -207,7 +207,7 @@ input SearchTagsParams {
 type Comment {
   id: String!
   creationTimestamp: String!
-  ownerId: User!
+  ownerId: String!
   owner: User!
   parentEntityId: String
   parentEntity: Comment
@@ -220,5 +220,6 @@ union CommentableEntity = Comment | Post | Image
 
 input CreatePostCommentParams {
   postId: String!
+  ownerId: String!
   body: String!
 }
