@@ -1,3 +1,4 @@
+export * from './chassis.widget';
 export * from './current-user-context.widget';
 export * from './user-creation-form.widget';
 export * from './users-list.widget';
