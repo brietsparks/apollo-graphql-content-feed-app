@@ -1,25 +1,23 @@
 import type { NextPage } from 'next'
 import { addApolloState, initializeApollo, GetUsersDocument, GetTagsDocument, GetPostsDocument, GetImagesDocument, GetContentItemsDocument } from '~/apollo';
 
-import { CurrentUserContextProviderWidget, UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsListWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget, ImagesListWidget, ContentItemsListWidget } from '~/widgets';
+import { UserCreationFormWidget, UsersListWidget, TagCreationFormWidget, TagsListWidget, TagsCollectionFormWidget, PostCreationFormWidget, PostsListWidget, ImageCreationFormWidget, ImagesListWidget, ContentItemsListWidget } from '~/widgets';
 import { HomePageLayout } from '~/views';
 
 const Home: NextPage = () => {
   return (
-    <CurrentUserContextProviderWidget>
-      <HomePageLayout
-        userCreationForm={<UserCreationFormWidget />}
-        usersList={<UsersListWidget />}
-        tagCreationForm={<TagCreationFormWidget />}
-        tagsList={<TagsListWidget />}
-        tagSearchBar={<TagsCollectionFormWidget />}
-        postCreationForm={<PostCreationFormWidget />}
-        postsList={<PostsListWidget />}
-        imageCreationForm={<ImageCreationFormWidget />}
-        imagesList={<ImagesListWidget />}
-        contentItemsList={<ContentItemsListWidget />}
-      />
-    </CurrentUserContextProviderWidget>
+    <HomePageLayout
+      userCreationForm={<UserCreationFormWidget />}
+      usersList={<UsersListWidget />}
+      tagCreationForm={<TagCreationFormWidget />}
+      tagsList={<TagsListWidget />}
+      tagSearchBar={<TagsCollectionFormWidget />}
+      postCreationForm={<PostCreationFormWidget />}
+      postsList={<PostsListWidget />}
+      imageCreationForm={<ImageCreationFormWidget />}
+      imagesList={<ImagesListWidget />}
+      contentItemsList={<ContentItemsListWidget />}
+    />
   );
 }
 
