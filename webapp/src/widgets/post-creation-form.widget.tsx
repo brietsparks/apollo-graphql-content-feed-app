@@ -1,13 +1,14 @@
 import React from 'react';
 
 import { useCreatePostMutation } from '~/apollo';
-import { PostForm, PostFormData, PostFormProps } from '~/views';
+import { PostForm, PostFormData, PostFormProps, PostFormSuccessEvent } from '~/views';
 
 import { createPostMutationUpdate } from './apollo';
 import { useCurrentUser } from './current-user-context.widget';
 import { TagsCollectionFormWidget } from './tags-collection-form.widget';
 
 export interface PostCreationFormWidgetProps {
+  onSuccess?: (e: PostFormSuccessEvent) => void;
 }
 
 export function PostCreationFormWidget(props: PostCreationFormWidgetProps) {
@@ -37,6 +38,7 @@ export function PostCreationFormWidget(props: PostCreationFormWidgetProps) {
       buttonLabel="Create Post"
       pending={postCreation.loading}
       tagsComponent={TagsCollectionFormWidget as PostFormProps['tagsComponent']}
+      onSuccess={props.onSuccess}
     />
   );
 }

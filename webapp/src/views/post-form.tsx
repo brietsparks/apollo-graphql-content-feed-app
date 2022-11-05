@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 export interface PostFormProps {
   tagsComponent: ComponentType<PostFormTagsComponentProps>;
   submit: (data: PostFormData) => void | Promise<unknown>;
+  onSuccess?: (event: PostFormSuccessEvent) => void;
   buttonLabel: string;
   pending: boolean;
 }
@@ -22,6 +23,10 @@ export interface PostFormData {
   body?: string;
 }
 
+export interface PostFormSuccessEvent {
+  reset: () => void;
+}
+
 export function PostForm(props: PostFormProps) {
   const { tagsComponent: TagsForm } = props;
 
@@ -33,6 +38,10 @@ export function PostForm(props: PostFormProps) {
     setTags([]);
   };
 
+  const handleSuccess = () => {
+    props.onSuccess?.({ reset });
+  };
+
   const handleSubmit = form.handleSubmit((data, e) => {
     e?.preventDefault();
     const promise = props.submit({
@@ -40,7 +49,7 @@ export function PostForm(props: PostFormProps) {
       tagIds: tags.map(tag => tag.id)
     });
     if (promise) {
-      promise.then(reset);
+      promise.then(handleSuccess);
     }
   });
 

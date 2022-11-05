@@ -4,7 +4,7 @@ import { EmotionCache } from '@emotion/react';
 
 import { createEmotionCache, MuiStylesProvider } from '~/styles';
 import { useApollo } from '~/apollo';
-import { ChassisWidget } from '~/widgets';
+import { CurrentUserContextProviderWidget, ChassisWidget } from '~/widgets';
 
 const clientSideEmotionCache = createEmotionCache();
 
@@ -19,9 +19,11 @@ function App(props: AppProps) {
   return (
     <MuiStylesProvider emotionCache={emotionCache}>
       <ApolloProvider client={apolloClient}>
-        <ChassisWidget>
-          <Component {...pageProps} />
-        </ChassisWidget>
+        <CurrentUserContextProviderWidget>
+          <ChassisWidget>
+            <Component {...pageProps} />
+          </ChassisWidget>
+        </CurrentUserContextProviderWidget>
       </ApolloProvider>
     </MuiStylesProvider>
   );
