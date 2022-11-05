@@ -1,12 +1,16 @@
-import { PostsListWidget } from '~/widgets';
+import { PostsListWidget, PostCreationFormDialogWidget } from '~/widgets';
 import { addApolloState, GetPostsDocument, initializeApollo } from '~/apollo';
+import { PostsPageView } from '~/views';
 
 export interface PostsPageProps {
 }
 
 export default function PostsPage(props: PostsPageProps) {
   return (
-    <PostsListWidget />
+    <PostsPageView
+      postCreationDialogComponent={PostCreationFormDialogWidget}
+      postsList={<PostsListWidget />}
+    />
   );
 }
 

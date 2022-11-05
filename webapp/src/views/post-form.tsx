@@ -5,9 +5,9 @@ import { usePostFormModel, SubmitPostForm, PostFormSuccessHandler, PostFormTag, 
 
 export interface PostFormProps {
   submit: SubmitPostForm;
-  onSuccess: PostFormSuccessHandler;
+  onSuccess?: PostFormSuccessHandler;
   tagsComponent: ComponentType<PostFormTagsComponentProps>;
-  buttonLabel: string;
+  submitButtonLabel: string;
   pending: boolean;
 }
 
@@ -42,7 +42,7 @@ export function PostForm(props: PostFormProps) {
           {...form.register('body')}
         />
 
-        <Button type="submit">{props.buttonLabel}</Button>
+        <Button type="submit">{props.submitButtonLabel}</Button>
       </Stack>
     </form>
   );

@@ -5,5 +5,8 @@ export * from './tag-form';
 export * from './tags-search-bar';
 export * from './home-page-layout';
 export * from './tags-collection-form';
+export * from './post-form-model';
 export * from './post-form';
+export * from './post-form-dialog';
 export * from './image-form';
+export * from './posts-page-view';
