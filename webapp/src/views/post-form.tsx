@@ -1,11 +1,12 @@
-import React, { ComponentType, useState } from 'react';
+import React, { ComponentType } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
+
+import { usePostFormModel, SubmitPostForm, PostFormSuccessHandler, PostFormTag, PostFormTagsChangeHandler } from './post-form-model';
 
 export interface PostFormProps {
+  submit: SubmitPostForm;
+  onSuccess: PostFormSuccessHandler;
   tagsComponent: ComponentType<PostFormTagsComponentProps>;
-  submit: (data: PostFormData) => void | Promise<unknown>;
-  onSuccess?: (event: PostFormSuccessEvent) => void;
   buttonLabel: string;
   pending: boolean;
 }
@@ -14,47 +15,17 @@ export interface PostFormTagsComponentProps {
   value?: PostFormTag[];
   onChange?: PostFormTagsChangeHandler;
 }
-export type PostFormTagsChangeHandler = (tags: PostFormTag[]) => void;
-export type PostFormTag = { id: string };
-
-export interface PostFormData {
-  tagIds?: string[];
-  title: string
-  body?: string;
-}
-
-export interface PostFormSuccessEvent {
-  reset: () => void;
-}
 
 export function PostForm(props: PostFormProps) {
   const { tagsComponent: TagsForm } = props;
 
-  const form = useForm<PostFormData>();
-  const [tags, setTags] = useState<PostFormTag[]>([]);
-
-  const reset = () => {
-    form.reset();
-    setTags([]);
-  };
-
-  const handleSuccess = () => {
-    props.onSuccess?.({ reset });
-  };
-
-  const handleSubmit = form.handleSubmit((data, e) => {
-    e?.preventDefault();
-    const promise = props.submit({
-      ...data,
-      tagIds: tags.map(tag => tag.id)
-    });
-    if (promise) {
-      promise.then(handleSuccess);
-    }
+  const form = usePostFormModel({
+    submit: props.submit,
+    onSuccess: props.onSuccess,
   });
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={form.handleSubmit}>
       <Stack spacing={2}>
         <TextField
           label="Title"
@@ -62,8 +33,8 @@ export function PostForm(props: PostFormProps) {
         />
 
         <TagsForm
-          value={tags}
-          onChange={setTags}
+          value={form.tags}
+          onChange={form.handleChangeTags}
         />
 
         <TextField
