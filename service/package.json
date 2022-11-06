@@ -1,5 +1,5 @@
 {
-  "name": "blog-apollo-service",
+  "name": "apollo-graphql-content-feed-service",
   "version": "0.0.0",
   "devDependencies": {
     "@faker-js/faker": "^7.3.0",

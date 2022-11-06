@@ -1,6 +1,6 @@
-# Blog Apollo App
+# Apollo Graphql Content Feed App
 
-An app that explores practices and patterns for building a GraphQL-power app with Apollo Server and Apollo Client.
+An app that explores practices and patterns for building a GraphQL-power app with Apollo Server and Apollo Client, using a generic posts+images feed app as a usecase.
 
 ## Dependencies
 
