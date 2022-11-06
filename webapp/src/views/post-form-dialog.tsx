@@ -24,35 +24,35 @@ export function PostFormDialog(props: PostFormDialogProps) {
   }
 
   return (
-    <>
-      <Dialog open={props.isOpen} onClose={handleClickClose}>
-        <DialogTitle>Create Post</DialogTitle>
+    <Dialog open={props.isOpen} onClose={handleClickClose}>
+      <DialogTitle>Create Post</DialogTitle>
 
-        <DialogContent>
-          <Stack spacing={2}>
-            <TextField
-              label="Title"
-              {...form.register('title')}
-            />
+      <DialogContent>
+        <Stack spacing={2}>
+          <TextField
+            label="Title"
+            {...form.register('title')}
+            helperText={form.formState.errors.title?.message}
+            error={!!form.formState.errors.title?.message}
+          />
 
-            <TagsForm
-              value={form.tags}
-              onChange={form.handleChangeTags}
-            />
+          <TagsForm
+            value={form.tags}
+            onChange={form.handleChangeTags}
+          />
 
-            <TextField
-              label="Body"
-              {...form.register('body')}
-            />
+          <TextField
+            label="Body"
+            {...form.register('body')}
+          />
 
-          </Stack>
-        </DialogContent>
+        </Stack>
+      </DialogContent>
 
-        <DialogActions>
-          <Button onClick={props.close}>{cancelButtonLabel}</Button>
-          <Button onClick={form.handleSubmit} type="submit" color="primary">{props.submitButtonLabel}</Button>
-        </DialogActions>
-      </Dialog>
-    </>
+      <DialogActions>
+        <Button onClick={props.close}>{cancelButtonLabel}</Button>
+        <Button onClick={form.handleSubmit} type="submit" color="primary">{props.submitButtonLabel}</Button>
+      </DialogActions>
+    </Dialog>
   );
 }

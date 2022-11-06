@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 export interface usePostFormModelProps {
   submit: SubmitPostForm;
@@ -25,7 +27,9 @@ export interface PostFormSuccessEvent {
 }
 
 export function usePostFormModel(props: usePostFormModelProps) {
-  const form = useForm<PostFormData>();
+  const form = useForm<PostFormData>({
+    resolver: yupResolver(validationSchema())
+  });
   const [tags, setTags] = useState<PostFormTag[]>([]);
 
   const reset = () => {
@@ -57,3 +61,8 @@ export function usePostFormModel(props: usePostFormModelProps) {
     handleChangeTags,
   };
 }
+
+const validationSchema = () => yup.object({
+  title: yup.string().label('Title').required(),
+  body: yup.string().label('Body'),
+}).required();

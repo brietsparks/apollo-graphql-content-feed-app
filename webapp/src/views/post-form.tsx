@@ -30,6 +30,8 @@ export function PostForm(props: PostFormProps) {
         <TextField
           label="Title"
           {...form.register('title')}
+          helperText={form.formState.errors.title?.message}
+          error={!!form.formState.errors.title?.message}
         />
 
         <TagsForm

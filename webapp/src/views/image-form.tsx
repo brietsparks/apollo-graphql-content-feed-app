@@ -1,6 +1,8 @@
 import React, { ComponentType, useState } from 'react';
 import { Button, Stack, TextField } from '@mui/material';
 import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 
 export interface ImageFormProps {
   tagsComponent: ComponentType<ImageFormTagsComponentProps>;
@@ -25,7 +27,9 @@ export interface ImageFormData {
 export function ImageForm(props: ImageFormProps) {
   const { tagsComponent: TagsForm } = props;
 
-  const form = useForm<ImageFormData>();
+  const form = useForm<ImageFormData>({
+    resolver: yupResolver(validationSchema())
+  });
   const [tags, setTags] = useState<ImageFormTag[]>([]);
 
   const reset = () => {
@@ -50,6 +54,8 @@ export function ImageForm(props: ImageFormProps) {
         <TextField
           label="URL"
           {...form.register('url')}
+          helperText={form.formState.errors.url?.message}
+          error={!!form.formState.errors.url?.message}
         />
 
         <TagsForm
@@ -67,3 +73,8 @@ export function ImageForm(props: ImageFormProps) {
     </form>
   );
 }
+
+const validationSchema = () => yup.object({
+  url: yup.string().label('URL').required(),
+  caption: yup.string().label('Caption'),
+}).required();
