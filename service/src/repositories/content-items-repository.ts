@@ -27,7 +27,7 @@ export class ContentItemsRepository {
 
     const pagination = makeCursorPagination({
       field: cursorField,
-      sortDirection: 'desc',
+      direction: 'desc',
       limit: params.pagination.limit || 4,
       cursor: params.pagination.cursor
     });
@@ -42,6 +42,11 @@ export class ContentItemsRepository {
                 ${imagesTable.prefixedColumn('creationTimestamp')}
               ) as ${cursorField}`
             )
+          )
+          .fullOuterJoin(
+            imagesTable.name,
+            postsTable.prefixedColumn('id'),
+            imagesTable.prefixedColumn('id')
           )
           .select({
             // ...postsTable.prefixedColumns(),
@@ -60,11 +65,6 @@ export class ContentItemsRepository {
             'images:url': 'images.url',
             'images:caption': 'images.caption',
           })
-          .fullOuterJoin(
-            imagesTable.name,
-            postsTable.prefixedColumn('id'),
-            imagesTable.prefixedColumn('id')
-          )
           .as('subquery')
       })
       .select(
@@ -100,29 +100,29 @@ export class ContentItemsRepository {
 
     const rows = await query;
 
-    return pagination.getResult(rows, (item) => {
-      if (item['posts:id']) {
-        return {
+    const items: ContentItem[] = [];
+    for (const row of rows) {
+      if (row['posts:id']) {
+        items.push({
           _type: 'post',
-          'id': item['posts:id'],
-          'creationTimestamp': item[cursorField],
-          'ownerId': item['posts:ownerId'],
-          'title': item['posts:title'],
-          'body': item['posts:body'],
-        };
-      }
-      if (item['images:id']) {
-        return {
+          'id': row['posts:id'],
+          'creationTimestamp': row[cursorField],
+          'ownerId': row['posts:ownerId'],
+          'title': row['posts:title'],
+          'body': row['posts:body'],
+        });
+      } else if (row['images:id']) {
+        items.push({
           _type: 'image',
-          'id': item['images:id'],
-          'creationTimestamp': item[cursorField],
-          'ownerId': item['images:ownerId'],
-          'url': item['images:url'],
-          'caption': item['images:caption'],
-        };
+          'id': row['images:id'],
+          'creationTimestamp': row[cursorField],
+          'ownerId': row['images:ownerId'],
+          'url': row['images:url'],
+          'caption': row['images:caption'],
+        });
       }
+    }
 
-      return null;
-    });
+    return pagination.getResult(items);
   };
 }

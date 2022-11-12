@@ -109,7 +109,8 @@ export class PostsRepository {
     }
 
     const rows = await query;
-    return pagination.getResult(rows, postsTable.toAttributeCase<Post>);
+    const posts = rows.map<Post>(postsTable.toAttributeCase);
+    return pagination.getResult(posts);
   };
 
   getRecentPostsByOwnerIds = async (params: GetRecentPostsByOwnerIdsParams): Promise<Post[]> => {
@@ -175,7 +176,7 @@ export class PostsRepository {
 export function makePostsCursorPagination(params: Partial<CursorPaginationParams<keyof Post>> = {}) {
   return makeCursorPagination({
     field: postsTable.prefixedColumn(params.field || 'creationTimestamp'),
-    sortDirection: params.sortDirection || 'desc',
+    direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor,
   });

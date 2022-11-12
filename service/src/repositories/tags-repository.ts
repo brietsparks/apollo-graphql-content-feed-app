@@ -72,18 +72,16 @@ export class TagsRepository {
   getTags = async (params: GetTagsParams) => {
     const pagination = makeTagsCursorPagination(params.pagination);
 
-    const q = this.db
+    const rows = await this.db
       .from(tagsTable.name)
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit)
       .select(tagsTable.prefixedColumns());
 
-    console.log(q.toSQL().sql);
+    const tags = rows.map<Tag>(tagsTable.toAttributeCase);
 
-    const rows = await q;
-
-    return pagination.getResult(rows, tagsTable.toAttributeCase<Tag>);
+    return pagination.getResult(tags);
   }
 
   searchTags = async (params: SearchTagsParams): Promise<SearchTagsResult> => {
@@ -144,7 +142,7 @@ export class TagsRepository {
 export function makeTagsCursorPagination(params: Partial<CursorPaginationParams<keyof Tag>> = {}) {
   return makeCursorPagination({
     field: tagsTable.prefixedColumn(params.field || 'creationTimestamp'),
-    sortDirection: params.sortDirection || 'desc',
+    direction: params.direction || 'desc',
     limit: params.limit || 12,
     cursor: params.cursor,
   });

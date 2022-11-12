@@ -60,7 +60,7 @@ export class ImagesRepository {
           ...params,
         }));
 
-      if (params.tagIds.length) {
+      if (params.tagIds?.length) {
         await this.attachTagsToImage({
           imageId: id,
           tagIds: params.tagIds
@@ -96,7 +96,10 @@ export class ImagesRepository {
     }
 
     const rows = await query;
-    return pagination.getResult(rows, imagesTable.toAttributeCase<Image>);
+
+    const images = rows.map<Image>(imagesTable.toAttributeCase);
+
+    return pagination.getResult(images);
   };
 
   getRecentImagesByOwnerIds = async (params: GetRecentImagesByOwnerIdsParams): Promise<Image[]> => {
@@ -162,7 +165,7 @@ export class ImagesRepository {
 export function makeImagesCursorPagination(params: Partial<CursorPaginationParams<keyof Image>>) {
   return makeCursorPagination({
     field: imagesTable.prefixedColumn(params.field || 'creationTimestamp'),
-    sortDirection: params.sortDirection || 'desc',
+    direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor
   });

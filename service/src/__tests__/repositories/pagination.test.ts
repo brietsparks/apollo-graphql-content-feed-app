@@ -39,7 +39,7 @@ describe('makePagination', () => {
   it('returns paginated items', async () => {
     const pagination = makeCursorPagination<any>({
       limit: 3,
-      sortDirection: 'desc',
+      direction: 'desc',
       field: 'id',
     });
 

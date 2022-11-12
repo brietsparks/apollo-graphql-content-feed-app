@@ -80,7 +80,7 @@ export class UsersRepository {
 export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<keyof User>>) {
   return makeCursorPagination({
     field: usersTable.rawColumn(params.field || 'creationTimestamp'),
-    sortDirection: params.sortDirection || 'desc',
+    direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor,
   });

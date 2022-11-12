@@ -1,8 +1,8 @@
 import { Knex } from 'knex';
 
-export interface CursorPaginationParams<FieldType extends string = string> {
-  field: FieldType;
-  direction: SortDirection;
+export interface CursorPaginationParams<ColumnType extends string = string> {
+  field: ColumnType;
+  sortDirection: SortDirection;
   cursor?: Cursor;
   limit: number;
 }
@@ -33,8 +33,8 @@ export type SortDirection = 'asc' | 'desc';
 export type Where = [string, string, Cursor];
 
 export function makeCursorPagination<ColumnType extends string = string>(params: CursorPaginationParams<ColumnType>) {
-  const orderBy: OrderBy = [params.field, params.direction];
-  const comparator = params.direction === 'asc' ? '>=' : '<=';
+  const orderBy: OrderBy = [params.field, params.sortDirection];
+  const comparator = params.sortDirection === 'asc' ? '>=' : '<=';
   const where: Where = params.cursor ? [params.field, comparator, params.cursor] : [true] as any;
 
   const specifiedLimit = params.limit;
@@ -55,7 +55,7 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
       };
     }
 
-    const itemCursorField = params.field;
+    const itemCursorField = params.field as keyof RowType;
 
     if (rows.length <= specifiedLimit) {
       return {
@@ -94,10 +94,15 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
     throw new Error('invalid cursor pagination state in getItems. This is probably a bug with the library');
   }
 
-  function getResult<RowType extends Record<string, unknown>>(retrievedItems: RowType[]): CursorPaginationResult<RowType> {
+  function getResult<RowType extends Record<string, unknown>>(retrievedItems: RowType[], mapItem?: (item: RowType) => RowType | null): CursorPaginationResult<RowType> {
+    let items = getRows(retrievedItems);
+    if (mapItem) {
+      items = items.map(mapItem).filter(row => !!row);
+    }
+
     return {
-      items: getRows<RowType>(retrievedItems),
-      cursors: getCursors<RowType>(retrievedItems)
+      items,
+      cursors: getCursors(retrievedItems)
     }
   }
 
