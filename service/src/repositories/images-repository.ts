@@ -140,10 +140,10 @@ export class ImagesRepository {
           imageTagsTable.prefixedColumn('imageId'),
           imagesTable.prefixedColumn('id')
         )
-        .select(
-          imagesTable.prefixedColumns(),
-          { ...imageTagsTable.prefixedColumns('tagId') }
-        )
+        .select({
+          ...imagesTable.prefixedColumns(),
+          ...imageTagsTable.prefixedColumns('tagId'),
+        })
         .where(imageTagsTable.prefixedColumn('tagId'), tagId)
         .orderBy(imagesTable.prefixedColumn('creationTimestamp'), 'desc')
         .limit(3)

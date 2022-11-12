@@ -153,10 +153,10 @@ export class PostsRepository {
           postTagsTable.prefixedColumn('postId'),
           postsTable.prefixedColumn('id')
         )
-        .select(
-          postsTable.prefixedColumns(),
-          { ...postTagsTable.prefixedColumns('tagId') }
-        )
+        .select({
+          ...postsTable.prefixedColumns(),
+          ...postTagsTable.prefixedColumns('tagId'),
+        })
         .where(postTagsTable.prefixedColumn('tagId'), tagId)
         .orderBy(postsTable.prefixedColumn('creationTimestamp'), 'desc')
         .limit(3)
