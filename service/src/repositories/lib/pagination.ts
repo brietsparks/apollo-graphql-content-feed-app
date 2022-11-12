@@ -93,18 +93,10 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
     throw new Error('invalid cursor pagination state in getItems. This is probably a bug with the library');
   }
 
-  // function getResult<RowType extends Record<string, unknown>>(retrievedItems: RowType[], opts?: GetCursorsOptions): CursorPaginationResult<RowType> {
-  //   return {
-  //     items: getRows<RowType>(retrievedItems),
-  //     cursors: getCursors<RowType>(retrievedItems, opts),
-  //   }
-  // }
-
   return {
     ...predicate,
     getRows,
     getCursors,
-    // getResult,
   };
 }
 

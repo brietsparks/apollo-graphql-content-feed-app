@@ -68,7 +68,7 @@ export class UsersRepository {
       .limit(pagination.limit);
 
     return {
-      items: pagination.getRows(rows).map<User>(usersTable.toAttributeCase),
+      items: pagination.getRows(rows),
       cursors: pagination.getCursors(rows)
     };
   }
