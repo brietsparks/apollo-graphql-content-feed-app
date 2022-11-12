@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { usersTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type User = {
   id: string;
@@ -59,14 +60,17 @@ export class UsersRepository {
   getUsersByCursor = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
     const pagination = makeUsersCursorPagination(params.pagination);
 
-    const users = await this.db
+    const rows = await this.db
       .from(usersTable.name)
       .select(usersTable.rawColumns())
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
-    return pagination.getResult(users);
+    return {
+      items: pagination.getRows(rows).map<User>(usersTable.toAttributeCase),
+      cursors: pagination.getCursors(rows)
+    };
   }
 
   getUsersByIds = async (params: GetProjectsByIdsParams): Promise<User[]> => {

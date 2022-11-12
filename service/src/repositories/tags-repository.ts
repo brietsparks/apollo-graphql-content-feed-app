@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { tagsTable, postTagsTable, imageTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type Tag = {
   id: string;
@@ -34,8 +35,6 @@ export interface SearchTagsParams {
   term: string;
   pagination: Partial<CursorPaginationParams<keyof Tag>>;
 }
-
-export type SearchTagsResult = CursorPaginationResult<Tag>;
 
 export class TagsRepository {
   private trx: TransactionsHelper;
@@ -69,7 +68,7 @@ export class TagsRepository {
       .first();
   };
 
-  getTags = async (params: GetTagsParams) => {
+  getTags = async (params: GetTagsParams): Promise<CursorPaginationResult<Tag>> => {
     const pagination = makeTagsCursorPagination(params.pagination);
 
     const rows = await this.db
@@ -79,12 +78,13 @@ export class TagsRepository {
       .limit(pagination.limit)
       .select(tagsTable.prefixedColumns());
 
-    const tags = rows.map<Tag>(tagsTable.toAttributeCase);
-
-    return pagination.getResult(tags);
+    return {
+      items: pagination.getRows(rows),
+      cursors: pagination.getCursors(rows),
+    };
   }
 
-  searchTags = async (params: SearchTagsParams): Promise<SearchTagsResult> => {
+  searchTags = async (params: SearchTagsParams): Promise<CursorPaginationResult<Tag>> => {
     const pagination = makeTagsCursorPagination(params.pagination);
 
     const rows = await this.db
@@ -95,7 +95,10 @@ export class TagsRepository {
       .limit(pagination.limit)
       .select(tagsTable.rawColumns());
 
-    return pagination.getResult(rows);
+    return {
+      items: pagination.getRows(rows),
+      cursors: pagination.getCursors(rows),
+    };
   }
 
   getTagsOfPosts = async (postIds: string[]): Promise<PostTag[]> => {

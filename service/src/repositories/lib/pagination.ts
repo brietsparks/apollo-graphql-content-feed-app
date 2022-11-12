@@ -7,11 +7,6 @@ export interface CursorPaginationParams<FieldType extends string = string> {
   limit: number;
 }
 
-export interface CursorPaginationResult<RowType extends Record<string, unknown>> {
-  items: RowType[];
-  cursors: Cursors;
-}
-
 export interface Cursors<T extends Cursor = Cursor> {
   start?: T;
   end?: T;
@@ -32,6 +27,10 @@ export type SortDirection = 'asc' | 'desc';
 
 export type Where = [string, string, Cursor];
 
+export interface GetCursorsOptions {
+  field?: string;
+}
+
 export function makeCursorPagination<ColumnType extends string = string>(params: CursorPaginationParams<ColumnType>) {
   const orderBy: OrderBy = [params.field, params.direction];
   const comparator = params.direction === 'asc' ? '>=' : '<=';
@@ -46,7 +45,7 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
     where
   };
 
-  function getCursors<RowType extends Record<string, unknown>>(rows: RowType[]): Cursors {
+  function getCursors<RowType extends Record<string, unknown>>(rows: RowType[], opts?: GetCursorsOptions): Cursors {
     if (rows.length === 0) {
       return {
         start: params.cursor,
@@ -55,12 +54,12 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
       };
     }
 
-    const itemCursorField = params.field;
+    const field = opts?.field || params.field;
 
     if (rows.length <= specifiedLimit) {
       return {
         start: params.cursor,
-        end: rows[rows.length - 1][itemCursorField] as Cursor,
+        end: rows[rows.length - 1][field] as Cursor,
         next: undefined
       };
     }
@@ -68,8 +67,8 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
     if (rows.length === queriedLimit) {
       return {
         start: params.cursor,
-        end: rows[specifiedLimit - 1][itemCursorField] as Cursor,
-        next: rows[queriedLimit - 1][itemCursorField] as Cursor
+        end: rows[specifiedLimit - 1][field] as Cursor,
+        next: rows[queriedLimit - 1][field] as Cursor
       };
     }
 
@@ -94,16 +93,18 @@ export function makeCursorPagination<ColumnType extends string = string>(params:
     throw new Error('invalid cursor pagination state in getItems. This is probably a bug with the library');
   }
 
-  function getResult<RowType extends Record<string, unknown>>(retrievedItems: RowType[]): CursorPaginationResult<RowType> {
-    return {
-      items: getRows<RowType>(retrievedItems),
-      cursors: getCursors<RowType>(retrievedItems)
-    }
-  }
+  // function getResult<RowType extends Record<string, unknown>>(retrievedItems: RowType[], opts?: GetCursorsOptions): CursorPaginationResult<RowType> {
+  //   return {
+  //     items: getRows<RowType>(retrievedItems),
+  //     cursors: getCursors<RowType>(retrievedItems, opts),
+  //   }
+  // }
 
   return {
     ...predicate,
-    getResult,
+    getRows,
+    getCursors,
+    // getResult,
   };
 }
 

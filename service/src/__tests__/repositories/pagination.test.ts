@@ -50,7 +50,7 @@ describe('makePagination', () => {
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
-    console.log(result);
+    // console.log(result);
     // console.log(pagination.getPaginatedItems(result));
   });
 });

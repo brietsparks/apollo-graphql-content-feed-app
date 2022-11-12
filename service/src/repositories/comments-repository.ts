@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { commentsTable, postCommentsTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type Comment = {
   id: string;
@@ -66,7 +67,7 @@ export class CommentsRepository {
       .first();
   };
 
-  getCommentsOfPost = async (params: GetCommentsOfPostParams) => {
+  getCommentsOfPost = async (params: GetCommentsOfPostParams): Promise<CursorPaginationResult<Comment>> => {
     const pagination = makeCursorPagination({
       field: commentsTable.prefixedColumn(params.pagination?.field || 'creationTimestamp'),
       direction: params.pagination?.direction || 'desc',
@@ -89,8 +90,9 @@ export class CommentsRepository {
       .limit(pagination.limit)
       .select(commentsTable.prefixedColumns())
 
-    const comments = rows.map(commentsTable.toAttributeCase);
-
-    return pagination.getResult(comments);
+    return {
+      items: pagination.getRows(rows).map<Comment>(commentsTable.toAttributeCase),
+      cursors: pagination.getCursors(rows)
+    };
   };
 }

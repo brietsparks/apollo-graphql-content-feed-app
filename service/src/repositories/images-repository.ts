@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { imagesTable, imageTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type Image = {
   id: string;
@@ -97,9 +98,10 @@ export class ImagesRepository {
 
     const rows = await query;
 
-    const images = rows.map<Image>(imagesTable.toAttributeCase);
-
-    return pagination.getResult(images);
+    return {
+      items: pagination.getRows(rows).map<Image>(imagesTable.toAttributeCase),
+      cursors: pagination.getCursors(rows)
+    }
   };
 
   getRecentImagesByOwnerIds = async (params: GetRecentImagesByOwnerIdsParams): Promise<Image[]> => {

@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { postsTable, postTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type Post = {
   id: string;
@@ -109,8 +110,11 @@ export class PostsRepository {
     }
 
     const rows = await query;
-    const posts = rows.map<Post>(postsTable.toAttributeCase);
-    return pagination.getResult(posts);
+
+    return {
+      items: pagination.getRows(rows).map<Post>(postsTable.toAttributeCase),
+      cursors: pagination.getCursors(rows)
+    };
   };
 
   getRecentPostsByOwnerIds = async (params: GetRecentPostsByOwnerIdsParams): Promise<Post[]> => {

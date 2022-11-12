@@ -1,5 +1,5 @@
-import { knex, Knex } from 'knex';
-import { Without } from '../util/types';
+// import { knex, Knex } from 'knex';
+// import { Without } from '../util/types';
 /*
 
     'posts:id': 'posts.id',
@@ -22,33 +22,33 @@ parse
   posts:::ownerId --> ownerId
  */
 
-const postsTable = {} as any;
-
-const db = knex({});
-
-const ownerId = '';
-
-const query1Columns = postsTable.aliased();
-const query2Columns = query1Columns.aliased();
-
-(async function () {
-  const rows = await db
-    .from((subquery: Knex) => {
-      return subquery
-        .from(postsTable.name)
-        .select(query1Columns.select('*'))
-        .where({
-          [query1Columns.where('ownerId')]: ownerId
-        })
-        .as('subquery')
-    })
-    .select(query2Columns.select('*'))
-    .where(query2Columns.where({
-      'myColumn': 'some value'
-    }));
-
-  query2Columns.unalias(rows)
-})()
+// const postsTable = {} as any;
+//
+// const db = knex({});
+//
+// const ownerId = '';
+//
+// const query1Columns = postsTable.aliased();
+// const query2Columns = query1Columns.aliased();
+//
+// (async function () {
+//   const rows = await db
+//     .from((subquery: Knex) => {
+//       return subquery
+//         .from(postsTable.name)
+//         .select(query1Columns.select('*'))
+//         .where({
+//           [query1Columns.where('ownerId')]: ownerId
+//         })
+//         .as('subquery')
+//     })
+//     .select(query2Columns.select('*'))
+//     .where(query2Columns.where({
+//       'myColumn': 'some value'
+//     }));
+//
+//   query2Columns.unalias(rows)
+// })()
 
 export type Attribute<T> = keyof T;
 export type AttributeToPrefixedAliasLookup<T> = Record<Attribute<T>, string>;

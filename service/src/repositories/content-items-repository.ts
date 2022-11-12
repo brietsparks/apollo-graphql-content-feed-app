@@ -3,7 +3,8 @@ import { Knex } from 'knex';
 import { postsTable, imagesTable } from '../database';
 import { XOR } from '../util/types';
 
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 import { Post } from './posts-repository';
 import { Image } from './images-repository';
 
@@ -100,8 +101,10 @@ export class ContentItemsRepository {
 
     const rows = await query;
 
+    const paginatedRows = pagination.getRows(rows);
+
     const items: ContentItem[] = [];
-    for (const row of rows) {
+    for (const row of paginatedRows) {
       if (row['posts:id']) {
         items.push({
           _type: 'post',
@@ -123,6 +126,9 @@ export class ContentItemsRepository {
       }
     }
 
-    return pagination.getResult(items);
+    return {
+      items,
+      cursors: pagination.getCursors(rows)
+    };
   };
 }

@@ -55,13 +55,11 @@ describe('TagsRepository', () => {
     expect(result.length).toEqual(4);
   });
 
-  test('search tags', async () => {
-    const [t1, t2] = await Promise.all([
-      app.repositories.tagsRepository.createTag({ name: 'foo' }, { commit: true }),
-      app.repositories.tagsRepository.createTag({ name: 'foo1' }, { commit: true }),
-      app.repositories.tagsRepository.createTag({ name: 'bar' }, { commit: true }),
-      app.repositories.tagsRepository.createTag({ name: 'baz' }, { commit: true }),
-    ]);
+  test('searchTags', async () => {
+    const t1 = await app.repositories.tagsRepository.createTag({ name: 'foo' }, { commit: true });
+    const t2 = await app.repositories.tagsRepository.createTag({ name: 'foo1' }, { commit: true });
+    await app.repositories.tagsRepository.createTag({ name: 'bar' }, { commit: true });
+    await app.repositories.tagsRepository.createTag({ name: 'baz' }, { commit: true });
 
     const result = await app.repositories.tagsRepository.searchTags({
       pagination: {},
@@ -73,6 +71,6 @@ describe('TagsRepository', () => {
       app.repositories.tagsRepository.getTag(t2.id),
     ]);
 
-    expect(result.items).toEqual([tag1, tag2]);
+    expect(result.items).toEqual([tag2, tag1]);
   });
 });
