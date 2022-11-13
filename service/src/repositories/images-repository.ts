@@ -56,7 +56,7 @@ export class ImagesRepository {
 
       await trx
         .into(imagesTable.name)
-        .insert(imagesTable.toColumnCase({
+        .insert(imagesTable.insert({
           id,
           ...params,
         }));
@@ -75,8 +75,8 @@ export class ImagesRepository {
   getImage = async (id: string) => {
     return this.db
       .from(imagesTable.name)
-      .select(imagesTable.rawColumns())
-      .where({ [imagesTable.rawColumn('id')]: id })
+      .select(imagesTable.select('*'))
+      .where({ [imagesTable.predicate('id')]: id })
       .first();
   };
 
@@ -85,21 +85,21 @@ export class ImagesRepository {
 
     const query = this.db
       .from(imagesTable.name)
-      .select(imagesTable.prefixedColumns())
+      .select(imagesTable.select('*'))
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere({
-        [imagesTable.prefixedColumn('ownerId')]: params.ownerId
+        [imagesTable.predicate('ownerId')]: params.ownerId
       });
     }
 
     const rows = await query;
 
     return {
-      items: pagination.getRows(rows).map<Image>(imagesTable.toAttributeCase),
+      items: pagination.getRows(rows).map<Image>(imagesTable.toAlias),
       cursors: pagination.getCursors(rows)
     }
   };
@@ -108,16 +108,16 @@ export class ImagesRepository {
     return this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(imagesTable.name)
-        .select(imagesTable.rawColumns())
-        .where(imagesTable.rawColumn('ownerId'), ownerId)
-        .orderBy(imagesTable.rawColumn('creationTimestamp'), 'desc')
+        .select(imagesTable.select('*'))
+        .where(imagesTable.predicate('ownerId'), ownerId)
+        .orderBy(imagesTable.predicate('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
   };
 
   attachTagsToImage = async (params: AttachTagsToImageParams, opts: TransactionOptions) => {
     return this.trx.query(opts,async (trx) => {
-      const insert = params.tagIds.map(tagId => imageTagsTable.toColumnCase({
+      const insert = params.tagIds.map(tagId => imageTagsTable.insert({
         id: uuid(),
         tagId,
         imageId: params.imageId,
@@ -137,23 +137,23 @@ export class ImagesRepository {
         .from(imagesTable.name)
         .innerJoin(
           imageTagsTable.name,
-          imageTagsTable.prefixedColumn('imageId'),
-          imagesTable.prefixedColumn('id')
+          imageTagsTable.predicate('imageId'),
+          imagesTable.predicate('id')
         )
         .select({
-          ...imagesTable.prefixedColumns(),
-          ...imageTagsTable.prefixedColumns('tagId'),
+          ...imagesTable.select('*'),
+          ...imageTagsTable.select('tagId'),
         })
-        .where(imageTagsTable.prefixedColumn('tagId'), tagId)
-        .orderBy(imagesTable.prefixedColumn('creationTimestamp'), 'desc')
+        .where(imageTagsTable.predicate('tagId'), tagId)
+        .orderBy(imagesTable.predicate('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
 
     const imagesOfTags: Record<string, Image[]> = {};
 
     for (const row of rows) {
-      const image = imagesTable.toAttributeCase<Image>(row);
-      const tagId = imageTagsTable.toAttributeCase<{ tagId: string }>(row).tagId;
+      const image = imagesTable.toAlias<Image>(row);
+      const tagId = imageTagsTable.toAlias<{ tagId: string }>(row).tagId;
       if (!imagesOfTags[tagId]) {
         imagesOfTags[tagId] = [];
       }
@@ -166,7 +166,7 @@ export class ImagesRepository {
 
 export function makeImagesCursorPagination(params: Partial<CursorPaginationParams<keyof Image>>) {
   return makeCursorPagination({
-    field: imagesTable.prefixedColumn(params.field || 'creationTimestamp'),
+    field: imagesTable.predicate(params.field || 'creationTimestamp'),
     direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor

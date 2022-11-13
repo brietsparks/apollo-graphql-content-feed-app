@@ -51,7 +51,7 @@ export class TagsRepository {
 
       await trx
         .into(tagsTable.name)
-        .insert(tagsTable.toColumnCase({
+        .insert(tagsTable.insert({
           id,
           ...params,
         }));
@@ -63,8 +63,8 @@ export class TagsRepository {
   getTag = async (id: string) => {
     return this.db
       .from(tagsTable.name)
-      .select(tagsTable.rawColumns())
-      .where({ [tagsTable.rawColumn('id')]: id })
+      .select(tagsTable.select('*'))
+      .where({ [tagsTable.predicate('id')]: id })
       .first();
   };
 
@@ -76,7 +76,7 @@ export class TagsRepository {
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit)
-      .select(tagsTable.prefixedColumns());
+      .select(tagsTable.select('*'));
 
     return {
       items: pagination.getRows(rows),
@@ -89,11 +89,11 @@ export class TagsRepository {
 
     const rows = await this.db
       .from(tagsTable.name)
-      .where(tagsTable.rawColumn('name'), 'like', `%${params.term}%`)
+      .where(tagsTable.predicate('name'), 'like', `%${params.term}%`)
       .andWhere(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit)
-      .select(tagsTable.rawColumns());
+      .select(tagsTable.select('*'));
 
     return {
       items: pagination.getRows(rows),
@@ -106,17 +106,17 @@ export class TagsRepository {
       .from(tagsTable.name)
       .innerJoin(
         postTagsTable.name,
-        postTagsTable.prefixedColumn('tagId'),
-        tagsTable.prefixedColumn('id')
+        postTagsTable.predicate('tagId'),
+        tagsTable.predicate('id')
       )
-      .select(tagsTable.prefixedColumns())
-      .select(postTagsTable.prefixedColumns())
-      .whereIn(postTagsTable.prefixedColumn('postId'), postIds)
-      .orderBy(postTagsTable.prefixedColumn('creationTimestamp'));
+      .select(tagsTable.select('*'))
+      .select(postTagsTable.select('*'))
+      .whereIn(postTagsTable.predicate('postId'), postIds)
+      .orderBy(postTagsTable.predicate('creationTimestamp'));
 
     return rows.map(row => {
-      const tag = tagsTable.toAttributeCase(row);
-      const { postId } = postTagsTable.toAttributeCase(row);
+      const tag = tagsTable.toAlias(row);
+      const { postId } = postTagsTable.toAlias(row);
       return { ...tag, postId } as PostTag;
     });
   };
@@ -126,17 +126,17 @@ export class TagsRepository {
       .from(tagsTable.name)
       .innerJoin(
         imageTagsTable.name,
-        imageTagsTable.prefixedColumn('tagId'),
-        tagsTable.prefixedColumn('id')
+        imageTagsTable.predicate('tagId'),
+        tagsTable.predicate('id')
       )
-      .select(tagsTable.prefixedColumns())
-      .select(imageTagsTable.prefixedColumns())
-      .whereIn(imageTagsTable.prefixedColumn('imageId'), imageIds)
-      .orderBy(imageTagsTable.prefixedColumn('creationTimestamp'));
+      .select(tagsTable.select('*'))
+      .select(imageTagsTable.select('*'))
+      .whereIn(imageTagsTable.predicate('imageId'), imageIds)
+      .orderBy(imageTagsTable.predicate('creationTimestamp'));
 
     return rows.map(row => {
-      const tag = tagsTable.toAttributeCase(row);
-      const { imageId } = imageTagsTable.toAttributeCase(row);
+      const tag = tagsTable.toAlias(row);
+      const { imageId } = imageTagsTable.toAlias(row);
       return { ...tag, imageId } as ImageTag;
     });
   };
@@ -144,7 +144,7 @@ export class TagsRepository {
 
 export function makeTagsCursorPagination(params: Partial<CursorPaginationParams<keyof Tag>> = {}) {
   return makeCursorPagination({
-    field: tagsTable.prefixedColumn(params.field || 'creationTimestamp'),
+    field: tagsTable.predicate(params.field || 'creationTimestamp'),
     direction: params.direction || 'desc',
     limit: params.limit || 12,
     cursor: params.cursor,

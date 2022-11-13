@@ -7,7 +7,7 @@ export const usersTable = new TableAliasHelper('users', {
   creationTimestamp: 'creation_timestamp',
 });
 
-export const postsTable = new Table('posts', {
+export const postsTable = new TableAliasHelper('posts', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   ownerId: 'owner_id',
@@ -15,7 +15,7 @@ export const postsTable = new Table('posts', {
   body: 'body',
 });
 
-export const imagesTable = new Table('images', {
+export const imagesTable = new TableAliasHelper('images', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   ownerId: 'owner_id',
@@ -23,20 +23,20 @@ export const imagesTable = new Table('images', {
   caption: 'caption',
 });
 
-export const tagsTable = new Table('tags', {
+export const tagsTable = new TableAliasHelper('tags', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   name: 'name',
 });
 
-export const postTagsTable = new Table('post_tags', {
+export const postTagsTable = new TableAliasHelper('post_tags', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   postId: 'post_id',
   tagId: 'tag_id',
 });
 
-export const imageTagsTable = new Table('image_tags', {
+export const imageTagsTable = new TableAliasHelper('image_tags', {
   id: 'id',
   creationTimestamp: 'creation_timestamp',
   imageId: 'image_id',
