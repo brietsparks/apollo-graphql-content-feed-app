@@ -76,8 +76,12 @@ export class TableAliasHelper<T extends Record<string, string>> {
     return selection;
   }
 
-  predicate(alias: Alias<T>) {
+  column(alias: Alias<T>) {
     return this.aliasToPrefixedColumnLookup[alias];
+  }
+
+  predicate(alias: Alias<T>) {
+    return this.column(alias);
   }
 
   toAlias<U extends Partial<AliasedRow<T>>>(row: Record<string, unknown>) {
