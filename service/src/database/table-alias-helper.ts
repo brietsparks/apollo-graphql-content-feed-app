@@ -42,7 +42,7 @@ export class TableAliasHelper<T extends Record<string, string>> {
     return this.tableName;
   }
 
-  wrap(delimiter = ':') {
+  wrap = (delimiter = ':') => {
     const aliasToAlias: Record<string, string> = {};
     for (const alias of Object.keys(this.aliasToColumn)) {
       aliasToAlias[alias] = alias;
@@ -59,7 +59,7 @@ export class TableAliasHelper<T extends Record<string, string>> {
     );
   }
 
-  select(...aliases: SelectionAliases<T>) {
+  select = (...aliases: SelectionAliases<T>) => {
     if (aliases[0] === '*') {
       return this.prefixedAliasToPrefixedColumnLookup;
     }
@@ -76,15 +76,31 @@ export class TableAliasHelper<T extends Record<string, string>> {
     return selection;
   }
 
-  column(alias: Alias<T>) {
+  insert = (row: Partial<AliasedRow<T>>): Record<string, unknown> => {
+    const insertionRow: Record<string, unknown> = {};
+    for (const [alias, value] of Object.entries(row)) {
+      const column = this.aliasToColumn[alias];
+      if (column) {
+        insertionRow[column] = value;
+      }
+    }
+
+    return insertionRow;
+  }
+
+  prefixedAlias = (alias: keyof T) => {
+    return this.aliasToPrefixedAliasLookup[alias];
+  };
+
+  column = (alias: Alias<T>) => {
     return this.aliasToPrefixedColumnLookup[alias];
   }
 
-  predicate(alias: Alias<T>) {
+  predicate = (alias: Alias<T>) => {
     return this.column(alias);
   }
 
-  toAlias<U extends Partial<AliasedRow<T>>>(row: Record<string, unknown>) {
+  toAlias = <U extends Partial<AliasedRow<T>>>(row: Record<string, unknown>) => {
     const aliasedRow: Partial<AliasedRow<T>> = {};
     for (const [prefixedAlias, value] of Object.entries(row)) {
       const alias = this.prefixedAliasToAliasLookup[prefixedAlias];

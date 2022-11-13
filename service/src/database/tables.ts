@@ -1,6 +1,7 @@
 import { Table } from './table-util';
+import { TableAliasHelper } from './table-alias-helper';
 
-export const usersTable = new Table('users', {
+export const usersTable = new TableAliasHelper('users', {
   id: 'id',
   name: 'name',
   creationTimestamp: 'creation_timestamp',

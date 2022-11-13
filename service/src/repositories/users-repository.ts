@@ -40,7 +40,7 @@ export class UsersRepository {
 
       await trx
         .into(usersTable.name)
-        .insert(usersTable.toColumnCase({
+        .insert(usersTable.insert({
           id,
           name: params.name
         }));
@@ -49,41 +49,43 @@ export class UsersRepository {
     });
   };
 
-  getUser = async (id: string) => {
-    return this.db
+  getUser = async (id: string): Promise<User> => {
+    const row = await this.db
       .from(usersTable.name)
-      .select(usersTable.rawColumns())
-      .where({ [usersTable.rawColumn('id')]: id })
+      .select(usersTable.select('*'))
+      .where({ [usersTable.predicate('id')]: id })
       .first();
+
+    return usersTable.toAlias<User>(row);
   };
 
-  getUsersByCursor = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
+  getUsers = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
     const pagination = makeUsersCursorPagination(params.pagination);
 
     const rows = await this.db
       .from(usersTable.name)
-      .select(usersTable.rawColumns())
+      .select(usersTable.select('*'))
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     return {
-      items: pagination.getRows(rows),
-      cursors: pagination.getCursors(rows)
+      items: pagination.getRows(rows).map<User>(usersTable.toAlias),
+      cursors: pagination.getCursors(rows, { field: usersTable.prefixedAlias(params.pagination.field || 'creationTimestamp') })
     };
   }
 
   getUsersByIds = async (params: GetProjectsByIdsParams): Promise<User[]> => {
     return this.db
       .from(usersTable.name)
-      .select(usersTable.rawColumns())
-      .whereIn(usersTable.rawColumn('id'), params.ids);
+      .select(usersTable.select('*'))
+      .whereIn(usersTable.predicate('id'), params.ids);
   };
 }
 
 export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<keyof User>>) {
   return makeCursorPagination({
-    field: usersTable.rawColumn(params.field || 'creationTimestamp'),
+    field: usersTable.column(params.field || 'creationTimestamp'),
     direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor,

@@ -26,6 +26,16 @@ describe('TableAliasHelper', () => {
     });
   });
 
+  test('insert', () => {
+    expect(table.insert({
+      'myColumn': 'foo',
+      'col': 'bar'
+    })).toEqual({
+      'my_column': 'foo',
+      'col': 'bar'
+    });
+  });
+
   test('predicate', () => {
     expect(table.predicate('myColumn')).toEqual('my_table.my_column');
   });
