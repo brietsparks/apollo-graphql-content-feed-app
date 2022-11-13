@@ -25,4 +25,33 @@ describe('TableAliasHelper', () => {
       });
     });
   });
+
+  test('predicate', () => {
+    expect(table.predicate('myColumn')).toEqual('my_table.my_column');
+  });
+
+  test('toAlias', () => {
+    const row = table.toAlias({
+      'my_table:col': 'foo',
+      'my_table:myColumn': 'bar',
+    });
+
+    expect(row).toEqual({
+      'col': 'foo',
+      'myColumn': 'bar',
+    });
+  });
+
+  describe('wrap', () => {
+    test('test', () => {
+      expect(table.wrap().select('*')).toEqual({
+        'my_table::col': 'my_table:col',
+        'my_table::myColumn': 'my_table:myColumn',
+      });
+    });
+
+    test('toAlias', () => {
+
+    });
+  });
 });
