@@ -1,76 +1,3 @@
-// import { knex, Knex } from 'knex';
-// import { Without } from '../util/types';
-/*
-
-    'posts:id': 'posts.id',
-    'posts:ownerId': 'posts.owner_id',
-
-  'posts::id': 'post:id',
-  'posts::ownerId': 'post:ownerId',
-
-'posts:::id': 'post::id',
-'posts:::ownerId': 'post::ownerId',
-
-parse
-  posts:id --> id
-  posts:ownerId --> ownerId
-
-  posts::id --> id
-  posts::ownerId --> ownerId
-
-  posts:::id --> id
-  posts:::ownerId --> ownerId
- */
-
-// const postsTable = {} as any;
-//
-// const db = knex({});
-//
-// const ownerId = '';
-//
-// const query1Columns = postsTable.aliased();
-// const query2Columns = query1Columns.aliased();
-//
-// (async function () {
-//   const rows = await db
-//     .from((subquery: Knex) => {
-//       return subquery
-//         .from(postsTable.name)
-//         .select(query1Columns.select('*'))
-//         .where({
-//           [query1Columns.where('ownerId')]: ownerId
-//         })
-//         .as('subquery')
-//     })
-//     .select(query2Columns.select('*'))
-//     .where(query2Columns.where({
-//       'myColumn': 'some value'
-//     }));
-//
-//   query2Columns.unalias(rows)
-// })()
-
-/*
-
-alias -> column
-ownerId -> owner_id
-
-h1
-  prefixedAlias -> prefixedColumn
-  posts:ownerId -> posts.owner_id
-
-  prefixedAlias -> alias
-  posts:ownerId -> ownerId
-
-h2
-  prefixedAlias -> prefixedColumn
-  posts::ownerId -> posts:ownerId
-
-  prefixedAlias -> alias
-  posts::ownerId -> ownerId
-
- */
-
 import { invert } from 'lodash';
 
 export type Alias<T> = keyof T;
@@ -109,7 +36,6 @@ export class TableAliasHelper<T extends Record<string, string>> {
     this.prefixedAliasToAliasLookup = this.buildPrefixedAliasToAliasLookup(aliasToColumn);
     this.aliasToPrefixedColumnLookup = this.buildAliasToPrefixedColumnLookup(aliasToColumn);
     this.prefixedAliasToPrefixedColumnLookup = this.buildPrefixedAliasToPrefixedColumnLookup(aliasToColumn);
-
   }
 
   get name() {
@@ -117,9 +43,14 @@ export class TableAliasHelper<T extends Record<string, string>> {
   }
 
   wrap(delimiter = ':') {
+    const aliasToAlias: Record<string, string> = {};
+    for (const alias of Object.keys(this.aliasToColumn)) {
+      aliasToAlias[alias] = alias;
+    }
+
     return new TableAliasHelper(
       this.tableName,
-      this.aliasToColumn,
+      aliasToAlias,
       `${delimiter}${this.aliasDelimiter}`,
       {
         columnDelimiter: this.aliasDelimiter,

@@ -43,15 +43,40 @@ describe('TableAliasHelper', () => {
   });
 
   describe('wrap', () => {
-    test('test', () => {
-      expect(table.wrap().select('*')).toEqual({
-        'my_table::col': 'my_table:col',
-        'my_table::myColumn': 'my_table:myColumn',
+    describe('select', () => {
+      test('wildcard', () => {
+        expect(table.wrap().select('*')).toEqual({
+          'my_table::col': 'my_table:col',
+          'my_table::myColumn': 'my_table:myColumn',
+        });
+      });
+
+      test('specified columns', () => {
+        expect(table.wrap().select( 'myColumn')).toEqual({
+          'my_table::myColumn': 'my_table:myColumn',
+        });
+
+        expect(table.wrap().select( 'col', 'myColumn')).toEqual({
+          'my_table::col': 'my_table:col',
+          'my_table::myColumn': 'my_table:myColumn',
+        });
       });
     });
 
-    test('toAlias', () => {
+    test('predicate', () => {
+      expect(table.wrap().predicate('myColumn')).toEqual('my_table:myColumn');
+    });
 
+    test('toAlias', () => {
+      const row = table.wrap().toAlias({
+        'my_table::col': 'foo',
+        'my_table::myColumn': 'bar',
+      });
+
+      expect(row).toEqual({
+        'col': 'foo',
+        'myColumn': 'bar',
+      });
     });
   });
 });
