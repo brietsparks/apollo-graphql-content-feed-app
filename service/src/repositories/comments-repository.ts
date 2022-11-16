@@ -69,7 +69,10 @@ export class CommentsRepository {
 
   getCommentsOfPost = async (params: GetCommentsOfPostParams): Promise<CursorPaginationResult<Comment>> => {
     const pagination = makeCursorPagination({
-      field: commentsTable.prefixedColumn(params.pagination?.field || 'creationTimestamp'),
+      field: commentsTable.prefixedColumn(
+        // params.pagination?.field ||
+        'creationTimestamp'
+      ),
       direction: params.pagination?.direction || 'desc',
       limit: params.pagination?.limit || 12,
       cursor: params.pagination?.cursor,

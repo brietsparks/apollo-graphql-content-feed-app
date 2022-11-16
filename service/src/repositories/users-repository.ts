@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import { usersTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, FieldParam, makeCursorPagination } from './lib/pagination';
 import { CursorPaginationResult } from './shared';
 
 export type User = {
@@ -62,16 +62,24 @@ export class UsersRepository {
   getUsers = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
     const pagination = makeUsersCursorPagination(params.pagination);
 
-    const rows = await this.db
+    const q = this.db
       .from(usersTable.name)
       .select(usersTable.select('*'))
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
+    console.log(q.toSQL().sql)
+
+    const rows = await q;
+
+    // console.log(usersTable.column('creationTimestamp'))
+    // console.log(usersTable.prefixedAlias('creationTimestamp'))
+
+
     return {
       items: pagination.getRows(rows).map<User>(usersTable.toAlias),
-      cursors: pagination.getCursors(rows, { field: usersTable.prefixedAlias(params.pagination.field || 'creationTimestamp') })
+      cursors: pagination.getCursors(rows)
     };
   }
 
@@ -85,7 +93,10 @@ export class UsersRepository {
 
 export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<keyof User>>) {
   return makeCursorPagination({
-    field: usersTable.column(params.field || 'creationTimestamp'),
+    field: {
+      alias: usersTable.prefixedAlias('creationTimestamp'),
+      column: usersTable.column('creationTimestamp')
+    },
     direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor,

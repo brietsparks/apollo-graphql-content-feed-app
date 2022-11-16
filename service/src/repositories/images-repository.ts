@@ -166,7 +166,10 @@ export class ImagesRepository {
 
 export function makeImagesCursorPagination(params: Partial<CursorPaginationParams<keyof Image>>) {
   return makeCursorPagination({
-    field: imagesTable.predicate(params.field || 'creationTimestamp'),
+    field: imagesTable.predicate(
+      // params.field ||
+      'creationTimestamp'
+    ),
     direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor

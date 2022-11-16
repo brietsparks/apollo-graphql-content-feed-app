@@ -183,7 +183,10 @@ export class PostsRepository {
 
 export function makePostsCursorPagination(params: Partial<CursorPaginationParams<keyof Post>> = {}) {
   return makeCursorPagination({
-    field: postsTable.column(params.field || 'creationTimestamp'),
+    field: postsTable.column(
+      // params.field ||
+      'creationTimestamp'
+    ),
     direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor,

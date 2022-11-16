@@ -18,19 +18,9 @@ export interface TableAliasHelperConfig {
 export class TableAliasHelper<T extends Record<string, string>> {
 
   private config: TableAliasHelperConfig;
-
-  /*
-  todo
-  prefixed alias should be the same a prefixed column
-  remove unneeded lookups
-   */
-
   private readonly aliasToPrefixedAliasLookup: AliasToPrefixedAliasLookup<T>;
-
   private readonly prefixedAliasToAliasLookup: PrefixedAliasToAliasLookup<T>
-
   private readonly aliasToPrefixedColumnLookup: AliasToPrefixedColumnLookup<T>;
-
   private readonly prefixedAliasToPrefixedColumnLookup: PrefixedAliasToPrefixedColumnLookup;
 
   constructor(
@@ -125,7 +115,7 @@ export class TableAliasHelper<T extends Record<string, string>> {
   private buildAliasToPrefixedAliasLookup(aliasToColumnLookup: T): AliasToPrefixedAliasLookup<T> {
     const aliasToPrefixedAliasLookup: Partial<AliasToPrefixedAliasLookup<T>> = {};
     for (const alias of Object.keys(aliasToColumnLookup)) {
-      aliasToPrefixedAliasLookup[alias as Alias<T>] = this.getPrefixedColumn(alias);
+      aliasToPrefixedAliasLookup[alias as Alias<T>] = this.getPrefixedAlias(alias);
     }
     return aliasToPrefixedAliasLookup as AliasToPrefixedAliasLookup<T>;
   }
@@ -146,7 +136,7 @@ export class TableAliasHelper<T extends Record<string, string>> {
   private buildPrefixedAliasToPrefixedColumnLookup(aliasToColumnLookup: T): PrefixedAliasToPrefixedColumnLookup {
     const prefixedAliasToPrefixedColumnLookup: Partial<PrefixedAliasToPrefixedColumnLookup> = {};
     for (const alias of Object.keys(aliasToColumnLookup)) {
-      prefixedAliasToPrefixedColumnLookup[this.getPrefixedColumn(alias)] = this.getPrefixedColumn(alias);
+      prefixedAliasToPrefixedColumnLookup[this.getPrefixedAlias(alias)] = this.getPrefixedColumn(alias);
     }
     return prefixedAliasToPrefixedColumnLookup as PrefixedAliasToPrefixedColumnLookup;
   }

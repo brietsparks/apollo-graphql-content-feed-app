@@ -144,7 +144,10 @@ export class TagsRepository {
 
 export function makeTagsCursorPagination(params: Partial<CursorPaginationParams<keyof Tag>> = {}) {
   return makeCursorPagination({
-    field: tagsTable.predicate(params.field || 'creationTimestamp'),
+    field: tagsTable.predicate(
+      // params.field ||
+      'creationTimestamp'
+    ),
     direction: params.direction || 'desc',
     limit: params.limit || 12,
     cursor: params.cursor,
