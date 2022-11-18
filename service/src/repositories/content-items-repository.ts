@@ -3,7 +3,8 @@ import { Knex } from 'knex';
 import { postsTable, imagesTable } from '../database';
 import { XOR } from '../util/types';
 
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 import { Post } from './posts-repository';
 import { Image } from './images-repository';
 
@@ -23,11 +24,15 @@ export class ContentItemsRepository {
   ) {}
 
   getContentItems = async (params: GetContentItemsParams): Promise<CursorPaginationResult<ContentItem>> => {
-    const cursorField = '_creation_timestamp';
+    const innerPostsTable = postsTable;
+    const outerPostsTable = postsTable.wrap();
+    const innerImagesTable = imagesTable;
+    const outerImagesTable = imagesTable.wrap();
 
+    const cursorField = '_creation_timestamp';
     const pagination = makeCursorPagination({
       field: cursorField,
-      sortDirection: 'desc',
+      direction: 'desc',
       limit: params.pagination.limit || 4,
       cursor: params.pagination.cursor
     });
@@ -35,94 +40,62 @@ export class ContentItemsRepository {
     const query = this.db
       .from((db: Knex) => {
         db.from(postsTable.name)
+          .fullOuterJoin(
+            imagesTable.name,
+            innerPostsTable.predicate('id'),
+            innerImagesTable.predicate('id')
+          )
           .select(
             this.db.raw(
               `coalesce(
-                ${postsTable.prefixedColumn('creationTimestamp')},
-                ${imagesTable.prefixedColumn('creationTimestamp')}
+                ${innerPostsTable.column('creationTimestamp')},
+                ${innerImagesTable.column('creationTimestamp')}
               ) as ${cursorField}`
             )
           )
           .select({
-            // ...postsTable.prefixedColumns(),
-            // ...imagesTable.prefixedColumns()
-
-
-            // alias must cannot use a "." for separator because the outer query will parse it as table and column
-            'posts:id': 'posts.id',
-            'posts:creationTimestamp': 'posts.creation_timestamp',
-            'posts:ownerId': 'posts.owner_id',
-            'posts:title': 'posts.title',
-            'posts:body': 'posts.body',
-            'images:id': 'images.id',
-            'images:creationTimestamp': 'images.creation_timestamp',
-            'images:ownerId': 'images.owner_id',
-            'images:url': 'images.url',
-            'images:caption': 'images.caption',
+            ...innerPostsTable.select('*'),
+            ...innerImagesTable.select('*'),
           })
-          .fullOuterJoin(
-            imagesTable.name,
-            postsTable.prefixedColumn('id'),
-            imagesTable.prefixedColumn('id')
-          )
           .as('subquery')
       })
-      .select(
-        cursorField,
-        'posts:id',
-        'posts:creationTimestamp',
-        'posts:ownerId',
-        'posts:title',
-        'posts:body',
-        'images:id',
-        'images:creationTimestamp',
-        'images:ownerId',
-        'images:url',
-        'images:caption',
-
-        // Object.values({
-        //   ...postsTable.prefixedColumns(),
-        //   ...imagesTable.prefixedColumns()
-        // })
-      )
+      .select(cursorField, {
+        ...outerPostsTable.select('*'),
+        ...outerImagesTable.select('*')
+      })
       .where(...pagination.where)
-
-      // raw is needed because orderBy will wrap the identifier in quotes, which will make the subquery alias field unrecognized
-      .orderByRaw(`${cursorField} desc`) // todo: escape via bindings
+      .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere(q => q
-        .orWhere({ 'posts:ownerId': params.ownerId })
-        .orWhere({ 'images:ownerId': params.ownerId })
+        .orWhere({ [outerPostsTable.predicate('ownerId')]: params.ownerId })
+        .orWhere({ [outerImagesTable.predicate('ownerId')]: params.ownerId })
       );
     }
 
     const rows = await query;
 
-    return pagination.getResult(rows, (item) => {
-      if (item['posts:id']) {
-        return {
-          _type: 'post',
-          'id': item['posts:id'],
-          'creationTimestamp': item[cursorField],
-          'ownerId': item['posts:ownerId'],
-          'title': item['posts:title'],
-          'body': item['posts:body'],
-        };
-      }
-      if (item['images:id']) {
-        return {
-          _type: 'image',
-          'id': item['images:id'],
-          'creationTimestamp': item[cursorField],
-          'ownerId': item['images:ownerId'],
-          'url': item['images:url'],
-          'caption': item['images:caption'],
-        };
-      }
+    const paginatedRows = pagination.getRows(rows);
 
-      return null;
-    });
+    const items: ContentItem[] = [];
+    for (const row of paginatedRows) {
+      if (row[outerPostsTable.prefixedAlias('id')]) {
+        items.push({
+          _type: 'post',
+          ...outerPostsTable.toAlias(row),
+        });
+      } else if (row[outerImagesTable.prefixedAlias('id')]) {
+        items.push({
+          _type: 'image',
+          ...outerImagesTable.toAlias(row),
+        });
+      }
+    }
+
+    return {
+      items,
+      cursors: pagination.getCursors(rows)
+    };
   };
 }

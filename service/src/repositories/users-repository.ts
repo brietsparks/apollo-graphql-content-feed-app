@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { usersTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, FieldParam, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type User = {
   id: string;
@@ -39,7 +40,7 @@ export class UsersRepository {
 
       await trx
         .into(usersTable.name)
-        .insert(usersTable.toColumnCase({
+        .insert(usersTable.insert({
           id,
           name: params.name
         }));
@@ -48,39 +49,51 @@ export class UsersRepository {
     });
   };
 
-  getUser = async (id: string) => {
-    return this.db
+  getUser = async (id: string): Promise<User> => {
+    const row = await this.db
       .from(usersTable.name)
-      .select(usersTable.rawColumns())
-      .where({ [usersTable.rawColumn('id')]: id })
+      .select(usersTable.select('*'))
+      .where({ [usersTable.predicate('id')]: id })
       .first();
+
+    if (!row) {
+      return undefined;
+    }
+
+    return usersTable.toAlias<User>(row);
   };
 
-  getUsersByCursor = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
+  getUsers = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
     const pagination = makeUsersCursorPagination(params.pagination);
 
-    const users = await this.db
+    const rows = await this.db
       .from(usersTable.name)
-      .select(usersTable.rawColumns())
+      .select(usersTable.select('*'))
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
-    return pagination.getResult(users);
+    return {
+      items: pagination.getRows(rows).map<User>(usersTable.toAlias),
+      cursors: pagination.getCursors(rows)
+    };
   }
 
   getUsersByIds = async (params: GetProjectsByIdsParams): Promise<User[]> => {
     return this.db
       .from(usersTable.name)
-      .select(usersTable.rawColumns())
-      .whereIn(usersTable.rawColumn('id'), params.ids);
+      .select(usersTable.select('*'))
+      .whereIn(usersTable.predicate('id'), params.ids);
   };
 }
 
 export function makeUsersCursorPagination(params: Partial<CursorPaginationParams<keyof User>>) {
   return makeCursorPagination({
-    field: usersTable.rawColumn(params.field || 'creationTimestamp'),
-    sortDirection: params.sortDirection || 'desc',
+    field: {
+      alias: usersTable.prefixedAlias('creationTimestamp'),
+      column: usersTable.column('creationTimestamp')
+    },
+    direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor,
   });

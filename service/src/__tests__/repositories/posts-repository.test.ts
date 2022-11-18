@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 
 import { getTestApp, TestApp } from '../test-setup';
-import { CursorPaginationResult } from '../../repositories/lib/pagination';
+import { CursorPaginationResult } from '../../repositories/shared';
 import { Post, CreatePostParams } from '../../repositories';
 
 describe('PostsRepository', () => {
@@ -59,7 +59,14 @@ describe('PostsRepository', () => {
         limit: 3
       }
     });
-    expect(posts.items).toEqual([post6, post5, post4]);
+    expect(posts).toEqual({
+      items: [post6, post5, post4],
+      cursors: {
+        start: undefined,
+        end: post4.creationTimestamp,
+        next: post3.creationTimestamp,
+      }
+    });
 
     posts = await app.repositories.postsRepository.getPosts({
       pagination: {
@@ -67,7 +74,14 @@ describe('PostsRepository', () => {
         limit: 2,
       }
     });
-    expect(posts.items).toEqual([post4, post3]);
+    expect(posts).toEqual({
+      items: [post4, post3],
+      cursors: {
+        start: post4.creationTimestamp,
+        end: post3.creationTimestamp,
+        next: post2.creationTimestamp,
+      }
+    });
   });
 
   test('getRecentPostsOfTags', async () => {

@@ -33,27 +33,35 @@ describe('ContentItemsRepository', () => {
         ownerId: userCreation.id,
         url: `c4.${faker.random.alphaNumeric()}`
       }, { commit: true });
-      const c5 = await app.repositories.postsRepository.createPost({
+      await app.repositories.postsRepository.createPost({
         ownerId: userCreation.id,
         title: `c5.${faker.random.alphaNumeric()}`
       }, { commit: true });
 
-      const [content3, content4, content5] = await Promise.all([
+      const [content1, content2, content3, content4] = await Promise.all([
+        app.repositories.postsRepository.getPost(c1.id),
+        app.repositories.imagesRepository.getImage(c2.id),
         app.repositories.postsRepository.getPost(c3.id),
         app.repositories.imagesRepository.getImage(c4.id),
-        app.repositories.postsRepository.getPost(c5.id)
       ])
 
       const result = await app.repositories.contentItemsRepository.getContentItems({
-        pagination: { limit: 3 },
+        pagination: { limit: 3, cursor: content4.creationTimestamp },
         ownerId: userCreation.id
       });
 
-      expect(result.items).toEqual([
-        { ...content5, _type: 'post' },
-        { ...content4, _type: 'image' },
-        { ...content3, _type: 'post' },
-      ]);
+      expect(result).toEqual({
+        items: [
+          { ...content4, _type: 'image' },
+          { ...content3, _type: 'post' },
+          { ...content2, _type: 'image' },
+        ],
+        cursors: {
+          start: content4.creationTimestamp,
+          end: content2.creationTimestamp,
+          next: content1.creationTimestamp
+        }
+      });
     });
   });
 });

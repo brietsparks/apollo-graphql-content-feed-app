@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { tagsTable, postTagsTable, imageTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type Tag = {
   id: string;
@@ -35,8 +36,6 @@ export interface SearchTagsParams {
   pagination: Partial<CursorPaginationParams<keyof Tag>>;
 }
 
-export type SearchTagsResult = CursorPaginationResult<Tag>;
-
 export class TagsRepository {
   private trx: TransactionsHelper;
 
@@ -52,7 +51,7 @@ export class TagsRepository {
 
       await trx
         .into(tagsTable.name)
-        .insert(tagsTable.toColumnCase({
+        .insert(tagsTable.insert({
           id,
           ...params,
         }));
@@ -62,42 +61,50 @@ export class TagsRepository {
   };
 
   getTag = async (id: string) => {
-    return this.db
+    const row = await this.db
       .from(tagsTable.name)
-      .select(tagsTable.rawColumns())
-      .where({ [tagsTable.rawColumn('id')]: id })
+      .select(tagsTable.select('*'))
+      .where({ [tagsTable.predicate('id')]: id })
       .first();
+
+    if (!row) {
+      return undefined;
+    }
+
+    return tagsTable.toAlias<Tag>(row);
   };
 
-  getTags = async (params: GetTagsParams) => {
-    const pagination = makeTagsCursorPagination(params.pagination);
-
-    const q = this.db
-      .from(tagsTable.name)
-      .where(...pagination.where)
-      .orderBy(...pagination.orderBy)
-      .limit(pagination.limit)
-      .select(tagsTable.prefixedColumns());
-
-    console.log(q.toSQL().sql);
-
-    const rows = await q;
-
-    return pagination.getResult(rows, tagsTable.toAttributeCase<Tag>);
-  }
-
-  searchTags = async (params: SearchTagsParams): Promise<SearchTagsResult> => {
+  getTags = async (params: GetTagsParams): Promise<CursorPaginationResult<Tag>> => {
     const pagination = makeTagsCursorPagination(params.pagination);
 
     const rows = await this.db
       .from(tagsTable.name)
-      .where(tagsTable.rawColumn('name'), 'like', `%${params.term}%`)
+      .where(...pagination.where)
+      .orderBy(...pagination.orderBy)
+      .limit(pagination.limit)
+      .select(tagsTable.select('*'));
+
+    return {
+      items: pagination.getRows(rows).map<Tag>(tagsTable.toAlias),
+      cursors: pagination.getCursors(rows),
+    };
+  }
+
+  searchTags = async (params: SearchTagsParams): Promise<CursorPaginationResult<Tag>> => {
+    const pagination = makeTagsCursorPagination(params.pagination);
+
+    const rows = await this.db
+      .from(tagsTable.name)
+      .where(tagsTable.predicate('name'), 'like', `%${params.term}%`)
       .andWhere(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit)
-      .select(tagsTable.rawColumns());
+      .select(tagsTable.select('*'));
 
-    return pagination.getResult(rows);
+    return {
+      items: pagination.getRows(rows).map<Tag>(tagsTable.toAlias),
+      cursors: pagination.getCursors(rows),
+    };
   }
 
   getTagsOfPosts = async (postIds: string[]): Promise<PostTag[]> => {
@@ -105,17 +112,17 @@ export class TagsRepository {
       .from(tagsTable.name)
       .innerJoin(
         postTagsTable.name,
-        postTagsTable.prefixedColumn('tagId'),
-        tagsTable.prefixedColumn('id')
+        postTagsTable.predicate('tagId'),
+        tagsTable.predicate('id')
       )
-      .select(tagsTable.prefixedColumns())
-      .select(postTagsTable.prefixedColumns())
-      .whereIn(postTagsTable.prefixedColumn('postId'), postIds)
-      .orderBy(postTagsTable.prefixedColumn('creationTimestamp'));
+      .select(tagsTable.select('*'))
+      .select(postTagsTable.select('*'))
+      .whereIn(postTagsTable.predicate('postId'), postIds)
+      .orderBy(postTagsTable.predicate('creationTimestamp'));
 
     return rows.map(row => {
-      const tag = tagsTable.toAttributeCase(row);
-      const { postId } = postTagsTable.toAttributeCase(row);
+      const tag = tagsTable.toAlias(row);
+      const { postId } = postTagsTable.toAlias(row);
       return { ...tag, postId } as PostTag;
     });
   };
@@ -125,17 +132,17 @@ export class TagsRepository {
       .from(tagsTable.name)
       .innerJoin(
         imageTagsTable.name,
-        imageTagsTable.prefixedColumn('tagId'),
-        tagsTable.prefixedColumn('id')
+        imageTagsTable.predicate('tagId'),
+        tagsTable.predicate('id')
       )
-      .select(tagsTable.prefixedColumns())
-      .select(imageTagsTable.prefixedColumns())
-      .whereIn(imageTagsTable.prefixedColumn('imageId'), imageIds)
-      .orderBy(imageTagsTable.prefixedColumn('creationTimestamp'));
+      .select(tagsTable.select('*'))
+      .select(imageTagsTable.select('*'))
+      .whereIn(imageTagsTable.predicate('imageId'), imageIds)
+      .orderBy(imageTagsTable.predicate('creationTimestamp'));
 
     return rows.map(row => {
-      const tag = tagsTable.toAttributeCase(row);
-      const { imageId } = imageTagsTable.toAttributeCase(row);
+      const tag = tagsTable.toAlias(row);
+      const { imageId } = imageTagsTable.toAlias(row);
       return { ...tag, imageId } as ImageTag;
     });
   };
@@ -143,8 +150,11 @@ export class TagsRepository {
 
 export function makeTagsCursorPagination(params: Partial<CursorPaginationParams<keyof Tag>> = {}) {
   return makeCursorPagination({
-    field: tagsTable.prefixedColumn(params.field || 'creationTimestamp'),
-    sortDirection: params.sortDirection || 'desc',
+    field: tagsTable.predicate(
+      // params.field ||
+      'creationTimestamp'
+    ),
+    direction: params.direction || 'desc',
     limit: params.limit || 12,
     cursor: params.cursor,
   });

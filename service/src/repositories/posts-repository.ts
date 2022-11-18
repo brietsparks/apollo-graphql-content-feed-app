@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { postsTable, postTagsTable } from '../database';
 
 import { TransactionOptions, TransactionsHelper } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type Post = {
   id: string;
@@ -54,7 +55,7 @@ export class PostsRepository {
 
       await trx
         .into(postsTable.name)
-        .insert(postsTable.toColumnCase({
+        .insert(postsTable.insert({
           id,
           ownerId: params.ownerId,
           title: params.title,
@@ -73,11 +74,17 @@ export class PostsRepository {
   };
 
   getPost = async (id: string): Promise<Post> => {
-    return this.db
+    const row = await this.db
       .from(postsTable.name)
-      .select(postsTable.rawColumns())
-      .where({ [postsTable.rawColumn('id')]: id })
+      .select(postsTable.select('*'))
+      .where({ [postsTable.predicate('id')]: id })
       .first();
+
+    if (!row) {
+      return undefined;
+    }
+
+    return postsTable.toAlias<Post>(row);
   };
 
   getPosts = async (params: GetPostsParams): Promise<CursorPaginationResult<Post>> => {
@@ -85,14 +92,14 @@ export class PostsRepository {
 
     const query = this.db
       .from(postsTable.name)
-      .select(postsTable.prefixedColumns())
+      .select(postsTable.select('*'))
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
 
     if (params.ownerId) {
       query.andWhere({
-        [postsTable.prefixedColumn('ownerId')]: params.ownerId
+        [postsTable.predicate('ownerId')]: params.ownerId
       });
     }
 
@@ -100,32 +107,38 @@ export class PostsRepository {
       query
         .innerJoin(
           postTagsTable.name,
-          postTagsTable.prefixedColumn('postId'),
-          postsTable.prefixedColumn('id')
+          postTagsTable.predicate('postId'),
+          postsTable.predicate('id')
         )
         .andWhere({
-          [postTagsTable.prefixedColumn('tagId')]: params.tagId
+          [postTagsTable.predicate('tagId')]: params.tagId
         });
     }
 
     const rows = await query;
-    return pagination.getResult(rows, postsTable.toAttributeCase<Post>);
+
+    return {
+      items: pagination.getRows(rows).map<Post>(postsTable.toAlias),
+      cursors: pagination.getCursors(rows)
+    };
   };
 
   getRecentPostsByOwnerIds = async (params: GetRecentPostsByOwnerIdsParams): Promise<Post[]> => {
-    return this.db.unionAll(params.ownerIds.map(
+    const rows = await this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(postsTable.name)
-        .select(postsTable.rawColumns())
-        .where(postsTable.rawColumn('ownerId'), ownerId)
-        .orderBy(postsTable.rawColumn('creationTimestamp'), 'desc')
+        .select(postsTable.select('*'))
+        .where(postsTable.predicate('ownerId'), ownerId)
+        .orderBy(postsTable.predicate('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
+
+    return rows.map<Post>(postsTable.toAlias);
   };
 
   attachTagsToPost = async (params: AttachTagsToPostParams, opts: TransactionOptions) => {
     return this.trx.query(opts,async (trx) => {
-      const insert = params.tagIds.map(tagId => postTagsTable.toColumnCase({
+      const insert = params.tagIds.map(tagId => postTagsTable.insert({
         id: uuid(),
         tagId,
         postId: params.postId,
@@ -145,23 +158,23 @@ export class PostsRepository {
         .from(postsTable.name)
         .innerJoin(
           postTagsTable.name,
-          postTagsTable.prefixedColumn('postId'),
-          postsTable.prefixedColumn('id')
+          postTagsTable.predicate('postId'),
+          postsTable.predicate('id')
         )
-        .select(
-          postsTable.prefixedColumns(),
-          { ...postTagsTable.prefixedColumns('tagId') }
-        )
-        .where(postTagsTable.prefixedColumn('tagId'), tagId)
-        .orderBy(postsTable.prefixedColumn('creationTimestamp'), 'desc')
+        .select({
+          ...postsTable.select('*'),
+          ...postTagsTable.select('*'),
+        })
+        .where(postTagsTable.predicate('tagId'), tagId)
+        .orderBy(postsTable.predicate('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
 
     const postsOfTags: Record<string, Post[]> = {};
 
     for (const row of rows) {
-      const post = postsTable.toAttributeCase<Post>(row);
-      const tagId = postTagsTable.toAttributeCase<{ tagId: string }>(row).tagId;
+      const post = postsTable.toAlias<Post>(row);
+      const tagId = postTagsTable.toAlias<{ tagId: string }>(row).tagId;
       if (!postsOfTags[tagId]) {
         postsOfTags[tagId] = [];
       }
@@ -174,8 +187,11 @@ export class PostsRepository {
 
 export function makePostsCursorPagination(params: Partial<CursorPaginationParams<keyof Post>> = {}) {
   return makeCursorPagination({
-    field: postsTable.prefixedColumn(params.field || 'creationTimestamp'),
-    sortDirection: params.sortDirection || 'desc',
+    field: {
+      alias: postsTable.prefixedAlias('creationTimestamp'),
+      column: postsTable.column('creationTimestamp')
+    },
+    direction: params.direction || 'desc',
     limit: params.limit || 4,
     cursor: params.cursor,
   });

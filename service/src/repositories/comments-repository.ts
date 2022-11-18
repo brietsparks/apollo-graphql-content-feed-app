@@ -4,7 +4,8 @@ import { v4 as uuid } from 'uuid';
 import { commentsTable, postCommentsTable } from '../database';
 
 import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, CursorPaginationResult, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { CursorPaginationResult } from './shared';
 
 export type Comment = {
   id: string;
@@ -39,7 +40,7 @@ export class CommentsRepository {
 
       await trx
         .into(commentsTable.name)
-        .insert(commentsTable.toColumnCase({
+        .insert(commentsTable.insert({
           id,
           ownerId: params.ownerId,
           body: params.body,
@@ -48,7 +49,7 @@ export class CommentsRepository {
       const postCommentId = uuid();
       await trx
         .into(postCommentsTable.name)
-        .insert(postCommentsTable.toColumnCase({
+        .insert(postCommentsTable.insert({
           id: postCommentId,
           postId: params.postId,
           commentId: id
@@ -59,17 +60,26 @@ export class CommentsRepository {
   };
 
   getComment = async (id: string) => {
-    return this.db
+    const row = await this.db
       .from(commentsTable.name)
-      .where({ [commentsTable.rawColumn('id')]: id })
-      .select(commentsTable.rawColumns())
+      .where({ [commentsTable.predicate('id')]: id })
+      .select(commentsTable.select('*'))
       .first();
+
+    if (!row) {
+      return undefined;
+    }
+
+    return commentsTable.toAlias<Comment>(row);
   };
 
-  getCommentsOfPost = async (params: GetCommentsOfPostParams) => {
+  getCommentsOfPost = async (params: GetCommentsOfPostParams): Promise<CursorPaginationResult<Comment>> => {
     const pagination = makeCursorPagination({
-      field: commentsTable.prefixedColumn(params.pagination?.field || 'creationTimestamp'),
-      sortDirection: params.pagination?.sortDirection || 'desc',
+      field: {
+        alias: commentsTable.prefixedAlias('creationTimestamp'),
+        column: commentsTable.column('creationTimestamp')
+      },
+      direction: params.pagination?.direction || 'desc',
       limit: params.pagination?.limit || 12,
       cursor: params.pagination?.cursor,
     })
@@ -78,17 +88,20 @@ export class CommentsRepository {
       .from(commentsTable.name)
       .innerJoin(
         postCommentsTable.name,
-        postCommentsTable.prefixedColumn('commentId'),
-        commentsTable.prefixedColumn('id')
+        postCommentsTable.predicate('commentId'),
+        commentsTable.predicate('id')
       )
       .where({
-        [postCommentsTable.prefixedColumn('postId')]: params.postId
+        [postCommentsTable.predicate('postId')]: params.postId
       })
       .andWhere(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit)
-      .select(commentsTable.prefixedColumns())
+      .select(commentsTable.select('*'))
 
-    return pagination.getResult(rows, commentsTable.toAttributeCase<Comment>);
+    return {
+      items: pagination.getRows(rows).map<Comment>(commentsTable.toAlias),
+      cursors: pagination.getCursors(rows)
+    };
   };
 }

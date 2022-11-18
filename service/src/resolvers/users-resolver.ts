@@ -17,7 +17,7 @@ export function makeUsersResolver(repositories: Repositories) {
   };
 
   const getUsers: IFieldResolver<unknown, RequestContext, schema.QueryGetUsersArgs> = (_, { pagination }) => {
-    return repositories.usersRepository.getUsersByCursor({
+    return repositories.usersRepository.getUsers({
       pagination: adaptCursorPagination<User>(pagination)
     });
   };
