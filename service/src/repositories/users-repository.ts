@@ -62,20 +62,12 @@ export class UsersRepository {
   getUsers = async (params: GetUsersByCursorParams): Promise<CursorPaginationResult<User>> => {
     const pagination = makeUsersCursorPagination(params.pagination);
 
-    const q = this.db
+    const rows = await this.db
       .from(usersTable.name)
       .select(usersTable.select('*'))
       .where(...pagination.where)
       .orderBy(...pagination.orderBy)
       .limit(pagination.limit);
-
-    console.log(q.toSQL().sql)
-
-    const rows = await q;
-
-    // console.log(usersTable.column('creationTimestamp'))
-    // console.log(usersTable.prefixedAlias('creationTimestamp'))
-
 
     return {
       items: pagination.getRows(rows).map<User>(usersTable.toAlias),
