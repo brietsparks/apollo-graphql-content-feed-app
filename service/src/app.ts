@@ -1,6 +1,6 @@
-import { makeKnexClient } from './database';
-import { makeRepositories } from './repositories';
-import { makeServer } from './server';
+import { makeKnexClient } from '~/database';
+import { makeRepositories } from '~/repositories';
+import { makeServer } from '~/server';
 
 export type App = Awaited<ReturnType<typeof createApp>>;
 

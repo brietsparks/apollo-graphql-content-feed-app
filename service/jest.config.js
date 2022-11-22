@@ -7,7 +7,7 @@ module.exports = {
     },
   },
   moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.(m)?js$': '$1',
+    "~/(.*)": "<rootDir>/src/$1"
   },
   testMatch: ['**/__tests__/**/*.test.ts'],
   // testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(m)?ts$',

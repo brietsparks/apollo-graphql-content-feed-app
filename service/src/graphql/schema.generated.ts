@@ -23,7 +23,7 @@ export type Comment = {
   creationTimestamp: Scalars['String'];
   id: Scalars['String'];
   owner: User;
-  ownerId: User;
+  ownerId: Scalars['String'];
   parentEntity?: Maybe<Comment>;
   parentEntityId?: Maybe<Scalars['String']>;
 };
@@ -452,7 +452,7 @@ export type CommentResolvers<ContextType = any, ParentType extends ResolversPare
   creationTimestamp?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   owner?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
-  ownerId?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  ownerId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   parentEntity?: Resolver<Maybe<ResolversTypes['Comment']>, ParentType, ContextType>;
   parentEntityId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
