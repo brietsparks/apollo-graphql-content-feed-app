@@ -9,19 +9,10 @@ export interface ImagesLoader {
 
 export function makeImagesLoader(imagesRepository: ImagesRepository): ImagesLoader {
   const getImagesByOwnerIds = async (ownerIds: ReadonlyArray<string>) => {
-    const images = await imagesRepository.getRecentImagesByOwnerIds({
+    const imagesByOwnerIds = await imagesRepository.getRecentImagesByOwnerIds({
       ownerIds: ownerIds as string[]
     });
-
-    const lookup: Record<string, Image[]> = {};
-    for (const ownerId of ownerIds) {
-      lookup[ownerId] = [];
-    }
-    for (const image of images) {
-      lookup[image.ownerId].push(image);
-    }
-
-    return ownerIds.map(ownerId => lookup[ownerId]);
+    return ownerIds.map(ownerId => imagesByOwnerIds[ownerId] || []);
   };
 
   const getRecentImagesOfTags = async (tagIds: string[]) => {

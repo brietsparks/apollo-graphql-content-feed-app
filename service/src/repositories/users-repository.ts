@@ -79,11 +79,21 @@ export class UsersRepository {
     };
   }
 
-  getUsersByIds = async (params: GetProjectsByIdsParams): Promise<User[]> => {
-    return this.db
+  getUsersByIds = async (params: GetProjectsByIdsParams): Promise<Record<string, User>> => {
+    const usersByIds: Record<string, User> = {};
+
+    const rows = await this.db
       .from(usersTable.name)
       .select(usersTable.select('*'))
       .whereIn(usersTable.predicate('id'), params.ids);
+
+    const users = rows.map<User>(usersTable.toAlias);
+
+    for (const user of users) {
+      usersByIds[user.id] = user;
+    }
+
+    return usersByIds;
   };
 }
 

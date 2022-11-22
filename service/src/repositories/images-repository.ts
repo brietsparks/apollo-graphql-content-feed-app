@@ -110,8 +110,10 @@ export class ImagesRepository {
     }
   };
 
-  getRecentImagesByOwnerIds = async (params: GetRecentImagesByOwnerIdsParams): Promise<Image[]> => {
-    return this.db.unionAll(params.ownerIds.map(
+  getRecentImagesByOwnerIds = async (params: GetRecentImagesByOwnerIdsParams): Promise<Record<string, Image[]>> => {
+    const imagesByOwnerIds: Record<string, Image[]> = {};
+
+    const rows = await this.db.unionAll(params.ownerIds.map(
       (ownerId) => this.db
         .from(imagesTable.name)
         .select(imagesTable.select('*'))
@@ -119,6 +121,16 @@ export class ImagesRepository {
         .orderBy(imagesTable.predicate('creationTimestamp'), 'desc')
         .limit(3)
     ), true);
+
+    for (const row of rows) {
+      const image = imagesTable.toAlias<Image>(row);
+      if (!imagesByOwnerIds[image.ownerId]) {
+        imagesByOwnerIds[image.ownerId] = [];
+      }
+      imagesByOwnerIds[image.ownerId].push(image);
+    }
+
+    return imagesByOwnerIds;
   };
 
   attachTagsToImage = async (params: AttachTagsToImageParams, opts: TransactionOptions) => {
