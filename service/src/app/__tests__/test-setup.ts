@@ -1,5 +1,5 @@
-import { createPgTestcontainer } from '~/database';
-import { createApp, App } from '~/app';
+import { createPgTestcontainer } from '~/app/database';
+import { createApp, App } from '~/app/app';
 
 export interface TestApp extends App {
   stop: () => void;
