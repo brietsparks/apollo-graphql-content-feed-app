@@ -1,9 +1,10 @@
 import { StartedTestContainer } from 'testcontainers';
-import { Knex } from 'knex';
+import { knex, Knex } from 'knex';
 import { v4 as uuid } from 'uuid';
 
-import { createPgTestcontainer, makeKnexClient } from '../../database';
-import { TransactionsHelper } from '../../repositories/transactions';
+import { createPgTestcontainer } from '~/lib/testcontainers';
+
+import { TransactionsHelper } from '../transactions';
 
 describe('TransactionsHelper', () => {
   let testcontainer: StartedTestContainer;
@@ -12,7 +13,8 @@ describe('TransactionsHelper', () => {
   beforeAll(async () => {
     const result = await createPgTestcontainer();
     testcontainer = result.testcontainer;
-    db = await makeKnexClient({
+    db = knex({
+      client: 'pg',
       connection: result.params
     });
 

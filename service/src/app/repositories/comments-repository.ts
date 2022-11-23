@@ -1,10 +1,10 @@
 import { Knex } from 'knex';
 import { v4 as uuid } from 'uuid';
 
+import { TransactionsHelper, TransactionOptions, CursorPaginationParams, makeCursorPagination } from '~/lib/knex';
+
 import { commentsTable, postCommentsTable } from '../database';
 
-import { TransactionsHelper, TransactionOptions } from './transactions';
-import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
 import { CursorPaginationResult } from './shared';
 
 export type Comment = {

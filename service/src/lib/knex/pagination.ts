@@ -1,5 +1,6 @@
 import { Knex } from 'knex';
-import { XOR } from '../../util/types';
+
+import { XOR } from '~/lib/types';
 
 export interface CursorPaginationParams<FieldType extends string = string> {
   field: FieldParam<FieldType>;

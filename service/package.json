@@ -27,10 +27,10 @@
     "typescript": "~4.7"
   },
   "scripts": {
-    "dev": "nodemon -r tsconfig-paths/register src/main.ts",
-    "db:up": "ts-node -r tsconfig-paths/register src/main.ts db:up",
-    "db:down": "ts-node -r tsconfig-paths/register src/main.ts db:down",
-    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/src/main.js",
+    "dev": "nodemon -r tsconfig-paths/register src/app/main.ts",
+    "db:up": "ts-node -r tsconfig-paths/register src/app/main.ts db:up",
+    "db:down": "ts-node -r tsconfig-paths/register src/app/main.ts db:down",
+    "start": "node -r ts-node/register/transpile-only -r tsconfig-paths/register build/src/app/main.js",
     "clean": "rimraf coverage build tmp",
     "prebuild": "npm run lint",
     "build": "tsc -p tsconfig.json",

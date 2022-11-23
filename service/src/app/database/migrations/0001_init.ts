@@ -1,4 +1,4 @@
-import { createSqlFileMigration } from '../util';
+import { createSqlFileMigration } from '~/lib/knex';
 
 const { up, down } = createSqlFileMigration({
   upFile: `${__dirname}/../sql/0001_init.up.sql`,

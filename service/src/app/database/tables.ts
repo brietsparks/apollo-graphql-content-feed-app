@@ -1,4 +1,4 @@
-import { TableAliasHelper } from './table-alias-helper';
+import { TableAliasHelper } from '~/lib/knex';
 
 export const usersTable = new TableAliasHelper('users', {
   id: 'id',

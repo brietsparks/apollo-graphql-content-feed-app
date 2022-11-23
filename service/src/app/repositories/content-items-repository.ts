@@ -1,9 +1,10 @@
 import { Knex } from 'knex';
 
-import { postsTable, imagesTable } from '../database';
-import { XOR } from '../util/types';
+import { CursorPaginationParams, makeCursorPagination } from '~/lib/knex/pagination';
+import { XOR } from '~/lib/types';
 
-import { CursorPaginationParams, makeCursorPagination } from './lib/pagination';
+import { postsTable, imagesTable } from '../database';
+
 import { CursorPaginationResult } from './shared';
 import { Post } from './posts-repository';
 import { Image } from './images-repository';
