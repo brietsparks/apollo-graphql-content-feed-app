@@ -1,8 +1,8 @@
 import { createPgTestcontainer } from '~/lib/testcontainers';
 
-import { createApp, App } from '../app';
+import { createApp, Nexus } from '../nexus';
 
-export interface TestApp extends App {
+export interface TestApp extends Nexus {
   stop: () => void;
 }
 
